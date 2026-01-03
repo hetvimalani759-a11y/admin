@@ -1,0 +1,12 @@
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="number" name="total_amount" placeholder="Amount" required>
+
+    <select name="status">
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+    </select>
+
+    <button type="submit">Add Order</button>
+</form>

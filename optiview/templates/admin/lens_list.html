@@ -1,0 +1,29 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+
+<h4>Lenses</h4>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Power Range</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for l in lenses %}
+        <tr>
+            <td>{{ l.name }}</td>
+            <td>{{ l.lens_type }}</td>
+            <td>{{ l.power_range }}</td>
+            <td>₹{{ l.price }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No lenses available</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

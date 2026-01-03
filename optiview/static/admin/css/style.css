@@ -1,0 +1,171 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+}
+.light-mode {
+    background: #f1f5f9;
+    color: black;
+}
+
+.light-mode .card {
+    background: white;
+}
+
+.dark-mode {
+    background: #111827;
+    color: white;
+}
+
+.dark-mode .card {
+    background: #1f2937;
+    color: white;
+}
+/* LOGIN PAGE */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+}
+
+.login-box {
+    width: 360px;
+    padding: 30px;
+    border-radius: 12px;
+    background: var(--card);
+    box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+body.dark-mode {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+
+/* Layout */
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 220px;
+    background: #1e1e2f;
+    color: white;
+    padding: 20px;
+}
+
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.sidebar ul li:hover,
+.sidebar ul li.active {
+    background: #343454;
+}
+
+/* Main Content */
+.main {
+    flex: 1;
+    padding: 20px;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.profile {
+    background: #1e1e2f;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+/* Cards */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.card h4 {
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.card p {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Table */
+.table-section {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.table-section h3 {
+    margin-bottom: 15px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.success {
+    color: green;
+    font-weight: bold;
+}
+
+.pending {
+    color: orange;
+    font-weight: bold;
+}
+
+.failed {
+    color: red;
+    font-weight: bold;
+}

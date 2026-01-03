@@ -1,0 +1,20 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+
+<h3>Add Notification</h3>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <input type="text" name="title" class="form-control mb-2"
+           placeholder="Notification Title" required>
+
+    <textarea name="message" class="form-control mb-2"
+              placeholder="Notification Message" required></textarea>
+
+    <button type="submit" class="btn btn-success">
+        Send Notification
+    </button>
+</form>
+
+{% endblock %}
