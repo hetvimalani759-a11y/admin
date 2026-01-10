@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
         ('adminpanel', '0002_notification'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
+    
 
     operations = [
         migrations.AddField(

@@ -8,6 +8,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('adminpanel', '0006_remove_order_customer_name_remove_order_price_and_more'),
     ]
+    
 
     operations = [
         migrations.CreateModel(

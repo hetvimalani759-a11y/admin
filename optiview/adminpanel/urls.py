@@ -25,5 +25,6 @@ urlpatterns = [
     path('add-order/',views.add_order, name='add_order'),
     path('company/update/',views.update_company_info,name='update_company_info'),
     path("notifications/read/", views.mark_notifications_read, name="mark_notifications_read"),
+    
     # path('orders/update/<int:order_id>/',views.update_order_status,name='update_order_status')
 ]

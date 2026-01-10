@@ -354,6 +354,7 @@ def update_order_status(request, id):
     return redirect("order_list")
 
 
+
 from .models import Notification
 from django.contrib.auth.models import User
 

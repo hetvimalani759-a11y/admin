@@ -25,7 +25,7 @@ urlpatterns = [
     
     path('django-admin/', admin.site.urls),
     path('admin-panel/', include('adminpanel.urls')),
-   
+
    
 ]
 

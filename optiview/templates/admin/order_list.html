@@ -19,6 +19,7 @@
         <td>₹{{ order.total_amount }}</td>
         <td>{{ order.status }}</td>
         <td>
+            
             <form method="post" action="{% url 'adminpanel:update_order_status' order.id %}">
                 {% csrf_token %}
                 <select name="status">
