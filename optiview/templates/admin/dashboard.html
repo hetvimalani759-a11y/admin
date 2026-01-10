@@ -1,75 +1,82 @@
 {% extends 'admin/base.html' %}
+
+{% block extra_css %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 <h2 class="mb-4">Dashboard</h2>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="row g-4">
 
     <div class="col-md-3">
-    <div class="card stat">
-        <h6>Total Products</h6>
-        <h3>{{ total_products }}</h3>
+        <div class="card stat p-3 text-center">
+            <h6>Total Products</h6>
+            <h3>{{ total_products }}</h3>
+        </div>
     </div>
+
+    <div class="col-md-3">
+        <div class="card stat p-3 text-center">
+            <h6>Orders</h6>
+            <h3>{{ total_orders }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card stat p-3 text-center">
+            <h6>Revenue</h6>
+            <h3>₹{{ total_revenue }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card stat p-3 text-center">
+            <h6>Lenses</h6>
+            <h3>{{ total_lenses }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card stat p-3">
+            <h6>Latest Products</h6>
+            {% for product in latest_products %}
+                <div>{{ product.name }} – ₹{{ product.price }}</div>
+            {% empty %}
+                <p>No products found</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card stat p-3">
+            <h6>Low Stock Alerts</h6>
+            {% if low_stock_products %}
+                {% for product in low_stock_products %}
+                    <div class="text-danger">
+                        {{ product.name }} — Stock: {{ product.stock }}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No low stock products</p>
+            {% endif %}
+        </div>
+    </div>
+
 </div>
 
-<div class="col-md-3">
-    <div class="card stat">
-        <h6>Orders</h6>
-        <h3>{{ total_orders }}</h3>
-    </div>
-</div>
+<hr class="my-4">
 
-<div class="col-md-3">
-    <div class="card stat">
-        <h6>Revenue</h6>
-        <h3>₹{{ total_revenue }}</h3>
-    </div>
-</div>
-
-<div class="col-md-3">
-    <div class="card stat">
-        <h6>Lenses</h6>
-        <h3>{{ total_lenses }}</h3>
-    </div>
-</div>
-<div class="col-md-3">
-    <div class="card stat">
-        <h6>Latest Products</h6>
-        <h4>{% for product in latest_products %}
-        {{ product.name }} - ₹{{ product.price }}
-        {% empty %}
-        No products found
-        {% endfor %}</h4>
-    </div>
-</div>
-
-<div class="col-md-3">
-    <div class="card stat">
-        <h6>Low Stock Alerts</h6>
-           <h4>
-
-{% if low_stock_products %}
-    {% for product in low_stock_products %}
-
-        {{ product.name }} —
-        Stock: {{ product.stock }}
-    {% endfor %}
-{% else %}
-  No low stock products
-{% endif %}
-</h4>
-    </div>
-</div>
 <h4>Low Stock Products</h4>
 <canvas id="lowStockChart" height="120"></canvas>
-<script>
-    const ctx = document.getElementById('lowStockChart').getContext('2d');
 
-    const lowStockChart = new Chart(ctx, {
+<script>
+const lowStockCtx = document.getElementById('lowStockChart');
+
+if (lowStockCtx) {
+    new Chart(lowStockCtx, {
         type: 'bar',
         data: {
             labels: {{ low_stock_names|safe }},
@@ -82,47 +89,45 @@
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { display: false }
-            },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks:
-                 {
-                        stepSize: 1
-                    }
-                }
+                y: { beginAtZero: true }
             }
         }
     });
-    
-    
+}
 </script>
 
-</div>
-<h5 class="mt-4">Monthly Revenue</h5>
+<hr class="my-4">
+
+<h4>Monthly Revenue</h4>
 
 <table class="table table-bordered">
-    <tr>
-        <th>Month</th>
-        <th>Total Revenue (₹)</th>
-    </tr>
-
-    {% for r in monthly_revenue %}
-    <tr>
-        <td>{{ r.month|date:"F Y" }}</td>
-        <td>₹ {{ r.total }}</td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="2">No revenue data</td></tr>
-    {% endfor %}
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th>Total Revenue (₹)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in monthly_revenue %}
+        <tr>
+            <td>{{ r.month|date:"F Y" }}</td>
+            <td>₹{{ r.total }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">No revenue data</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
-<h4 class="mt-4">Monthly Revenue</h4>
-<canvas id="revenueChart" height="120"></canvas>
-<script>
-    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
 
+<canvas id="revenueChart" height="120"></canvas>
+
+<script>
+const revenueCtx = document.getElementById('revenueChart');
+
+if (revenueCtx) {
     new Chart(revenueCtx, {
         type: 'line',
         data: {
@@ -133,65 +138,47 @@
                 borderColor: 'rgba(13, 110, 253, 1)',
                 backgroundColor: 'rgba(13, 110, 253, 0.2)',
                 fill: true,
-                tension: 0.4,
-                pointRadius: 5
+                tension: 0.4
             }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: {
-                    display: true
-                }
-            },
             scales: {
-                y: {
-                    beginAtZero: true
-                }
+                y: { beginAtZero: true }
             }
         }
     });
+}
 </script>
 
-<div class="row mb-4">
-    <div class="col-md-12">
-        <div class="card shadow-sm">
-            <div class="card-body d-flex align-items-center">
+<hr class="my-4">
 
-                {% if company.logo %}
-                    <img src="{{ company.logo.url }}" 
-                         class="me-4 rounded"
-                         style="width:90px;height:90px;object-fit:cover;">
-                {% endif %}
+<div class="card shadow-sm mb-4">
+    <div class="card-body d-flex align-items-center">
 
-                <div>
-                    <h3 class="mb-1">{{ company.name }}</h3>
-                    <p class="mb-1 text-muted">
-                        📍{{ company.address }}
-                    </p>
-                    <p class="mb-0">
-                        📞 {{ company.phone }} |
-                        📧 {{ company.email }}
-                    </p>
+        {% if company.logo %}
+            <img src="{{ company.logo.url }}"
+                 class="me-4 rounded"
+                 style="width:90px;height:90px;object-fit:cover;">
+        {% endif %}
 
-                    {% if company.gst_number %}
-                        <small class="text-secondary">
-                            GST: {{ company.gst_number }}
-                        </small>
-                    {% endif %}
-                </div>
+        <div>
+            <h3 class="mb-1">{{ company.name }}</h3>
+            <p class="mb-1 text-muted">📍 {{ company.address }}</p>
+            <p class="mb-0">📞 {{ company.phone }} | 📧 {{ company.email }}</p>
 
-            </div>
+            {% if company.gst_number %}
+                <small class="text-secondary">GST: {{ company.gst_number }}</small>
+            {% endif %}
         </div>
+
     </div>
 </div>
-<div class="text-end mb-3">
-    <a href="{% url 'adminpanel:update_company_info' %}" class="btn btn-sm btn-primary">
-    ✏️ Edit Company Info
-</a>
 
+<div class="text-end">
+    <a href="{% url 'adminpanel:update_company_info' %}" class="btn btn-primary btn-sm">
+        ✏️ Edit Company Info
+    </a>
 </div>
 
-
-</div>
 {% endblock %}
