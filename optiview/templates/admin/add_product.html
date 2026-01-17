@@ -5,6 +5,17 @@
 
 <form method="POST" enctype="multipart/form-data" class="card p-4">
     {% csrf_token %}
+    <select name="category" id="category" required>
+    <option value="">Select Category</option>
+    {% for c in categories %}
+        <option value="{{ c.id }}">{{ c.name }}</option>
+    {% endfor %}
+</select>
+
+<select name="subcategory" id="subcategory" required>
+    <option value="">Select SubCategory</option>
+</select>
+
 
     <div class="mb-3">
         <label>Product Name</label>
@@ -40,5 +51,21 @@
     <button class="btn btn-success">Save Product</button>
     <a href="{% url 'adminpanel:product_list' %}" class="btn btn-secondary">Back</a>
 </form>
+<script>
+document.getElementById("category").addEventListener("change", function () {
+    let categoryId = this.value;
+
+    fetch(`/get-subcategories/${categoryId}/`)
+        .then(res => res.json())
+        .then(data => {
+            let sub = document.getElementById("subcategory");
+            sub.innerHTML = "<option value=''>Select SubCategory</option>";
+            data.forEach(item => {
+                sub.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            });
+        });
+});
+</script>
+
 
 {% endblock %}

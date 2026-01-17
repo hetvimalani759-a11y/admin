@@ -32,3 +32,10 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch("/admin-panel/notifications/read/");
     });
 });
+
+<script>
+function toggle(id) {
+    let el = document.getElementById("cat-" + id);
+    el.style.display = el.style.display === "block" ? "none" : "block";
+}
+</script>
