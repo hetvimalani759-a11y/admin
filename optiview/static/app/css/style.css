@@ -1,0 +1,372 @@
+/* GLOBAL */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+}
+
+/* HEADER */
+.header {
+    background: #000;
+    color: #fff;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header a {
+    color: #fff;
+    margin-left: 20px;
+    text-decoration: none;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* HOME HERO IMAGE WITH OVERLAY */
+.home-hero {
+    height: 80vh;
+    background: linear-gradient(
+        rgba(0,0,0,0.6),
+        rgba(0,0,0,0.6)
+    ),
+    url("/static/images/mission.jpg");
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-content {
+    color: white;
+    padding: 20px;
+}
+
+.hero-content h1 {
+    font-size: 42px;
+    margin-bottom: 15px;
+}
+
+.hero-content p {
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+/* BUTTONS */
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn {
+    padding: 12px 28px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn.primary {
+    background: white;
+    color: black;
+}
+
+.btn.secondary {
+    border: 2px solid white;
+    color: white;
+}
+
+/* CONTACT PAGE */
+.contact-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 40px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.contact-part {
+    width: 30%;
+    text-align: center;
+}
+
+/* ABOUT PAGE */
+/*.about-section {
+    padding: 60px 20px;
+    text-align: center;
+}*/
+
+.subtitle {
+    color: #777;
+    margin-bottom: 40px;
+}
+
+/*.about-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1000px;
+    margin: auto;
+    flex-wrap: wrap;
+}
+
+.about-card {
+    background: #fff;
+    padding: 20px;
+    width: 30%;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+.about-card:hover {
+    transform: translateY(-8px);
+}
+
+.about-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.about-card h3 {
+    margin-bottom: 15px;
+}*/
+
+/* FOOTER */
+/* .footer {
+    background: #000;
+    color: white;
+    text-align: center;
+    padding: 10px;
+} */
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .about-card,
+    .contact-part {
+        width: 100%;
+    }
+
+    .contact-box {
+        flex-direction: column;
+    }
+
+    .hero-content h1 {
+        font-size: 30px;
+    }
+}
+/* SHOP PAGE */
+.shop-section {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.shop-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 40px;
+}
+
+.product-card {
+    background: #fff;
+    width: 260px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-8px);
+}
+
+.product-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.product-card h3 {
+    margin-bottom: 10px;
+}
+
+.product-card p {
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+
+
+.filter-bar {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.filter-bar input,
+.filter-bar select {
+    padding: 10px;
+    width: 160px;
+}
+
+.product-detail {
+    padding: 60px;
+}
+
+.detail-container {
+    display: flex;
+    gap: 40px;
+    max-width: 1000px;
+    margin: auto;
+}
+
+.detail-container img {
+    width: 400px;
+    border-radius: 10px;
+}
+
+.detail-info .price {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+/* ABOUT PAGE MAIN LAYOUT */
+.about-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
+    gap: 50px;
+}
+
+.about-main.reverse {
+    flex-direction: row-reverse;
+}
+
+.about-left img {
+    width: 480px;
+    height: auto;
+    border-radius: 10px;
+}
+
+.about-right {
+    width: 50%;
+}
+
+.about-right h2 {
+    margin-bottom: 15px;
+}
+
+/* FEATURES COLUMN WISE */
+.feature-section {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 80px auto;
+    padding: 0 20px;
+}
+
+.feature {
+    width: 30%;
+    background: #fff;
+    padding: 30px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+
+/* =========================
+   FIGMA STYLE FOOTER
+========================= */
+
+.figma-footer {
+    background: #000;
+    padding: 60px 40px 30px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* MAIN GRID */
+.footer-grid {
+    display: flex;               /* 🔥 THIS FIXES COLUMN ISSUE */
+    justify-content: space-between;
+    align-items: flex-start;
+    max-width: 1200px;
+    margin: auto;
+    gap: 40px;
+}
+
+/* EACH COLUMN */
+.footer-col {
+    flex: 1;
+}
+
+.footer-col h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.footer-col p,
+.footer-col a {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.8;
+    text-decoration: none;
+}
+
+/* LINKS STYLE */
+.footer-col a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+/* BRAND BOTTOM AREA */
+.footer-brand {
+    max-width: 1200px;
+    margin: 50px auto 0;
+}
+
+.footer-brand h2 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.footer-brand p {
+    font-size: 14px;
+    color: #777;
+}
+
+/* =========================
+   RESPONSIVE (MOBILE)
+========================= */
+@media (max-width: 900px) {
+    .footer-grid {
+        flex-direction: column;
+        gap: 30px;
+    }
+}
