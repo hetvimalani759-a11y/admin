@@ -66,6 +66,45 @@
     </div>
 </nav>
 
+<style>
+.tree-container {
+    max-width: 400px;
+}
+
+.category {
+    margin-bottom: 10px;
+}
+
+.category-title {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 6px;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.subcategory-list {
+    display: none;
+    margin-left: 20px;
+    margin-top: 5px;
+}
+
+.subcategory-list li {
+    list-style: none;
+    padding: 4px 0;
+}
+
+.empty {
+    color: gray;
+    font-size: 14px;
+}
+</style>
+<script>
+function toggle(id) {
+    let el = document.getElementById("cat-" + id);
+    el.style.display = el.style.display === "block" ? "none" : "block";
+}
+</script>
 
 <!-- LAYOUT -->
 <div class="d-flex">

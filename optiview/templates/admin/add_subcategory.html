@@ -1,0 +1,49 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<h2>Add SubCategory</h2>
+
+<div style="display: flex; gap: 40px;">
+
+    <!-- LEFT SIDE FORM -->
+    <form method="post">
+        {% csrf_token %}
+
+        <select name="category" required>
+            <option value="">Select Category</option>
+            {% for c in categories %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="text" name="name" placeholder="SubCategory name" required>
+
+        <button type="submit">Save</button>
+    </form>
+
+    RIGHT SIDE TABLE
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Category</th>
+                <th>SubCategory</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sc in subcategories %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ sc.category.name }}</td>
+                <td>{{ sc.name }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No SubCategories</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
