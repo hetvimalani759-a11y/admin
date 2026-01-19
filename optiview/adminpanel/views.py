@@ -7,6 +7,7 @@ from django.db.models import Sum, Q, Prefetch
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.models import User
 
+
 from .models import (
     Product, Category, SubCategory,
     Order, Lens, Notification, CompanyInfo
@@ -34,12 +35,19 @@ def logout_view(request):
     logout(request)
     messages.success(request, "Logged out successfully")
     return redirect("adminpanel:login")
+
+
 @login_required(login_url="adminpanel:login")
+
+  # or whatever value you define
+
 def dashboard(request):
+
     total_products = Product.objects.count()
     total_orders = Order.objects.count()
     total_lenses = Lens.objects.count()
     total_revenue = Order.objects.aggregate(total=Sum("total_amount"))["total"] or 0
+    latest_products = Product.objects.order_by("-created_at")[:1]
 
     monthly_revenue = (
         Order.objects
@@ -49,22 +57,36 @@ def dashboard(request):
         .order_by("month")
     )
 
-    notifications = Notification.objects.filter(
-        user=request.user, is_read=False
-    )
+    notifications = Notification.objects.filter(user=request.user, is_read=False)
 
     low_stock_products = Product.objects.filter(stock__lte=LOW_STOCK_THRESHOLD)
 
-    return render(request, "admin/dashboard.html", {
+    # Prepare data for Chart.js
+    low_stock_names = [p.name for p in low_stock_products]
+    low_stock_values = [p.stock for p in low_stock_products]
+
+    # Revenue chart data
+    revenue_months = [r["month"].strftime("%b %Y") for r in monthly_revenue]
+    revenue_values = [r["total"] for r in monthly_revenue]
+
+    context = {
         "total_products": total_products,
         "total_orders": total_orders,
         "total_lenses": total_lenses,
+        "latest_products": latest_products,
         "total_revenue": total_revenue,
         "monthly_revenue": monthly_revenue,
         "notifications": notifications,
         "notification_count": notifications.count(),
         "low_stock_products": low_stock_products,
-    })
+        "low_stock_names": low_stock_names,
+        "low_stock_values": low_stock_values,
+        "revenue_months": revenue_months,
+        "revenue_values": revenue_values,
+    }
+
+    return render(request, "admin/dashboard.html", context)
+
 @login_required
 def notifications(request):
     notifications = Notification.objects.all().order_by("-id")
@@ -94,15 +116,25 @@ def add_notification(request):
                 message=message
             )
         return redirect("adminpanel:notifications")
-
+    
     return render(request, "admin/add_notification.html")
-@login_required
+
+@login_required(login_url="adminpanel:login")
 def add_category(request):
+    categories = Category.objects.all().order_by("-id")
+
     if request.method == "POST":
         name = request.POST.get("name").strip()
-        Category.objects.get_or_create(name=name)
-        return redirect("adminpanel:product_list")
-    return render(request, "admin/add_category.html")
+        if name:
+            Category.objects.get_or_create(name=name)
+            messages.success(request, "Category added successfully")
+        return redirect("adminpanel:add_category")
+
+    return render(request, "admin/add_category.html", {
+        "categories": categories
+    })
+
+
 
 
 @login_required
@@ -131,9 +163,25 @@ def get_subcategories(request, category_id):
     )
 @login_required(login_url="adminpanel:login")
 def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'admin/product_list.html', {'products': products})
 
+    search = request.GET.get("search", "")
+
+    products = Product.objects.all()
+
+    if search:
+        products = products.filter(
+            Q(name__icontains=search) |
+            Q(brand__icontains=search) |
+            Q(price__icontains=search)
+        )
+
+    context = {
+        "products": products,
+        "search": search
+    }
+
+    return render(request, "admin/product_list.html", context)
+    
 @login_required(login_url="adminpanel:login")
 def add_product(request):
     categories = Category.objects.all()
@@ -162,6 +210,7 @@ def add_product(request):
     return render(request, "admin/add_product.html", {
         "categories": categories
     })
+
 @login_required
 def edit_product(request, id):
     product = get_object_or_404(Product, id=id)
@@ -187,6 +236,7 @@ def delete_product(request, id):
     Product.objects.filter(id=id).delete()
     messages.error(request, "Product deleted")
     return redirect("adminpanel:product_list")
+    
 @login_required
 def order_list(request):
     orders = Order.objects.all().order_by("-created_at")

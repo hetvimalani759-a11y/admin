@@ -7,9 +7,13 @@
     {% csrf_token %}
 
     <div class="mb-3">
-        <label>Product Name</label>
-        <input type="text" name="name" class="form-control" value="{{ product.name }}">
-    </div>
+    <label>Product Name</label>
+    <select name="name" class="form-control" required>
+      <option>eyeglasses</option>
+      <option>lens</option>
+      <option>frame</option>
+    </select>
+  </div>
 
     <div class="mb-3">
         <label>Brand</label>

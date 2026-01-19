@@ -3,47 +3,63 @@
 
 <h2>Add SubCategory</h2>
 
-<div style="display: flex; gap: 40px;">
+<div class="row">
+  <!-- LEFT: Add Subcategory -->
+  <div class="col-md-4">
+    <h5>Add Subcategory</h5>
 
-    <!-- LEFT SIDE FORM -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
     <form method="post">
-        {% csrf_token %}
+      {% csrf_token %}
 
-        <select name="category" required>
-            <option value="">Select Category</option>
-            {% for c in categories %}
-                <option value="{{ c.id }}">{{ c.name }}</option>
-            {% endfor %}
+      <div class="mb-3">
+        <label>Category</label>
+        <select name="category" class="form-control" required>
+          <option value="">Select Category</option>
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name }}</option>
+          {% endfor %}
         </select>
+      </div>
 
-        <input type="text" name="name" placeholder="SubCategory name" required>
+      <div class="mb-3">
+        <label>Subcategory Name</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
 
-        <button type="submit">Save</button>
+      <button class="btn btn-primary w-100">Add Subcategory</button>
     </form>
+  </div>
 
-    RIGHT SIDE TABLE
-    <table border="1" cellpadding="8">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Category</th>
-                <th>SubCategory</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for sc in subcategories %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ sc.category.name }}</td>
-                <td>{{ sc.name }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">No SubCategories</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+  <!-- RIGHT: Subcategory Table -->
+  <div class="col-md-8">
+    <h5>Subcategories</h5>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Subcategory</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub in subcategories %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ sub.name }}</td>
+          <td>{{ sub.category.name }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No subcategories yet</td></tr>
+        {% endfor %}
+      </tbody>
     </table>
-
+  </div>
 </div>
+
 {% endblock %}

@@ -5,12 +5,14 @@
 {% endblock %}
 
 {% block content %}
+
 <h2 class="mb-4">Dashboard</h2>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <div class="row g-4">
 
+    <!-- Stats Cards -->
     <div class="col-md-3">
         <div class="card stat p-3 text-center">
             <h6>Total Products</h6>
@@ -39,6 +41,7 @@
         </div>
     </div>
 
+    <!-- Latest Products -->
     <div class="col-md-6">
         <div class="card stat p-3">
             <h6>Latest Products</h6>
@@ -50,6 +53,7 @@
         </div>
     </div>
 
+    <!-- Low Stock Alerts -->
     <div class="col-md-6">
         <div class="card stat p-3">
             <h6>Low Stock Alerts</h6>
@@ -72,17 +76,24 @@
 <h4>Low Stock Products</h4>
 <canvas id="lowStockChart" height="120"></canvas>
 
+<!-- JSON safe data for JS -->
+{{ low_stock_names|json_script:"lowStockLabels" }}
+{{ low_stock_values|json_script:"lowStockValues" }}
+
 <script>
 const lowStockCtx = document.getElementById('lowStockChart');
 
 if (lowStockCtx) {
+    const lowStockLabels = JSON.parse(document.getElementById('lowStockLabels').textContent);
+    const lowStockValues = JSON.parse(document.getElementById('lowStockValues').textContent);
+
     new Chart(lowStockCtx, {
         type: 'bar',
         data: {
-            labels: {{ low_stock_names|safe }},
+            labels: lowStockLabels,
             datasets: [{
                 label: 'Stock Left',
-                data: {{ low_stock_values|safe }},
+                data: lowStockValues,
                 backgroundColor: 'rgba(220, 53, 69, 0.7)',
                 borderRadius: 6
             }]
@@ -124,17 +135,24 @@ if (lowStockCtx) {
 
 <canvas id="revenueChart" height="120"></canvas>
 
+<!-- JSON safe data for revenue chart -->
+{{ revenue_months|json_script:"revenueLabels" }}
+{{ revenue_values|json_script:"revenueData" }}
+
 <script>
 const revenueCtx = document.getElementById('revenueChart');
 
 if (revenueCtx) {
+    const revenueLabels = JSON.parse(document.getElementById('revenueLabels').textContent);
+    const revenueData = JSON.parse(document.getElementById('revenueData').textContent);
+
     new Chart(revenueCtx, {
         type: 'line',
         data: {
-            labels: {{ revenue_months|safe }},
+            labels: revenueLabels,
             datasets: [{
                 label: 'Revenue (₹)',
-                data: {{ revenue_values|safe }},
+                data: revenueData,
                 borderColor: 'rgba(13, 110, 253, 1)',
                 backgroundColor: 'rgba(13, 110, 253, 0.2)',
                 fill: true,
@@ -153,6 +171,7 @@ if (revenueCtx) {
 
 <hr class="my-4">
 
+<!-- Company Info Card -->
 <div class="card shadow-sm mb-4">
     <div class="card-body d-flex align-items-center">
 
@@ -180,6 +199,5 @@ if (revenueCtx) {
         ✏️ Edit Company Info
     </a>
 </div>
-
 
 {% endblock %}

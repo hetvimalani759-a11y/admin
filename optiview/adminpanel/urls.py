@@ -20,6 +20,7 @@ urlpatterns = [
     path("category/add/", views.add_category, name="add_category"),
     path("subcategory/add/", views.add_subcategory, name="add_subcategory"),
     path('products/', views.product_list, name='product_list'),
+    path("ajax/subcategories/<int:category_id>/", views.get_subcategories, name="get_subcategories"),
     path('products/add/', views.add_product, name='add_product'),
     path('products/edit/<int:id>/', views.edit_product, name='edit_product'),
     path('products/delete/<int:id>/', views.delete_product, name='delete_product'),

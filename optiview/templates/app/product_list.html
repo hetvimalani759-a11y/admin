@@ -24,8 +24,7 @@
     <div style="border:1px solid #ccc; padding:10px; margin:10px;">
         <h2>{{ product.name }} ({{ product.brand }})</h2>
         <img src="{{ product.image.url }}" width="150" alt="{{ product.name }}">
-        <p>Price: ${{ product.price }}</p>
-        <p>Stock: {{ product.stock }}</p>
+        <p>Price: ₹{{ product.price }}</p>
     </div>
     {% empty %}
     <p>No products available.</p>

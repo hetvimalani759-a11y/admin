@@ -3,69 +3,81 @@
 
 <h4>Add Product</h4>
 
-<form method="POST" enctype="multipart/form-data" class="card p-4">
-    {% csrf_token %}
-    <select name="category" id="category" required>
-    <option value="">Select Category</option>
-    {% for c in categories %}
-        <option value="{{ c.id }}">{{ c.name }}</option>
-    {% endfor %}
-</select>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
 
-<select name="subcategory" id="subcategory" required>
-    <option value="">Select SubCategory</option>
-</select>
+  <div class="mb-3">
+    <label>Category</label>
+    <select name="category" id="category" class="form-control" required>
+      <option value="">Select Category</option>
+      {% for category in categories %}
+        <option value="{{ category.id }}">{{ category.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
 
+  <div class="mb-3">
+    <label>Subcategory</label>
+    <select name="subcategory" id="subcategory" class="form-control" required>
+      <option value="">Select Subcategory</option>
+    </select>
+  </div>
 
-    <div class="mb-3">
-        <label>Product Name</label>
-        <select name="name" class="form-control" required>
-            <option>eyeglases</option>
-            <option>lens</option>
-            <option>frame</option>
-        </select>
-    
-    </div>
+  <div class="mb-3">
+    <label>Product Name</label>
+    <select name="name" class="form-control" required>
+      <option>eyeglasses</option>
+      <option>lens</option>
+      <option>frame</option>
+    </select>
+  </div>
 
-    <div class="mb-3">
-        <label>Brand</label>
-        <input type="text" name="brand" class="form-control" required>
-    </div>
+  <div class="mb-3">
+    <label>Brand</label>
+    <input type="text" name="brand" class="form-control" required>
+  </div>
 
-    <div class="mb-3">
-        <label>Price</label>
-        <input type="number" name="price" class="form-control" required>
-    </div>
-    
+  <div class="mb-3">
+    <label>Price</label>
+    <input type="number" name="price" class="form-control" required>
+  </div>
 
-    <div class="mb-3">
-        <label>Stock</label>
-        <input type="number" name="stock" class="form-control" required>
-    </div>
+  <div class="mb-3">
+    <label>Stock</label>
+    <input type="number" name="stock" class="form-control" required>
+  </div>
 
-    <div class="mb-3">
-        <label>Image</label>
-        <input type="file" name="image" class="form-control" required>
-    </div>
+  <div class="mb-3">
+    <label>Image</label>
+    <input type="file" name="image" class="form-control" required>
+  </div>
 
-    <button class="btn btn-success">Save Product</button>
-    <a href="{% url 'adminpanel:product_list' %}" class="btn btn-secondary">Back</a>
+  <button class="btn btn-success">Save Product</button>
+  <a href="{% url 'adminpanel:product_list' %}" class="btn btn-secondary">Back</a>
 </form>
+
 <script>
 document.getElementById("category").addEventListener("change", function () {
-    let categoryId = this.value;
+    const categoryId = this.value;
+    const subcategorySelect = document.getElementById("subcategory");
 
-    fetch(`/get-subcategories/${categoryId}/`)
+    subcategorySelect.innerHTML = "<option value=''>Loading...</option>";
+
+    if (!categoryId) {
+        subcategorySelect.innerHTML = "<option value=''>Select Subcategory</option>";
+        return;
+    }
+
+    fetch(`/admin-panel/ajax/subcategories/${categoryId}/`)
         .then(res => res.json())
         .then(data => {
-            let sub = document.getElementById("subcategory");
-            sub.innerHTML = "<option value=''>Select SubCategory</option>";
-            data.forEach(item => {
-                sub.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+            let options = "<option value=''>Select Subcategory</option>";
+            data.forEach(sub => {
+                options += `<option value="${sub.id}">${sub.name}</option>`;
             });
+            subcategorySelect.innerHTML = options;
         });
 });
 </script>
-
 
 {% endblock %}

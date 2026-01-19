@@ -33,9 +33,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-<script>
+{/* <script>
 function toggle(id) {
     let el = document.getElementById("cat-" + id);
     el.style.display = el.style.display === "block" ? "none" : "block";
 }
-</script>
+</script> */}
