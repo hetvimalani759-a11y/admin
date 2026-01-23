@@ -5,6 +5,15 @@ from django.contrib import messages
 from adminpanel.models import Product, Lens
 
 
+
+
+def shop(request):
+    return render(request, 'app/shop.html', {'products': products})
+
+
+def product_detail(request, id):
+    product = next(p for p in products if p['id'] == id)
+    return render(request, 'app/product_detail.html', {'product': product})
 # -------------------- PRODUCT VIEWS --------------------
 
 def product_list(request):
@@ -110,12 +119,3 @@ products = [
         'subcategory': 'Classic'
     }
 ]
-
-
-def shop(request):
-    return render(request, 'app/shop.html', {'products': products})
-
-
-def product_detail(request, id):
-    product = next(p for p in products if p['id'] == id)
-    return render(request, 'app/product_detail.html', {'product': product})
