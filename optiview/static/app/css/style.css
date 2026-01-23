@@ -100,6 +100,85 @@ body {
     border: 2px solid white;
     color: white;
 }
+/* ACCOUNT DROPDOWN */
+.account-dropdown {
+    position: relative;
+    display: inline-block;
+    margin-left: 25px;
+}
+
+.account-btn {
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 14px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.account-btn:hover {
+    background: rgba(255,255,255,0.15);
+}
+
+/* DROPDOWN BOX */
+.account-menu {
+    position: absolute;
+    top: 45px;
+    right: 0;
+    background: #fff;
+    width: 180px;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    z-index: 999;
+}
+
+/* SHOW ON HOVER */
+.account-dropdown:hover .account-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* MENU ITEMS */
+.account-menu a {
+    display: block;
+    padding: 12px 18px;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+/* USERNAME */
+.account-menu a:first-child {
+    font-weight: 600;
+    background: #f8f8f8;
+    cursor: default;
+}
+
+/* HOVER EFFECT */
+.account-menu a:hover {
+    background: #000;
+    color: #fff;
+}
+
+/* LOGOUT SPECIAL */
+.account-menu a:last-child {
+    color: #c0392b;
+}
+
+.account-menu a:last-child:hover {
+    background: #c0392b;
+    color: #fff;
+}
+
+
+
 
 /* CONTACT PAGE */
 .contact-box {

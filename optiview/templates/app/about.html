@@ -16,6 +16,19 @@
         <a href="/contact/" class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a>
         <a href="/products/" class="{% if request.path == '/products/' %}active{% endif %}">Products</a>
         <a href="/lenses/" class="{% if request.path == '/lenses/' %}active{% endif %}">lenses</a>
+        <div class="account-dropdown">
+            <span class="account-btn">Account ▾</span>
+
+            <div class="account-menu">
+                {% if user.is_authenticated %}
+                    <a href="#">Hi, {{ user.username }}</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'register' %}">Register</a>
+                {% endif %}
+            </div>
+        </div>
     </nav>
 </header>
      <div class="about-center"><h1>Elevate Your Look with our Fashion Forward Eyewear</h1></div>    
