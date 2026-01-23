@@ -14,7 +14,6 @@ def lens_list(request):
 
 def home(request):
     return render(request, 'app/index.html')
-
 def about(request):
     return render(request, 'app/about.html')
 def contact(request):
@@ -28,7 +27,7 @@ products = [
         'id': 1,
         'name': 'Sport Goggles',
         'price': 1499,
-        'image': 'images/product1.jpg',
+        'image': 'app/images/product1.jpg',
         'description': 'Perfect for outdoor sports and riding.',
         'category': 'Men',
         'subcategory': 'Sport'
@@ -37,7 +36,7 @@ products = [
         'id': 2,
         'name': 'Classic Goggles',
         'price': 1299,
-        'image': 'images/product2.jpg',
+        'image': 'app/images/product2.jpg',
         'description': 'Stylish classic goggles for daily use.',
         'category': 'Women',
         'subcategory': 'Classic'
