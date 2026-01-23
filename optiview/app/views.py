@@ -22,21 +22,39 @@ def register_view(request):
         return redirect('home')
 
     if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
         password = request.POST.get("password")
         password2 = request.POST.get("password2")
 
+        # EMPTY FIELD CHECK
+        if not username or not password or not password2:
+            messages.error(request, "All fields are required!")
+            return redirect('register')
+
+        # PASSWORD MATCH
         if password != password2:
             messages.error(request, "Passwords do not match!")
             return redirect('register')
 
+        # PASSWORD LENGTH
+        if len(password) < 6:
+            messages.error(request, "Password must be at least 6 characters long!")
+            return redirect('register')
+
+        # USERNAME EXISTS
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists!")
             return redirect('register')
 
-        User.objects.create_user(username=username, email=email, password=password)
-        messages.success(request, "Account created! Please login.")
+        # CREATE USER
+        User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        messages.success(request, "Account created successfully! Please login.")
         return redirect('login')
 
     return render(request, "app/register.html")
@@ -100,7 +118,7 @@ products = [
         'id': 1,
         'name': 'Sport Goggles',
         'price': 1499,
-        'image': 'images/product1.jpg',
+        'image': 'app/images/product1.jpg',
         'description': 'Perfect for outdoor sports and riding.',
         'category': 'Men',
         'subcategory': 'Sport'
@@ -110,7 +128,7 @@ products = [
         'id': 2,
         'name': 'Classic Goggles',
         'price': 1299,
-        'image': 'images/product2.jpg',
+        'image': 'app/images/product2.jpg',
         'description': 'Stylish classic goggles for daily use.',
         'category': 'Women',
         'subcategory': 'Classic'

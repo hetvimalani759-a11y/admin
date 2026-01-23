@@ -1,0 +1,13 @@
+{% extends 'admin/base.html' %}
+
+{% block content %}
+<h2>Update Company Info</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <a href="{% url 'adminpanel:dashboard' %}" class="btn btn-primary">Update</a>
+    <a href="{% url 'adminpanel:dashboard' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}

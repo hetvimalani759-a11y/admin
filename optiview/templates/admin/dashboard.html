@@ -70,17 +70,22 @@
             {% empty %}
                 <p>No products found</p>
             {% endfor %}
-            </h4>
         </div>
         </a>
     </div>
 
     <!-- Low Stock Alerts -->
+<<<<<<< HEAD
+    <div class="col-md-6">
+        <div class="card stat p-3">
+            <h6>Low Stock Alerts</h6>
+=======
     <div class="col-md-3">
         <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
         <div class="card stat p-3 text-center" width="100%">
             <h5>Low Stock Alerts</h5>
             <h5>
+>>>>>>> f52ea413cf905817579fcf5167e852b8f482b6c1
             {% if low_stock_products %}
                 {% for product in low_stock_products %}
                     <div class="text-danger">
@@ -90,7 +95,6 @@
             {% else %}
                 <p>No low stock products</p>
             {% endif %}
-            </h5>
         </div>
         </a>
     </div>
@@ -221,16 +225,9 @@ if (revenueCtx) {
 </div>
 
 <div class="text-end">
-    {% if company %}
-    <a href="{% url 'adminpanel:company_update' %}" class="btn btn-primary">
+    <a href="{% url 'adminpanel:update_company_info' %}" class="btn btn-primary btn-sm">
         ✏️ Edit Company Info
     </a>
-{% else %}
-    <a href="{% url 'adminpanel:company_create' %}" class="btn btn-success">
-        ➕ Add Company Info
-    </a>
-{% endif %}
-
 </div>
 
 {% endblock %}
