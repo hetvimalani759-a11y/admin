@@ -3,25 +3,25 @@
 <head>
     <title>About Us | Optiview</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
 <header class="header">
     <div class="logo">Optiview</div>
     <nav>
-        <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
-        <a href="/shop/" class="{% if request.path == '/shop/' %}active{% endif %}">Shop</a>
-        <a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">About</a>
-        <a href="/contact/" class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a>
-        <a href="/products/" class="{% if request.path == '/products/' %}active{% endif %}">products</a>
-        <a href="/lenses/" class="{% if request.path == '/lenses/' %}active{% endif %}">lenses</a>
+        <a href="/">Home</a>
+        <a href="/shop/">Shop</a>
+        <a href="/about/">About</a>
+        <a href="/contact/">Contact</a>
+        <a href="/products/">products</a>
+        <a href="/lenses/">lenses</a>
     </nav>
 </header>
      <div class="about-center"><h1>Elevate Your Look with our Fashion Forward Eyewear</h1></div>    
 <section class="about-main">
     <div class="about-left">
-        <img src="{% static 'app/images/product1.jpg' %}">
+        <img src="{% static 'images/product1.jpg' %}">
     </div>
 
     <div class="about-right">
@@ -35,7 +35,7 @@
 <!-- ABOUT SECTION 2 -->
 <section class="about-main reverse">
     <div class="about-left">
-        <img src="{% static 'app/images/product2.jpg' %}">
+        <img src="{% static 'images/product2.jpg' %}">
     </div>
 
     <div class="about-right">
@@ -108,6 +108,8 @@
             <p><a href="/shop/">Shop</a></p>
             <p><a href="/about/">About Us</a></p>
             <p><a href="/contact/">Contact</a></p>
+            <p><a href="/products/">products</a></p>
+            <p><a href="/lenses/">lenses</a></p>
         </div>
 
         <div class="footer-col">

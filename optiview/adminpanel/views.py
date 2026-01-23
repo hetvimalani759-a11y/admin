@@ -8,11 +8,11 @@ from django.db.models.functions import TruncMonth
 from django.contrib.auth.models import User
 
 
-
 from .models import (
     Product, Category, SubCategory,
     Order, Lens, Notification, CompanyInfo
 )
+from .form import CompanyInfoForm
 
 LOW_STOCK_THRESHOLD = 50
 def login_view(request):
@@ -42,14 +42,12 @@ def logout_view(request):
   # or whatever value you define
 
 def dashboard(request):
-    company = CompanyInfo.objects.first()
+
     total_products = Product.objects.count()
     total_orders = Order.objects.count()
-    total_users = User.objects.count()  # Count all registered users
     total_lenses = Lens.objects.count()
     total_revenue = Order.objects.aggregate(total=Sum("total_amount"))["total"] or 0
     latest_products = Product.objects.order_by("-created_at")[:1]
-
 
     monthly_revenue = (
         Order.objects
@@ -72,11 +70,9 @@ def dashboard(request):
     revenue_values = [r["total"] for r in monthly_revenue]
 
     context = {
-        "company": company,
         "total_products": total_products,
         "total_orders": total_orders,
         "total_lenses": total_lenses,
-        "total_users": total_users,
         "latest_products": latest_products,
         "total_revenue": total_revenue,
         "monthly_revenue": monthly_revenue,
@@ -97,10 +93,7 @@ def notifications(request):
     return render(request, "admin/notifications.html", {
         "notifications": notifications
     })
-@login_required
-def notifications_view(request):
-    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, "notifications.html", {"notifications": notifications})
+
 
 @login_required
 def mark_notifications_read(request):
@@ -262,40 +255,19 @@ def lens_list(request):
     lenses = Lens.objects.all()
     return render(request, "admin/lens_list.html", {"lenses": lenses})
 @login_required
-def company_create(request):
-    if CompanyInfo.objects.exists():
-        return redirect("adminpanel:company_update")
-
-    if request.method == "POST":
-        CompanyInfo.objects.create(
-            name=request.POST.get("name"),
-            email=request.POST.get("email"),
-            phone=request.POST.get("phone"),
-            address=request.POST.get("address"),
-            gst_number=request.POST.get("gst_number"),
-            logo=request.FILES.get("logo"),
-        )
-        messages.success(request, "Company info added")
+def update_company_info(request):
+    company = CompanyInfo.objects.first()
+    if not company:
+        messages.error(request, "Company info not found")
         return redirect("adminpanel:dashboard")
 
-    return render(request, "admin/company_add.html")
-
-
-@login_required
-def company_update(request):
-    company = get_object_or_404(CompanyInfo)
-
     if request.method == "POST":
-        company.name = request.POST.get("name")
-        company.email = request.POST.get("email")
-        company.phone = request.POST.get("phone")
-        company.address = request.POST.get("address")
-        company.gst_number = request.POST.get("gst_number")
-        if request.FILES.get("logo"):
-            company.logo = request.FILES.get("logo")
-        company.save()
+        form = CompanyInfoForm(request.POST, request.FILES, instance=company)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Company info updated")
+            return redirect("adminpanel:dashboard")
+    else:
+        form = CompanyInfoForm(instance=company)
 
-        messages.success(request, "Company info updated")
-        return redirect("adminpanel:dashboard")
-
-    return render(request, "admin/company_edit.html", {"company": company})
+    return render(request, "admin/update_company.html", {"form": form})

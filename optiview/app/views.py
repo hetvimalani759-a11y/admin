@@ -1,104 +1,34 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
-from adminpanel.models import Product, Lens
-
-
-# -------------------- PRODUCT VIEWS --------------------
+from django.shortcuts import render
+from django.shortcuts import render
+from adminpanel.models import Product, Lens  # import models from adminpanel
 
 def product_list(request):
-    products = Product.objects.all()
+    products = Product.objects.all()  # get all products
     return render(request, 'app/product_list.html', {'products': products})
 
-
 def lens_list(request):
-    lenses = Lens.objects.all()
+    lenses = Lens.objects.all()  # get all lenses
     return render(request, 'app/lens_list.html', {'lenses': lenses})
 
 
-# -------------------- HOME --------------------
 
 def home(request):
-<<<<<<< HEAD
     return render(request, 'app/index.html')
-=======
-    return render(request, "app/index.html")
 
-
-# -------------------- AUTH --------------------
-
-# REGISTER
-def register_view(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-
-    if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        password2 = request.POST.get("password2")
-
-        if password != password2:
-            messages.error(request, "Passwords do not match!")
-            return redirect('register')
-
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists!")
-            return redirect('register')
-
-        User.objects.create_user(username=username, email=email, password=password)
-        messages.success(request, "Account created! Please login.")
-        return redirect('login')
-
-    return render(request, "app/register.html")
-
-
-# LOGIN
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, "Invalid username or password!")
-            return redirect('login')
-
-    return render(request, "app/login.html")
-
-
-# LOGOUT → HOME
-def logout_view(request):
-    logout(request)
-    return redirect('home')
-
-
-# -------------------- STATIC PAGES --------------------
-
->>>>>>> f708d1c184202af945aeff7220443b69f6282dc4
 def about(request):
     return render(request, 'app/about.html')
-
-
 def contact(request):
-    return render(request, 'app/contact.html')
+    return render(request,'app/contact.html')
+def shop(request):
+    return render(request, 'app/shop.html')
 
-
-# -------------------- SHOP DEMO DATA --------------------
 
 products = [
     {
         'id': 1,
         'name': 'Sport Goggles',
         'price': 1499,
-        'image': 'app/images/product1.jpg',
+        'image': 'images/product1.jpg',
         'description': 'Perfect for outdoor sports and riding.',
         'category': 'Men',
         'subcategory': 'Sport'
@@ -107,13 +37,12 @@ products = [
         'id': 2,
         'name': 'Classic Goggles',
         'price': 1299,
-        'image': 'app/images/product2.jpg',
+        'image': 'images/product2.jpg',
         'description': 'Stylish classic goggles for daily use.',
         'category': 'Women',
         'subcategory': 'Classic'
     }
 ]
-
 
 def shop(request):
     return render(request, 'app/shop.html', {'products': products})
@@ -122,3 +51,4 @@ def shop(request):
 def product_detail(request, id):
     product = next(p for p in products if p['id'] == id)
     return render(request, 'app/product_detail.html', {'product': product})
+

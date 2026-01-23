@@ -27,11 +27,8 @@ urlpatterns = [
     path('lenses/', views.lens_list, name='lens_list'),
     path('orders/', views.order_list, name='order_list'),
     # path('add-order/',views.add_order, name='add_order'),
-    # path('company/update/',views.update_company_info,name='update_company_info'),
+    path('company/update/',views.update_company_info,name='update_company_info'),
     path("notifications/read/", views.mark_notifications_read, name="mark_notifications_read"),
-    path("company/add/", views.company_create, name="company_create"),
-    path("company/edit/", views.company_update, name="company_update"),
-
-
+    
     # path('orders/update/<int:order_id>/',views.update_order_status,name='update_order_status')
 ]
