@@ -1,6 +1,10 @@
 from django.shortcuts import render
-from django.shortcuts import render
-from adminpanel.models import Product, Lens  # import models from adminpanel
+from adminpanel.models import Product, Lens , Order
+from django.contrib.auth.decorators import login_required
+#from django.contrib.auth import authenticate, login
+
+
+  # import models from adminpanel
 
 def product_list(request):
     products = Product.objects.all()  # get all products
