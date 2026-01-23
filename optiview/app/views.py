@@ -14,16 +14,6 @@ def shop(request):
 def product_detail(request, id):
     product = next(p for p in products if p['id'] == id)
     return render(request, 'app/product_detail.html', {'product': product})
-# -------------------- PRODUCT VIEWS --------------------
-
-def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'app/product_list.html', {'products': products})
-
-
-def lens_list(request):
-    lenses = Lens.objects.all()
-    return render(request, 'app/lens_list.html', {'lenses': lenses})
 
 
 # -------------------- HOME --------------------
@@ -59,6 +49,16 @@ def register_view(request):
 
     return render(request, "app/register.html")
 
+# -------------------- PRODUCT VIEWS --------------------
+
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'app/product_list.html', {'products': products})
+
+
+def lens_list(request):
+    lenses = Lens.objects.all()
+    return render(request, 'app/lens_list.html', {'lenses': lenses})
 
 # LOGIN
 def login_view(request):
