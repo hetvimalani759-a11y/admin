@@ -1,0 +1,43 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<h3 class="mb-4">Add Company Information</h3>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label>Company Name</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Phone</label>
+        <input type="text" name="phone" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Address</label>
+        <textarea name="address" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>GST Number</label>
+        <input type="text" name="gst_number" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Company Logo</label>
+        <input type="file" name="logo" class="form-control">
+    </div>
+
+    <button type="submit" class="btn btn-success">Save Company Info</button>
+    <a href="{% url 'adminpanel:dashboard' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}
