@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block content %}
+{% load static %}
+    <link rel="stylesheet" href="{% static 'admin/css/style.css' %}">
 
 <h2 class="mb-4">Dashboard</h2>
 
@@ -13,42 +15,53 @@
 <div class="row g-4">
 
     <!-- Stats Cards -->
-    <div class="col-md-3">
+    <div class="col-md-3" >
+        <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
         <div class="card stat p-3 text-center">
             <h6>Total Products</h6>
             <h3>{{ total_products }}</h3>
         </div>
+        </a>
     </div>
 
     <div class="col-md-3">
+        <a class="nav-link" href="{% url 'adminpanel:order_list' %}">
         <div class="card stat p-3 text-center">
             <h6>Orders</h6>
             <h3>{{ total_orders }}</h3>
         </div>
+        </a>
     </div>
 
     <div class="col-md-3">
+        <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
         <div class="card stat p-3 text-center">
             <h6>Revenue</h6>
             <h3>₹{{ total_revenue }}</h3>
         </div>
+        </a>
     </div>
 
     <div class="col-md-3">
+        <a class="nav-link" href="{% url 'adminpanel:lens_list' %}">
         <div class="card stat p-3 text-center">
             <h6>Lenses</h6>
             <h3>{{ total_lenses }}</h3>
         </div>
+        </a>
     </div>
     <div class="col-md-3">
+        <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
         <div class="card stat p-3 text-center">
             <h5>Total Users</h5>
             <h3>{{ total_users }}</h3>
         </div>  
+        </a>
     </div>
 
     <!-- Latest Products -->
     <div class="col-md-3">
+        <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
         <div class="card stat p-3 text-center">
             <h5>Latest Products</h5>
             <h4>
@@ -59,10 +72,12 @@
             {% endfor %}
             </h4>
         </div>
+        </a>
     </div>
 
     <!-- Low Stock Alerts -->
     <div class="col-md-3">
+        <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
         <div class="card stat p-3 text-center" width="100%">
             <h5>Low Stock Alerts</h5>
             <h5>
@@ -77,6 +92,7 @@
             {% endif %}
             </h5>
         </div>
+        </a>
     </div>
 
 </div>

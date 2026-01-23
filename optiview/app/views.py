@@ -99,6 +99,7 @@ products = [
         'category': 'Men',
         'subcategory': 'Sport'
     },
+    
     {
         'id': 2,
         'name': 'Classic Goggles',
