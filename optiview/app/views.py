@@ -14,14 +14,6 @@ def shop(request):
 def product_detail(request, id):
     product = next(p for p in products if p['id'] == id)
     return render(request, 'app/product_detail.html', {'product': product})
-
-
-# -------------------- HOME --------------------
-
-def home(request):
-    return render(request, "app/index.html")
-
-
 # -------------------- AUTH --------------------
 
 # REGISTER
@@ -49,17 +41,11 @@ def register_view(request):
 
     return render(request, "app/register.html")
 
-# -------------------- PRODUCT VIEWS --------------------
 
-def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'app/product_list.html', {'products': products})
+# -------------------- HOME --------------------
 
-
-def lens_list(request):
-    lenses = Lens.objects.all()
-    return render(request, 'app/lens_list.html', {'lenses': lenses})
-
+def home(request):
+    return render(request, "app/index.html")
 # LOGIN
 def login_view(request):
     if request.user.is_authenticated:
@@ -84,6 +70,17 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+# -------------------- PRODUCT VIEWS --------------------
+
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'app/product_list.html', {'products': products})
+
+
+def lens_list(request):
+    lenses = Lens.objects.all()
+    return render(request, 'app/lens_list.html', {'lenses': lenses})
 
 
 # -------------------- STATIC PAGES --------------------
