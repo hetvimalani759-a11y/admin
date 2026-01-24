@@ -9,4 +9,3 @@ admin.site.register(Lens)
 admin.site.register(Order)
 admin.site.register(Notification)
 admin.site.register(CompanyInfo)
-

@@ -1,8 +1,26 @@
+<<<<<<< HEAD
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from adminpanel.models import Product, Lens
+=======
+from django.shortcuts import render
+from adminpanel.models import Product, Lens , Order
+from django.contrib.auth.decorators import login_required
+#from django.contrib.auth import authenticate, login
+
+
+  # import models from adminpanel
+
+def product_list(request):
+    products = Product.objects.all()  # get all products
+    return render(request, 'app/product_list.html', {'products': products})
+
+def lens_list(request):
+    lenses = Lens.objects.all()  # get all lenses
+    return render(request, 'app/lens_list.html', {'lenses': lenses})
+>>>>>>> b141380e698be4268573a0aa0606336bb704f8e9
 
 
 

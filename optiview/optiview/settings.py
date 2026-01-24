@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'adminpanel',
-    'app'
+    'app',
+    'delivery'
     
 ]
 
@@ -140,3 +141,16 @@ STATICFILES_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+APPEND_SLASH = True
+BASE_DIR=Path(__file__).resolve().parent.parent
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'harshanavadiya074@gmail.com'
+EMAIL_HOST_PASSWORD = 'qybe darg xxqe yphb'
+
+LOGOUT_REDIRECT_URL = '/delivery/login/'
+
+
