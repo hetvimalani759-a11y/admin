@@ -153,4 +153,6 @@ EMAIL_HOST_PASSWORD = 'qybe darg xxqe yphb'
 
 LOGOUT_REDIRECT_URL = '/delivery/login/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 

@@ -3,7 +3,7 @@
 <head>
     <title>{{ product.name }}</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
 </head>
 <body>
 <header class="header">
@@ -20,8 +20,8 @@
 
 <section class="product-detail">
     <div class="detail-container">
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:150px;height:auto;">
 
-        <img src="{% static product.image %}" alt="{{ product.name }}">
 
         <div class="detail-info">
             <h2>{{ product.name }}</h2>

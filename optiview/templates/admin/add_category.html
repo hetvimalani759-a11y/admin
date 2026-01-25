@@ -5,11 +5,11 @@
   <div class="col-md-4">
     <h5>Add Category</h5>
 
-    {% if messages %}
+    <!-- {% if messages %}
       {% for message in messages %}
         <div class="alert alert-success">{{ message }}</div>
       {% endfor %}
-    {% endif %}
+    {% endif %} -->
 
     <form method="post">
       {% csrf_token %}
@@ -27,7 +27,7 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>#</th>
+          <th>sr no.</th>
           <th>Category Name</th>
         </tr>
       </thead>
@@ -36,6 +36,13 @@
         <tr>
           <td>{{ forloop.counter }}</td>
           <td>{{ category.name }}</td>
+          <td>
+                <!-- Update button -->
+                <a href="{% url 'adminpanel:edit_category' category.id %}" class="btn btn-sm btn-primary">Edit</a>
+                
+                <!-- Delete button -->
+                <a href="{% url 'adminpanel:delete_category' category.id %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
         </tr>
         {% empty %}
         <tr><td colspan="2">No categories yet</td></tr>

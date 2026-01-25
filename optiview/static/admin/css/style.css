@@ -70,6 +70,39 @@ body.dark-mode {
     justify-content: center;
     background: linear-gradient(135deg, #4f46e5, #0ea5e9);
 }
+.card p, .card span, .card h6 {
+    color: #333;
+}
+.card {
+    min-height: 120px;
+    overflow: visible;
+}
+.card * {
+    position: static;
+}
+.info-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.icon {
+    font-size: 20px;
+}
+
+.text {
+    font-size: 15px;
+    color: #333;
+}
 
 .login-box {
     width: 360px;

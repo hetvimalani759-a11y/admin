@@ -7,12 +7,12 @@
   <!-- LEFT: Add Subcategory -->
   <div class="col-md-4">
     <h5>Add Subcategory</h5>
-
+<!-- 
     {% if messages %}
       {% for message in messages %}
         <div class="alert alert-success">{{ message }}</div>
       {% endfor %}
-    {% endif %}
+    {% endif %} -->
 
     <form method="post">
       {% csrf_token %}
@@ -42,7 +42,7 @@
     <table class="table table-bordered">
       <thead>
         <tr>
-          <th>#</th>
+          <th>sr no.</th>
           <th>Subcategory</th>
           <th>Category</th>
         </tr>
@@ -53,6 +53,13 @@
           <td>{{ forloop.counter }}</td>
           <td>{{ sub.name }}</td>
           <td>{{ sub.category.name }}</td>
+          <td>
+                <!-- Update button -->
+                <a href="{% url 'adminpanel:edit_subcategory' sub.id %}" class="btn btn-sm btn-primary">Edit</a>
+
+                <!-- Delete button -->
+                <a href="{% url 'adminpanel:delete_subcategory' sub.id %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
         </tr>
         {% empty %}
         <tr><td colspan="3">No subcategories yet</td></tr>

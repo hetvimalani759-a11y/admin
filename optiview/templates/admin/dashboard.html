@@ -1,12 +1,12 @@
 {% extends 'admin/base.html' %}
 
 {% block extra_css %}
+{% load static %}
+    <link rel="stylesheet" href="{% static 'admin/css/style.css' %}">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-{% load static %}
-    <link rel="stylesheet" href="{% static 'admin/css/style.css' %}">
 
 <h2 class="mb-4">Dashboard</h2>
 
@@ -15,7 +15,7 @@
 <div class="row g-4">
 
     <!-- Stats Cards -->
-    <div class="col-md-3" >
+    <div class="col-md-3">
         <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
         <div class="card stat p-3 text-center">
             <h6>Total Products</h6>
@@ -34,7 +34,7 @@
     </div>
 
     <div class="col-md-3">
-        <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
+        <a class="nav-link" href="{% url 'adminpanel:revenue_dashboard' %}">
         <div class="card stat p-3 text-center">
             <h6>Revenue</h6>
             <h3>₹{{ total_revenue }}</h3>
@@ -51,7 +51,7 @@
         </a>
     </div>
     <div class="col-md-3">
-        <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
+        <a class="nav-link" href="{% url 'adminpanel:user_list' %}">
         <div class="card stat p-3 text-center">
             <h5>Total Users</h5>
             <h3>{{ total_users }}</h3>
@@ -75,68 +75,17 @@
     </div>
 
     <!-- Low Stock Alerts -->
-<<<<<<< HEAD
-    <div class="col-md-6">
-        <div class="card stat p-3">
-            <h6>Low Stock Alerts</h6>
-=======
     <div class="col-md-3">
-        <a class="nav-link" href="{% url 'adminpanel:product_list' %}">
+        <a class="nav-link" href="{% url 'adminpanel:low_stock_products' %}">
         <div class="card stat p-3 text-center" width="100%">
             <h5>Low Stock Alerts</h5>
-            <h5>
->>>>>>> f52ea413cf905817579fcf5167e852b8f482b6c1
-            {% if low_stock_products %}
-                {% for product in low_stock_products %}
-                    <div class="text-danger">
-                        {{ product.name }} — Stock: {{ product.stock }}
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No low stock products</p>
-            {% endif %}
+            <h3>{{ low_stock }}</h5>
         </div>
         </a>
     </div>
 
 </div>
 
-<hr class="my-4">
-
-<h4>Low Stock Products</h4>
-<canvas id="lowStockChart" height="120"></canvas>
-
-<!-- JSON safe data for JS -->
-{{ low_stock_names|json_script:"lowStockLabels" }}
-{{ low_stock_values|json_script:"lowStockValues" }}
-
-<script>
-const lowStockCtx = document.getElementById('lowStockChart');
-
-if (lowStockCtx) {
-    const lowStockLabels = JSON.parse(document.getElementById('lowStockLabels').textContent);
-    const lowStockValues = JSON.parse(document.getElementById('lowStockValues').textContent);
-
-    new Chart(lowStockCtx, {
-        type: 'bar',
-        data: {
-            labels: lowStockLabels,
-            datasets: [{
-                label: 'Stock Left',
-                data: lowStockValues,
-                backgroundColor: 'rgba(220, 53, 69, 0.7)',
-                borderRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-}
-</script>
 
 <hr class="my-4">
 
@@ -225,9 +174,16 @@ if (revenueCtx) {
 </div>
 
 <div class="text-end">
-    <a href="{% url 'adminpanel:update_company_info' %}" class="btn btn-primary btn-sm">
+    {% if company %}
+    <a href="{% url 'adminpanel:company_update' %}" class="btn btn-primary">
         ✏️ Edit Company Info
     </a>
+    {% else %}
+    <a href="{% url 'adminpanel:company_create' %}" class="btn btn-success">
+        ➕ Add Company Info
+    </a>
+    {% endif %}
+
 </div>
 
 {% endblock %}

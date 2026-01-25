@@ -58,9 +58,10 @@
     <div class="shop-container">
         {% for product in products %}
         <div class="product-card">
-            <img src="{% static product.image %}" alt="{{ product.name }}">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:150px;height:auto;">
             <h3>{{ product.name }}</h3>
             <p>₹{{ product.price }}</p>
+            
 
             <a href="/product/{{ product.id }}/" class="btn primary">
                 Buy Now
