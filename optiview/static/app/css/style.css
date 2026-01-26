@@ -679,3 +679,62 @@ body {
     background: #f1f1f1;
     color: #333;
 }
+.wishlist-heart {
+    display: inline-block;
+    border: 2px solid black;
+    color: black;
+    background: white;
+    padding: 6px 10px;
+    font-size: 18px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.wishlist-heart.active {
+    background: red;
+    color: white;
+    border-color: red;
+}
+/* CART */
+.cart-table {
+    width: 90%;
+    margin: 30px auto;
+    border-collapse: collapse;
+}
+
+.cart-table th, .cart-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.cart-table th {
+    background: #f5f5f5;
+}
+/* Cart-Qty */
+.qty-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.qty-btn {
+    padding: 5px 10px;
+    border: 1px solid #000;
+    text-decoration: none;
+    font-weight: bold;
+    color: black;
+}
+
+.qty-btn:hover {
+    background: black;
+    color: white;
+}
+
+.qty-number {
+    min-width: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+

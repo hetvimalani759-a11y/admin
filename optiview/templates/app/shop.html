@@ -15,13 +15,19 @@
                 <!-- <a href="/product/{{ product.id }}/" class="btn primary">
                 Buy Now
             </a> -->
-                <a href="{% url 'add_to_wishlist' product.id %}" class="btn secondary">
+                <!-- <a href="{% url 'add_to_wishlist' product.id %}" class="btn secondary">
     ❤️ Wishlist
+</a> -->       
+                <a href="{% url 'add_to_wishlist' product.id %}"
+   class="wishlist-heart {% if product.id in wishlist_ids %}active{% endif %}">
+    ♥
 </a>
-
                 <a href="{% url 'add_to_cart' product.id %}" class="btn primary">
     Add to Cart
 </a>
+                <!-- <a href="{% url 'add_to_cart' product.id %}" class="btn primary">
+    Add to Cart
+</a> -->
             </div>
             {% endfor %}
         {% else %}
