@@ -1,119 +1,45 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Shop</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
-</head>
-<body>
+{% extends 'app/base.html' %}
+{% load static %}
 
-<header class="header">
-    <div class="logo">Optiview</div>
-    <nav>
-        <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
-        <a href="/shop/" class="{% if request.path == '/shop/' %}active{% endif %}">Shop</a>
-        <a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">About</a>
-        <a href="/contact/" class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a>
-        <a href="/products/" class="{% if request.path == '/products/' %}active{% endif %}">Products</a>
-        <a href="/lenses/" class="{% if request.path == '/lenses/' %}active{% endif %}">lenses</a>
-        <div class="account-dropdown">
-            <span class="account-btn">Account ▾</span>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/shop.css' %}">
+{% endblock %}
 
-            <div class="account-menu">
-                {% if user.is_authenticated %}
-                    <a href="#">Hi, {{ user.username }}</a>
-                    <a href="{% url 'logout' %}">Logout</a>
-                {% else %}
-                    <a href="{% url 'login' %}">Login</a>
-                    <a href="{% url 'register' %}">Register</a>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
-</header>
+{% block content %}
 
-<section class="shop-section">
-    <h2>Shop Goggles</h2>
+<section class="shop-section" style="padding:20px;">
+    <h2 style="margin-bottom:20px;">Shop Goggles</h2>
 
-    <!-- SEARCH + FILTER -->
-    <div class="filter-bar">
-        <input type="text" placeholder="Search products...">
-
-        <select>
-            <option>Category</option>
-            <option>Men</option>
-            <option>Women</option>
-        </select>
-
-        <select>
-            <option>Sub-Category</option>
-            <option>Sport</option>
-            <option>Classic</option>
-            <option>Premium</option>
-        </select>
-
-        <button class="btn">Search</button>
-    </div>
-    
-    <div class="shop-container">
-        {% for product in products %}
-        <div class="product-card">
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:150px;height:auto;">
-            <h3>{{ product.name }}</h3>
-            <p>₹{{ product.price }}</p>
-
-            <a href="/product/{{ product.id }}/" class="btn primary">
-                Buy Now
+    <!-- CATEGORY BUTTONS -->
+    <div class="category-buttons">
+        <a href="{% url 'shop' %}" class="btn {% if not request.GET.category %}active{% endif %}">All</a>
+        {% for cat in categories %}
+            <a href="?category={{ cat.name|urlencode }}" class="btn {% if request.GET.category == cat.name %}active{% endif %}">
+                {{ cat.name }}
             </a>
-        </div>
         {% endfor %}
+    </div>
+
+    <!-- PRODUCTS GRID -->
+    <div class="shop-container">
+        {% if products %}
+            {% for product in products %}
+            <div class="product-card">
+                <a href="/product/{{ product.id }}/"  class="product-link">
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    <h3>{{ product.name }}</h3>
+                    <p>₹{{ product.price }}</p>
+                </a>
+                <div class="product-actions">
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn primary">Add to Cart</a>
+                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn outline">Wishlist</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align:center; margin-top:20px;">No products found.</p>
+        {% endif %}
     </div>
 </section>
 
-<footer class="figma-footer">
-
-    <div class="footer-grid">
-
-        <div class="footer-col">
-            <h4>Optiview</h4>
-            <p>
-                Premium goggles designed for style,
-                comfort and eye protection.
-            </p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Quick Links</h4>
-            <p><a href="/">Home</a></p>
-            <p><a href="/shop/">Shop</a></p>
-            <p><a href="/about/">About Us</a></p>
-            <p><a href="/contact/">Contact</a></p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p>Email: info@optiview.com</p>
-            <p>Phone: +91 98765 43210</p>
-            <p>Mon - Sat: 9AM - 8PM</p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Follow Us</h4>
-            <p>Facebook</p>
-            <p>Instagram</p>
-            <p>Twitter</p>
-        </div>
-
-    </div>
-
-    <div class="footer-brand">
-        <h2>Optiview</h2>
-        <p>© 2026 Optiview. All rights reserved.</p>
-    </div>
-
-</footer>
-
-
-
-</body>
-</html>
+{% endblock %}

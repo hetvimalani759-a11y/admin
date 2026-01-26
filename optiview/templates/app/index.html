@@ -1,47 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Optiview Goggles</title>
-    {% load static %}
+{% extends 'app/base.html' %}
+{% load static %}
     <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
-</head>
-<!-- <div style="text-align:right; padding:10px;">
-    {% if request.user.is_authenticated %}
-        Welcome, {{ request.user.username }} 
-        <a href="{% url 'logout' %}">Logout</a>
-    {% else %}
-        <a href="{% url 'login' %}">Login</a> |
-        <a href="{% url 'register' %}">Register</a>
-    {% endif %}
-</div> -->
-
-<body>
-
-<header class="header">
-    <div class="logo">Optiview</div>
-    <nav>
-        <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
-        <a href="/shop/" class="{% if request.path == '/shop/' %}active{% endif %}">Shop</a>
-        <a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">About</a>
-        <a href="/contact/" class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a>
-        <a href="/products/" class="{% if request.path == '/products/' %}active{% endif %}">Products</a>
-        <a href="/lenses/" class="{% if request.path == '/lenses/' %}active{% endif %}">lenses</a>
-        <div class="account-dropdown">
-            <span class="account-btn">Account ▾</span>
-
-            <div class="account-menu">
-                {% if user.is_authenticated %}
-                    <a href="#">Hi, {{ user.username }}</a>
-                    <a href="{% url 'logout' %}">Logout</a>
-                {% else %}
-                    <a href="{% url 'login' %}">Login</a>
-                    <a href="{% url 'register' %}">Register</a>
-                {% endif %}
-            </div>
-        </div>
-    </nav>
-</header> 
-<br>
+{% block content %}
 
 <!-- HERO IMAGE WITH TEXT -->
 <section class="home-hero">
@@ -55,10 +15,13 @@
         </div>
     </div>
 </section>
-<h2>Welcome, {{ request.user.username }}</h2>
-<a href="{% url 'logout' %}">Logout</a>
 
-<!-- INFO SECTION -->
+{% if user.is_authenticated %}
+<h2>Welcome, {{ user.username }}</h2>
+<a href="{% url 'logout' %}">Logout</a>
+{% endif %}
+
+<!-- WHY OPTIVIEW -->
 <section class="home-info">
     <h2>Why Optiview?</h2>
     <p>
@@ -67,52 +30,54 @@
     </p>
 </section>
 
-<footer class="figma-footer">
+<!-- TOP CATEGORIES -->
+<section class="three-col-section gray">
+    <h2>Top Categories</h2>
 
-    <div class="footer-grid">
-
-        <div class="footer-col">
-            <h4>Optiview</h4>
-            <p>
-                Premium goggles designed for style,
-                comfort and eye protection.
-            </p>
+    <div class="three-col-grid">
+        <div class="col-box">
+            <h3>Eyeglasses</h3>
+            <p>Comfortable frames for daily use.</p>
         </div>
 
-        <div class="footer-col">
-            <h4>Quick Links</h4>
-            <p><a href="/">Home</a></p>
-            <p><a href="/shop/">Shop</a></p>
-            <p><a href="/about/">About Us</a></p>
-            <p><a href="/contact/">Contact</a></p>
-            <p><a href="/products/">products</a></p>
-            <p><a href="/lenses/">lenses</a></p>
+        <div class="col-box">
+            <h3>Sunglasses</h3>
+            <p>Stylish sunglasses with UV protection.</p>
         </div>
 
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p>Email: info@optiview.com</p>
-            <p>Phone: +91 98765 43210</p>
-            <p>Mon - Sat: 9AM - 8PM</p>
+        <div class="col-box">
+            <h3>Sports Goggles</h3>
+            <p>Designed for performance & durability.</p>
         </div>
-
-        <div class="footer-col">
-            <h4>Follow Us</h4>
-            <p>Facebook</p>
-            <p>Instagram</p>
-            <p>Twitter</p>
-        </div>
-
     </div>
+</section>
 
-    <div class="footer-brand">
-        <h2>Optiview</h2>
-        <p>© 2026 Optiview. All rights reserved.</p>
+<!-- FEATURED PRODUCTS -->
+<section class="three-col-section">
+    <h2>Featured Products</h2>
+
+    <div class="three-col-grid">
+        <div class="col-box product-box">
+            <img src="{% static 'images/product1.jpg' %}">
+            <h3>Classic Black Frame</h3>
+            <p>₹1,499</p>
+            <a href="/shop/" class="btn primary">Buy Now</a>
+        </div>
+
+        <div class="col-box product-box">
+            <img src="{% static 'images/product2.jpg' %}">
+            <h3>Modern Transparent</h3>
+            <p>₹1,799</p>
+            <a href="/shop/" class="btn primary">Buy Now</a>
+        </div>
+
+        <div class="col-box product-box">
+            <img src="{% static 'images/product3.jpg' %}">
+            <h3>Sporty Sunglasses</h3>
+            <p>₹1,999</p>
+            <a href="/shop/" class="btn primary">Buy Now</a>
+        </div>
     </div>
+</section>
 
-</footer>
-
-
-
-</body>
-</html>
+{% endblock %}

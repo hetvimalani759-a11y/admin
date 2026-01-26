@@ -1,0 +1,105 @@
+/* ======================
+   CATEGORY BUTTONS
+====================== */
+.category-buttons {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.category-buttons .btn {
+    display: inline-block;
+    margin: 0 10px 10px 0;
+    padding: 8px 20px;
+    font-weight: bold;
+    color: #4f46e5; /* purple text */
+    background-color: #f3f4f6; /* light gray background */
+    border: 2px solid #4f46e5;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.category-buttons .btn:hover {
+    background-color: #4f46e5;
+    color: #fff;
+}
+
+.category-buttons .btn.active {
+    background-color: #4f46e5;
+    color: #fff;
+}
+
+/* ======================
+   PRODUCTS GRID
+====================== */
+.shop-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.product-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.product-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.product-card h3 {
+    font-size: 18px;
+    margin: 10px 0 5px 0;
+}
+
+.product-card p {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.product-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.product-actions .btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.product-actions .btn.primary {
+    background-color: #4f46e5;
+    color: #fff;
+    border: none;
+}
+
+.product-actions .btn.primary:hover {
+    background-color: #3730a3;
+}
+
+.product-actions .btn.outline {
+    border: 1px solid #4f46e5;
+    color: #4f46e5;
+    background-color: transparent;
+}
+
+.product-actions .btn.outline:hover {
+    background-color: #4f46e5;
+    color: #fff;
+}

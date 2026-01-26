@@ -3,7 +3,72 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from adminpanel.models import Product, Lens, Order
+from adminpanel.models import Product, Lens, Order, Category
+from .models import Cart, Wishlist, Notification
+
+# -------------------- HOME --------------------
+
+def home(request):
+    return render(request, "app/index.html")
+
+
+# -------------------- SHOP --------------------
+
+def shop(request):
+    products = Product.objects.all()
+    categories = Category.objects.all()
+
+    search_query = request.GET.get('search')
+    category_filter = request.GET.get('category')
+
+    if search_query:
+        products = products.filter(name__icontains=search_query)
+
+    if category_filter:
+        products = products.filter(category__name=category_filter)
+
+    context = {
+        'products': products,
+        'categories': categories
+    }
+
+    return render(request, 'app/shop.html', context)
+
+
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    item, created = Cart.objects.get_or_create(user=request.user, product=product)
+    if not created:
+        item.quantity += 1
+        item.save()
+    return redirect('shop')
+
+
+@login_required
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Wishlist.objects.get_or_create(user=request.user, product=product)
+    return redirect('shop')
+
+
+# -------------------- PRODUCT --------------------
+
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'app/product_list.html', {'products': products})
+
+
+def product_detail(request, id):
+    product = get_object_or_404(Product, id=id)
+    return render(request, 'app/product_detail.html', {'product': product})
+
+
+# -------------------- LENS --------------------
+
+def lens_list(request):
+    lenses = Lens.objects.all()
+    return render(request, 'app/lens_list.html', {'lenses': lenses})
 
 
 # -------------------- AUTH --------------------
@@ -60,35 +125,6 @@ def logout_view(request):
     return redirect("home")
 
 
-
-# -------------------- HOME --------------------
-
-def home(request):
-    return render(request, "app/index.html")
-
-
-# -------------------- PRODUCT & LENS --------------------
-
-def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'app/product_list.html', {'products': products})
-
-
-def lens_list(request):
-    lenses = Lens.objects.all()
-    return render(request, 'app/lens_list.html', {'lenses': lenses})
-
-
-def product_detail(request, id):
-    product = get_object_or_404(Product, id=id)
-    return render(request, 'app/product_detail.html', {'product': product})
-
-
-def shop(request):
-    products = Product.objects.all()
-    return render(request, 'app/shop.html', {'products': products})
-
-
 # -------------------- STATIC PAGES --------------------
 
 def about(request):
@@ -97,11 +133,15 @@ def about(request):
 
 def contact(request):
     return render(request, 'app/contact.html')
-from .models import Notification
+
+
+# -------------------- NOTIFICATIONS --------------------
 
 def notifications(request):
     data = Notification.objects.filter(user=request.user).order_by("-created_at")
     return render(request, "app/notifications.html", {"notifications": data})
+
+
 def mark_read(request, id):
     Notification.objects.filter(id=id, user=request.user).update(is_read=True)
     return redirect("notifications")
