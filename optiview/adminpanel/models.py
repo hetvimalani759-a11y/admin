@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db import models
 from django.conf import settings
+from delivery.models import DeliveryPerson 
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -28,7 +29,7 @@ class Product(models.Model):
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     name = models.CharField(max_length=150)
     price = models.IntegerField()
-    stock = models.IntegerField()
+    # stock = models.IntegerField()
     image = models.ImageField(upload_to='products/')
     created_at = models.DateTimeField(auto_now_add=True)
     stock = models.PositiveIntegerField(default=0)
@@ -100,4 +101,21 @@ class CompanyInfo(models.Model):
 
     def __str__(self):
         return self.name
-    
+      # ✅ allowed here
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    delivery_person = models.ForeignKey(
+        DeliveryPerson,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders"
+    )
+    status = models.CharField(max_length=50)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Order #{self.id}"
+

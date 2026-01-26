@@ -1,0 +1,30 @@
+{% extends 'app/base.html' %}
+{% block content %}
+
+<section class="shop-section">
+    <h2>Your Wishlist</h2>
+
+    {% if items %}
+    <div class="shop-container">
+        {% for item in items %}
+        <div class="product-card">
+            <img src="{{ item.product.image.url }}" style="width:120px;">
+            <h3>{{ item.product.name }}</h3>
+            <p>₹{{ item.product.price }}</p>
+
+            <a href="{% url 'add_to_cart' item.product.id %}" class="btn primary">
+                Add to Cart
+            </a>
+
+            <a href="{% url 'remove_from_wishlist' item.id %}" class="btn danger">
+                Remove
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p style="text-align:center;">Wishlist is empty</p>
+    {% endif %}
+</section>
+
+{% endblock %}

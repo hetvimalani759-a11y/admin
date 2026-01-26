@@ -1,0 +1,64 @@
+﻿{% extends "admin/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h4 class="mb-4">Low Stock Products</h4>
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Sr No.</th>
+                    <th>Product</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in products %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ p.name }}</td>
+                    <td class="text-danger fw-bold">{{ p.stock }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-6">
+        <canvas id="lowStockChart"></canvas>
+    </div>
+</div>
+
+{{ labels|json_script:"lowStockLabels" }}
+{{ data|json_script:"lowStockData" }}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const labels = JSON.parse(document.getElementById('lowStockLabels').textContent);
+const values = JSON.parse(document.getElementById('lowStockData').textContent);
+
+const ctx = document.getElementById('lowStockChart');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Stock Quantity',
+            data: values,
+            backgroundColor: 'rgba(220, 53, 69, 0.7)',
+            borderRadius: 6
+        }]
+    },
+    options: {
+        animation: false,   // ✅ prevents zero-to-value animation
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+</script>
+
+{% endblock %}

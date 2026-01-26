@@ -1,70 +1,103 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from adminpanel.models import Product, Lens
+from django.contrib.auth.decorators import login_required
+from adminpanel.models import Product, Lens, Order, Category
+from .models import Cart, Wishlist, Notification
+
+# -------------------- HOME --------------------
+
+def home(request):
+    return render(request, "app/index.html")
 
 
-from .models import Product, Category
+# -------------------- SHOP --------------------
 
 def shop(request):
     products = Product.objects.all()
-    return render(request, 'app/shop.html', {'products': products})
+    categories = Category.objects.all()
+
+    search_query = request.GET.get('search')
+    category_filter = request.GET.get('category')
+
+    if search_query:
+        products = products.filter(name__icontains=search_query)
+
+    if category_filter:
+        products = products.filter(category__name=category_filter)
+
+    context = {
+        'products': products,
+        'categories': categories
+    }
+
+    return render(request, 'app/shop.html', context)
+
+
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    item, created = Cart.objects.get_or_create(user=request.user, product=product)
+    if not created:
+        item.quantity += 1
+        item.save()
+    return redirect('shop')
+
+
+@login_required
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Wishlist.objects.get_or_create(user=request.user, product=product)
+    return redirect('shop')
+
+
+# -------------------- PRODUCT --------------------
+
+def product_list(request):
+    products = Product.objects.all()
+    return render(request, 'app/product_list.html', {'products': products})
+
 
 def product_detail(request, id):
-    product = next(p for p in products if p['id'] == id)
+    product = get_object_or_404(Product, id=id)
     return render(request, 'app/product_detail.html', {'product': product})
+
+
+# -------------------- LENS --------------------
+
+def lens_list(request):
+    lenses = Lens.objects.all()
+    return render(request, 'app/lens_list.html', {'lenses': lenses})
+
+
 # -------------------- AUTH --------------------
 
-# REGISTER
 def register_view(request):
     if request.user.is_authenticated:
         return redirect('home')
 
     if request.method == "POST":
-        username = request.POST.get("username", "").strip()
-        email = request.POST.get("email", "").strip()
+        username = request.POST.get("username")
+        email = request.POST.get("email")
         password = request.POST.get("password")
         password2 = request.POST.get("password2")
 
-        # EMPTY FIELD CHECK
-        if not username or not password or not password2:
-            messages.error(request, "All fields are required!")
-            return redirect('register')
-
-        # PASSWORD MATCH
         if password != password2:
             messages.error(request, "Passwords do not match!")
             return redirect('register')
 
-        # PASSWORD LENGTH
-        if len(password) < 6:
-            messages.error(request, "Password must be at least 6 characters long!")
-            return redirect('register')
-
-        # USERNAME EXISTS
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists!")
             return redirect('register')
 
-        # CREATE USER
-        User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
-
+        User.objects.create_user(username=username, email=email, password=password)
         messages.success(request, "Account created successfully! Please login.")
         return redirect('login')
 
     return render(request, "app/register.html")
 
 
-# -------------------- HOME --------------------
-
-def home(request):
-    return render(request, "app/index.html")
-# LOGIN
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -84,21 +117,12 @@ def login_view(request):
     return render(request, "app/login.html")
 
 
-# LOGOUT → HOME
 def logout_view(request):
+    user = request.user
     logout(request)
-    return redirect('home')
-
-# -------------------- PRODUCT VIEWS --------------------
-
-def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'app/product_list.html', {'products': products})
-
-
-def lens_list(request):
-    lenses = Lens.objects.all()
-    return render(request, 'app/lens_list.html', {'lenses': lenses})
+    user.is_active = False
+    user.save()
+    return redirect("home")
 
 
 # -------------------- STATIC PAGES --------------------
@@ -111,51 +135,46 @@ def contact(request):
     return render(request, 'app/contact.html')
 
 
-# -------------------- SHOP DEMO DATA --------------------
+# -------------------- NOTIFICATIONS --------------------
 
-products = [
-    {
-        'id': 1,
-        'name': 'Sport Goggles',
-        'price': 1499,
-        'image': 'app/images/product1.jpg',
-        'description': 'Perfect for outdoor sports and riding.',
-        'category': 'Men',
-        'subcategory': 'Sport'
-    },
-    
-    {
-        'id': 2,
-        'name': 'Classic Goggles',
-        'price': 1299,
-        'image': 'app/images/product2.jpg',
-        'description': 'Stylish classic goggles for daily use.',
-        'category': 'Women',
-        'subcategory': 'Classic'
-    }
-]
+def notifications(request):
+    data = Notification.objects.filter(user=request.user).order_by("-created_at")
+    return render(request, "app/notifications.html", {"notifications": data})
 
-from django.shortcuts import render
-from .models import Product, Category
 
-def shop_view(request):
-    products = Product.objects.all()
-    categories = Category.objects.all()
+def mark_read(request, id):
+    Notification.objects.filter(id=id, user=request.user).update(is_read=True)
+    return redirect("notifications")
 
-    search_query = request.GET.get('search')
-    category_filter = request.GET.get('category')
+@login_required
+def cart_view(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total = sum(item.total_price() for item in cart_items)
 
-    if search_query:
-        products = products.filter(
-            name__icontains=search_query
-        )
+    return render(request, 'app/cart.html', {
+        'cart_items': cart_items,
+        'total': total
+    })
+@login_required
+def remove_from_cart(request, item_id):
+    item = get_object_or_404(Cart, id=item_id, user=request.user)
+    item.delete()
+    return redirect('cart')
+@login_required
+def wishlist_view(request):
+    items = Wishlist.objects.filter(user=request.user)
+    return render(request, 'app/wishlist.html', {'items': items})
 
-    if category_filter:
-        products = products.filter(category__name=category_filter)
 
-    context = {
-        'products': products,
-        'categories': categories
-    }
+@login_required
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Wishlist.objects.get_or_create(user=request.user, product=product)
+    return redirect('shop')
 
-    return render(request, 'app/shop.html', context)
+
+@login_required
+def remove_from_wishlist(request, item_id):
+    item = get_object_or_404(Wishlist, id=item_id, user=request.user)
+    item.delete()
+    return redirect('wishlist')

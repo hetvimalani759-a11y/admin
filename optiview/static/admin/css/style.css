@@ -1,4 +1,4 @@
-/* body {
+body {
     background: #f4f6f9;
 }
 .light-mode {
@@ -22,7 +22,7 @@
 /* =========================
    RESET & VARIABLES
 ========================= */
-/* :root {
+:root {
     --primary: #4f46e5;
     --bg-light: #f4f6f9;
     --card-light: #ffffff;
@@ -45,7 +45,7 @@
 /* =========================
    BODY MODES
 ========================= */
-/* body {
+body {
     background: var(--bg-light);
     color: var(--text-light);
 }
@@ -58,17 +58,50 @@ body.light-mode {
 body.dark-mode {
     background: var(--bg-dark);
     color: var(--text-dark);
-} */
+}
 
 /* =========================
    LOGIN PAGE
 ========================= */
-/* .login-page {
+.login-page {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #4f46e5, #0ea5e9);
+}
+.card p, .card span, .card h6 {
+    color: #333;
+}
+.card {
+    min-height: 120px;
+    overflow: visible;
+}
+.card * {
+    position: static;
+}
+.info-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.icon {
+    font-size: 20px;
+}
+
+.text {
+    font-size: 15px;
+    color: #333;
 }
 
 .login-box {
@@ -81,20 +114,20 @@ body.dark-mode {
 
 body.dark-mode .login-box {
     background: #1e293b;
-} */
+}
 
 /* =========================
    LAYOUT
 ========================= */
-/* .container {
+.container {
     display: flex;
     min-height: 100vh;
-} */
+}
 
 /* =========================
    SIDEBAR
 ========================= */
-/* .sidebar {
+.sidebar {
     width: 230px;
     background: #111827;
     color: white;
@@ -124,20 +157,20 @@ body.dark-mode .login-box {
 .sidebar ul li:hover,
 .sidebar ul li.active {
     background: #1f2937;
-} */
+}
 
 /* =========================
    MAIN CONTENT
 ========================= */
-/* .main {
+.main {
     flex: 1;
     padding: 22px;
-} */
+}
 
 /* =========================
    NAVBAR
 ========================= */
-/* .navbar {
+.navbar {
     background: var(--card-light);
     padding: 14px 18px;
     border-radius: var(--radius);
@@ -158,12 +191,12 @@ body.dark-mode .navbar {
     padding: 7px 16px;
     border-radius: 20px;
     font-size: 14px;
-} */
+}
 
 /* =========================
    CARDS
 ========================= */
-/* .cards {
+.cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 18px;
@@ -196,12 +229,12 @@ body.dark-mode .navbar {
 
 body.dark-mode .card {
     background: var(--card-dark);
-} */
+}
 
 /* =========================
    TABLE
 ========================= */
-/* .table-section {
+.table-section {
     background: var(--card-light);
     padding: 22px;
     border-radius: var(--radius);
@@ -214,6 +247,24 @@ body.dark-mode .table-section {
 
 .table-section h3 {
     margin-bottom: 14px;
+}
+/* DARK MODE TABLE FIX */
+body.dark-mode table {
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+body.dark-mode thead th {
+    color: #f9fafb !important;
+    background: #020617;
+}
+
+body.dark-mode tbody td {
+    color: #191a1b;
+}
+
+body.dark-mode table tr {
+    border-color: #1e293b;
 }
 
 table {
@@ -235,7 +286,7 @@ table th {
 }
 
 body.dark-mode table th {
-    background: hsl(231, 16%, 91%);
+    background: #020617;
 }
 
 table tr:hover {
@@ -243,13 +294,13 @@ table tr:hover {
 }
 
 body.dark-mode table tr:hover {
-    background: #f4f4f5;
-} */
+    background: #020617;
+}
 
 /* =========================
    STATUS COLORS
 ========================= */
-/* .success {
+.success {
     color: #16a34a;
     font-weight: 600;
 }
@@ -262,187 +313,4 @@ body.dark-mode table tr:hover {
 .failed {
     color: #dc2626;
     font-weight: 600;
-} */ 
-/* ============================
-   GLOBAL
-============================ */
-body {
-    background: linear-gradient(135deg, #f4f7fb, #eef2f7);
-    font-family: "Segoe UI", sans-serif;
-}
-
-.dashboard-title {
-    font-weight: 700;
-    font-size: 28px;
-    margin-bottom: 25px;
-    color: #111827;
-}
-
-/* ============================
-   GRID
-============================ */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 22px;
-}
-
-/* ============================
-   STAT CARDS
-============================ */
-.stat-card {
-    position: relative;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 18px;
-    padding: 22px 20px;
-    dashboard-box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
-    transition: all 0.35s ease;
-    cursor: pointer;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-.stat-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(79, 70, 229, 0.08), rgba(99, 102, 241, 0.15));
-    opacity: 0;
-    transition: 0.35s;
-}
-
-.stat-card:hover::before {
-    opacity: 1;
-}
-
-.stat-card:hover {
-    transform: translateY(-7px) scale(1.01);
-    box-shadow: 0 22px 45px rgba(0, 0, 0, 0.1);
-}
-
-/* ============================
-   ICON
-============================ */
-.stat-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    color: white;
-    margin-bottom: 14px;
-}
-
-/* ============================
-   TEXT
-============================ */
-.stat-title {
-    font-size: 14px;
-    color: #6b7280;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-}
-
-.stat-value {
-    font-size: 30px;
-    font-weight: 800;
-    color: #111827;
-    margin-top: 4px;
-}
-
-/* ============================
-   COLORS
-============================ */
-.bg-blue {
-    background: linear-gradient(135deg, #6366f1, #4f46e5);
-}
-
-.bg-green {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-}
-
-.bg-orange {
-    background: linear-gradient(135deg, #fb923c, #f97316);
-}
-
-.bg-red {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-.bg-purple {
-    background: linear-gradient(135deg, #a855f7, #9333ea);
-}
-
-/* ============================
-   BIG HERO CARD
-============================ */
-.hero-card {
-    grid-column: span 2;
-    background: linear-gradient(135deg, #4f46e5, #6366f1);
-    color: white;
-    border-radius: 22px;
-    padding: 30px 28px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
-    overflow: hidden;
-}
-
-.hero-card::after {
-    content: "";
-    position: absolute;
-    right: -50px;
-    top: -50px;
-    width: 180px;
-    height: 180px;
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 50%;
-}
-
-.hero-left h4 {
-    font-size: 18px;
-    font-weight: 600;
-    opacity: 0.9;
-}
-
-.hero-left h2 {
-    font-size: 42px;
-    font-weight: 800;
-    margin-top: 6px;
-}
-
-.hero-icon {
-    font-size: 64px;
-    opacity: 0.9;
-}
-
-/* ============================
-   SMALL CHART PLACEHOLDER
-============================ */
-.chart-box {
-    background: white;
-    border-radius: 18px;
-    padding: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
-}
-
-.chart-title {
-    font-weight: 700;
-    margin-bottom: 10px;
-    color: #111827;
-}
-
-/* ============================
-   MOBILE
-============================ */
-@media (max-width: 768px) {
-    .hero-card {
-        grid-column: span 1;
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-    }
 }

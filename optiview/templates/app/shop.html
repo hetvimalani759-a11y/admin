@@ -4,66 +4,30 @@
 {% block content %}
 
 <section class="shop-section">
-
     <h2>Shop Goggles</h2>
+    <div class="shop-container">
+        {% if products %}
+            {% for product in products %}
+            <div class="product-card">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:150px;height:auto;">
+                <h3>{{ product.name }}</h3>
+                <p>₹{{ product.price }}</p>
+                <!-- <a href="/product/{{ product.id }}/" class="btn primary">
+                Buy Now
+            </a> -->
+                <a href="{% url 'add_to_wishlist' product.id %}" class="btn secondary">
+    ❤️ Wishlist
+</a>
 
-    <!-- 🔍 SEARCH BAR -->
-    <form method="GET" class="filter-bar">
-        <input
-            type="text"
-            name="search"
-            placeholder="Search for Brand, Shape or Color..."
-            value="{{ request.GET.search }}"
-        >
-    </form>
-
-    <div style="display:flex; gap:30px; margin-top:40px;">
-
-        <!-- 📂 CATEGORY SIDEBAR -->
-        <div class="category-sidebar">
-            <h3>Categories</h3>
-
-            <a href="/shop/">All Products</a>
-
-            {% for cat in categories %}
-                <a href="?category={{ cat.name }}">
-                    {{ cat.name }}
-                </a>
+                <a href="{% url 'add_to_cart' product.id %}" class="btn primary">
+    Add to Cart
+</a>
+            </div>
             {% endfor %}
-        </div>
-
-        <!-- 🛒 PRODUCTS GRID -->
-        <div class="shop-container">
-
-            {% if products %}
-                {% for product in products %}
-                <div class="product-card">
-
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-
-                    <h3>{{ product.name }}</h3>
-
-                    <p>₹{{ product.price }}</p>
-
-                    <small>
-                        {{ product.frame_material }} |
-                        {{ product.shape }} |
-                        {{ product.gender }}
-                    </small>
-
-                    <br><br>
-
-                    <a href="#" class="btn primary">Buy Now</a>
-                </div>
-                {% endfor %}
-            {% else %}
-                <p>No products found.</p>
-            {% endif %}
-
-        </div>
-
+        {% else %}
+            <p style="text-align:center;">No products found.</p>
+        {% endif %}
     </div>
-
 </section>
 
 {% endblock %}

@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% block content %}
+{% load static %}
+    <link rel="stylesheet" href="{% static 'admin/css/style.css' %}">
+
+
+<h2>User List</h2>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Staff</th>
+            <th>Active</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.is_staff }}</td>
+            <td>{{ user.is_active }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
