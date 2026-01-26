@@ -3,7 +3,6 @@
 <head>
     <title>{{ product.name }}</title>
       {% load static %}
-    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
 </head>
 <body>
 
@@ -46,14 +45,8 @@
             <p><strong>Category:</strong> {{ product.category }}</p>
             <p><strong>Sub-Category:</strong> {{ product.subcategory }}</p>
 
-            <!-- <button class="btn primary">Add to Cart</button> -->
-             <a href="{% url 'add_to_wishlist' product.id %}" class="btn secondary">
-    ❤️ Add to Wishlist
-</a>
-
-             <a href="{% url 'add_to_cart' product.id %}" class="btn primary">
-    Add to Cart
-</a>
+            <a href="{% url 'add_to_cart' product.id %}">Add to Cart</a>
+            <a href="{% url 'add_to_wishlist' product.id %}">Add to Wishlist</a>
         </div>
     </div>
 </section>

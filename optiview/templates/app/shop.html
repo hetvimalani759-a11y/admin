@@ -1,6 +1,5 @@
 {% extends 'app/base.html' %}
 {% load static %}
-
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'app/css/shop.css' %}">
 {% endblock %}
@@ -13,11 +12,11 @@
 
     <!-- CATEGORY BUTTONS CENTERED -->
     <div class="category-buttons" style="text-align:center; margin-bottom:20px;">
-        <a href="{% url 'shop' %}" class="{% if not request.GET.category %}active{% endif %}">All</a>
+        <a href="{% url 'shop' %}" class="btn">All</a>
         {% for cat in categories %}
-            <a href="?category={{ cat.name|urlencode }}" class="{% if request.GET.category == cat.name %}active{% endif %}">
+            <a href="?category={{ cat.name }}" class="btn">
                 {{ cat.name }}
-            </a>
+            </a>        
         {% endfor %}
     </div>
 
@@ -30,9 +29,11 @@
                 <h3>{{ product.name }}</h3>
                 <p>₹{{ product.price }}</p>
             </a>
+             <a href="{% url 'add_to_cart' product.id %}">Add to Cart</a>
+             <a href="{% url 'add_to_wishlist' product.id %}">Add to Wishlist</a>
         </div>
         {% empty %}
-        <p style="text-align:center;">No products found.</p>
+            <p style="text-align:center;">No products found in this category.</p>
         {% endfor %}
     </div>
 
