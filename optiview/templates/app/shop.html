@@ -4,87 +4,67 @@
 {% block content %}
 
 <section class="shop-section">
+
     <h2>Shop Goggles</h2>
 
-    <!-- EXISTING SEARCH -->
-    <div class="filter-bar">
-        <input type="text" placeholder="Search for Brand or Style">
-    </div>
+    <!-- 🔍 SEARCH BAR -->
+    <form method="GET" class="filter-bar">
+        <input
+            type="text"
+            name="search"
+            placeholder="Search for Brand, Shape or Color..."
+            value="{{ request.GET.search }}"
+        >
+    </form>
 
-    <div class="shop-container">
+    <div style="display:flex; gap:30px; margin-top:40px;">
 
-        <!-- 🧩 CATEGORY SIDEBAR (NEW) -->
-        <aside class="shop-sidebar">
+        <!-- 📂 CATEGORY SIDEBAR -->
+        <div class="category-sidebar">
+            <h3>Categories</h3>
 
-            <h3>Men</h3>
-            <p>Sunglasses</p>
-            <p>Eyeglasses</p>
-            <p>Power Sunglasses</p>
+            <a href="/shop/">All Products</a>
 
-            <h3>Women</h3>
-            <p>Sunglasses</p>
-            <p>Eyeglasses</p>
-            <p>Cat-eye Frames</p>
+            {% for cat in categories %}
+                <a href="?category={{ cat.name }}">
+                    {{ cat.name }}
+                </a>
+            {% endfor %}
+        </div>
 
-            <h3>Kids</h3>
-            <p>Sunglasses</p>
-            <p>Safe Frames</p>
+        <!-- 🛒 PRODUCTS GRID -->
+        <div class="shop-container">
 
-            <h3>Shape</h3>
-            <p>Aviator</p>
-            <p>Wayfarer</p>
-            <p>Round / Oval</p>
-            <p>Rectangle</p>
-            <p>Oversized</p>
+            {% if products %}
+                {% for product in products %}
+                <div class="product-card">
 
-            <h3>Purpose</h3>
-            <p>Driving</p>
-            <p>Sports</p>
-            <p>Polarized</p>
-            <p>Anti-Fog</p>
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
 
-            <h3>Brands</h3>
-            <p>Ray-Ban</p>
-            <p>Oakley</p>
-            <p>Fastrack</p>
-            <p>Local Brand</p>
-        </aside>
+                    <h3>{{ product.name }}</h3>
 
-        <!-- 🛒 PRODUCTS (UNCHANGED) -->
-        <div class="shop-products">
+                    <p>₹{{ product.price }}</p>
 
-            <div class="product-card">
-                <img src="{% static 'images/product1.jpg' %}">
-                <h3>Classic Black Frame</h3>
-                <p>Material: Metal</p>
-                <p>Lens: Black</p>
-                <p>Shape: Aviator</p>
-                <p>₹1,499</p>
-                <a href="#" class="btn primary">Buy Now</a>
-            </div>
+                    <small>
+                        {{ product.frame_material }} |
+                        {{ product.shape }} |
+                        {{ product.gender }}
+                    </small>
 
-            <div class="product-card">
-                <img src="{% static 'images/product2.jpg' %}">
-                <h3>Modern Transparent</h3>
-                <p>Material: Plastic</p>
-                <p>Lens: Blue</p>
-                <p>Shape: Round</p>
-                <p>₹1,799</p>
-                <a href="#" class="btn primary">Buy Now</a>
-            </div>
+                    <br><br>
 
-            <div class="product-card">
-                <img src="{% static 'images/product3.jpg' %}">
-                <h3>Sporty Sunglasses</h3>
-                <p>Material: Titanium</p>
-                <p>Lens: Brown</p>
-                <p>Shape: Rectangle</p>
-                <p>₹1,999</p>
-                <a href="#" class="btn primary">Buy Now</a>
-            </div>
+                    <a href="#" class="btn primary">Buy Now</a>
+
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>No products found.</p>
+            {% endif %}
 
         </div>
+
     </div>
+
 </section>
 
 {% endblock %}

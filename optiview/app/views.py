@@ -5,11 +5,11 @@ from django.contrib import messages
 from adminpanel.models import Product, Lens
 
 
-
+from .models import Product, Category
 
 def shop(request):
+    products = Product.objects.all()
     return render(request, 'app/shop.html', {'products': products})
-
 
 def product_detail(request, id):
     product = next(p for p in products if p['id'] == id)
@@ -134,3 +134,28 @@ products = [
         'subcategory': 'Classic'
     }
 ]
+
+from django.shortcuts import render
+from .models import Product, Category
+
+def shop_view(request):
+    products = Product.objects.all()
+    categories = Category.objects.all()
+
+    search_query = request.GET.get('search')
+    category_filter = request.GET.get('category')
+
+    if search_query:
+        products = products.filter(
+            name__icontains=search_query
+        )
+
+    if category_filter:
+        products = products.filter(category__name=category_filter)
+
+    context = {
+        'products': products,
+        'categories': categories
+    }
+
+    return render(request, 'app/shop.html', context)
