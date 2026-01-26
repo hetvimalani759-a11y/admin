@@ -13,26 +13,26 @@ def home(request):
 
 
 # -------------------- SHOP --------------------
-
 def shop(request):
-    products = Product.objects.all()
+    category_name = request.GET.get('category')
     categories = Category.objects.all()
 
-    search_query = request.GET.get('search')
-    category_filter = request.GET.get('category')
+    if category_name:
+        products = Product.objects.filter(category__name=category_name)
+    else:
+        products = Product.objects.all()
 
-    if search_query:
-        products = products.filter(name__icontains=search_query)
+    wishlist_ids = []
+    if request.user.is_authenticated:
+        wishlist_ids = Wishlist.objects.filter(
+            user=request.user
+        ).values_list('product_id', flat=True)
 
-    if category_filter:
-        products = products.filter(category__name=category_filter)
-
-    context = {
+    return render(request, 'app/shop.html', {
         'products': products,
-        'categories': categories
-    }
-
-    return render(request, 'app/shop.html', context)
+        'categories': categories,
+        'wishlist_ids': wishlist_ids,
+    })
 
 
 @login_required
@@ -145,3 +145,52 @@ def notifications(request):
 def mark_read(request, id):
     Notification.objects.filter(id=id, user=request.user).update(is_read=True)
     return redirect("notifications")
+
+@login_required
+def cart_view(request):
+    cart_items = Cart.objects.filter(user=request.user)
+    total = sum(item.total_price() for item in cart_items)
+
+    return render(request, 'app/cart.html', {
+        'cart_items': cart_items,
+        'total': total
+    })
+@login_required
+def remove_from_cart(request, item_id):
+    item = get_object_or_404(Cart, id=item_id, user=request.user)
+    item.delete()
+    return redirect('cart')
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    item, created = Cart.objects.get_or_create(
+        user=request.user,
+        product=product
+    )
+    if not created:
+        item.quantity += 1
+        item.save()
+
+    return redirect('cart')   # ✅ DIRECT CART
+
+@login_required
+def wishlist_view(request):
+    items = Wishlist.objects.filter(user=request.user)
+    return render(request, 'app/wishlist.html', {'items': items})
+@login_required
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Wishlist.objects.get_or_create(
+        user=request.user,
+        product=product
+    )
+    return redirect('shop')
+
+
+
+
+@login_required
+def remove_from_wishlist(request, item_id):
+    item = get_object_or_404(Wishlist, id=item_id, user=request.user)
+    item.delete()
+    return redirect('wishlist')

@@ -29,7 +29,7 @@ class Product(models.Model):
     subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     name = models.CharField(max_length=150)
     price = models.IntegerField()
-    stock = models.IntegerField()
+    # stock = models.IntegerField()
     image = models.ImageField(upload_to='products/')
     created_at = models.DateTimeField(auto_now_add=True)
     stock = models.PositiveIntegerField(default=0)

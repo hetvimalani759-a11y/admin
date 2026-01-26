@@ -1,0 +1,29 @@
+{% extends 'app/base.html' %}
+{% block content %}
+
+<section class="shop-section">
+    <h2>Your Cart</h2>
+
+    {% if cart_items %}
+    <div class="shop-container">
+        {% for item in cart_items %}
+        <div class="product-card">
+            <img src="{{ item.product.image.url }}" style="width:120px;">
+            <h3>{{ item.product.name }}</h3>
+            <p>₹{{ item.product.price }}</p>
+            <p>Qty: {{ item.quantity }}</p>
+            <p><strong>Total: ₹{{ item.total_price }}</strong></p>
+        </div>
+        <a href="{% url 'remove_from_cart' item.id %}" class="btn danger">Remove</a>
+</a>
+
+        {% endfor %}
+    </div>
+
+    <h3 style="text-align:center;">Grand Total: ₹{{ total }}</h3>
+    {% else %}
+        <p style="text-align:center;">Cart is empty</p>
+    {% endif %}
+</section>
+
+{% endblock %}

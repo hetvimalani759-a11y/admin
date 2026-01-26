@@ -7,39 +7,35 @@
 
 {% block content %}
 
-<section class="shop-section" style="padding:20px;">
-    <h2 style="margin-bottom:20px;">Shop Goggles</h2>
+<div class="shop-page">
 
-    <!-- CATEGORY BUTTONS -->
-    <div class="category-buttons">
-        <a href="{% url 'shop' %}" class="btn {% if not request.GET.category %}active{% endif %}">All</a>
+    <h2 style="text-align:center; margin-bottom:20px;">Shop Goggles</h2>
+
+    <!-- CATEGORY BUTTONS CENTERED -->
+    <div class="category-buttons" style="text-align:center; margin-bottom:20px;">
+        <a href="{% url 'shop' %}" class="{% if not request.GET.category %}active{% endif %}">All</a>
         {% for cat in categories %}
-            <a href="?category={{ cat.name|urlencode }}" class="btn {% if request.GET.category == cat.name %}active{% endif %}">
+            <a href="?category={{ cat.name|urlencode }}" class="{% if request.GET.category == cat.name %}active{% endif %}">
                 {{ cat.name }}
             </a>
         {% endfor %}
     </div>
 
     <!-- PRODUCTS GRID -->
-    <div class="shop-container">
-        {% if products %}
-            {% for product in products %}
-            <div class="product-card">
-                <a href="/product/{{ product.id }}/"  class="product-link">
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                    <h3>{{ product.name }}</h3>
-                    <p>₹{{ product.price }}</p>
-                </a>
-                <div class="product-actions">
-                    <a href="{% url 'add_to_cart' product.id %}" class="btn primary">Add to Cart</a>
-                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn outline">Wishlist</a>
-                </div>
-            </div>
-            {% endfor %}
-        {% else %}
-            <p style="text-align:center; margin-top:20px;">No products found.</p>
-        {% endif %}
+   <div class="shop-container">
+        {% for product in products %}
+        <div class="product-card">
+            <a href="/product/{{ product.id }}/">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:150px;height:auto;">
+                <h3>{{ product.name }}</h3>
+                <p>₹{{ product.price }}</p>
+            </a>
+        </div>
+        {% empty %}
+        <p style="text-align:center;">No products found.</p>
+        {% endfor %}
     </div>
-</section>
+
+</div>
 
 {% endblock %}
