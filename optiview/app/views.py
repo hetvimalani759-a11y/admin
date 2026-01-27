@@ -1,25 +1,70 @@
 from django.shortcuts import render
 from adminpanel.models import Product, Lens , Order
 from django.contrib.auth.decorators import login_required
-#from django.contrib.auth import authenticate, login
+#
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# from django.contrib.auth import authenticate, login
 
 
-<<<<<<< HEAD
-  # import models from adminpanel
-
-def product_list(request):
-    products = Product.objects.all()  # get all products
-    return render(request, 'app/product_list.html', {'products': products})
-
-def lens_list(request):
-    lenses = Lens.objects.all()  # get all lenses
-    return render(request, 'app/lens_list.html', {'lenses': lenses})
-
-
-
-def home(request):
-    return render(request, 'app/index.html')
-=======
 
 
 def shop(request):
@@ -99,7 +144,6 @@ def lens_list(request):
 
 
 # -------------------- STATIC PAGES --------------------
->>>>>>> dfa612ace511239616ffd3fd5abd28f70517e88d
 
 def about(request):
     return render(request, 'app/about.html')
@@ -130,15 +174,3 @@ products = [
         'subcategory': 'Classic'
     }
 ]
-<<<<<<< HEAD
-
-def shop(request):
-    return render(request, 'app/shop.html', {'products': products})
-
-
-def product_detail(request, id):
-    product = next(p for p in products if p['id'] == id)
-    return render(request, 'app/product_detail.html', {'product': product})
-
-=======
->>>>>>> dfa612ace511239616ffd3fd5abd28f70517e88d

@@ -4,6 +4,8 @@ from . import views
 from django.views.generic import RedirectView
 
 
+
+
 urlpatterns = [
     path('', RedirectView.as_view(pattern_name='delivery_login', permanent=False)),  # redirect /delivery -> /delivery/login/
     path('login/', views.delivery_login, name='delivery_login'),
