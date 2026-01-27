@@ -133,8 +133,19 @@
     opacity: 0.9;
 }
 
-.empty-cart {
+/* Center empty cart message and button */
+.cart-items .empty-cart,
+.cart-items .btn {
+    display: block;
     text-align: center;
-    color: #777;
-    padding: 30px 0;
+    margin: 20px auto;
+}
+
+/* Optional: Center vertically if no items */
+.cart-items {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* vertical center */
+    align-items: center;     /* horizontal center */
+    min-height: 300px;       /* adjust height as needed */
 }

@@ -50,13 +50,6 @@
         </div>
         </a>
     </div>
-
-
-    <!-- Latest Products -->
-    <div class="col-md-6">
-        <div class="card stat p-3">
-            <h6>Latest Products</h6>
-
     <div class="col-md-3">
         <a class="nav-link" href="{% url 'adminpanel:user_list' %}">
         <div class="card stat p-3 text-center">
@@ -82,26 +75,11 @@
     </div>
 
     <!-- Low Stock Alerts -->
-
-    <div class="col-md-6">
-        <div class="card stat p-3">
-            <h6>Low Stock Alerts</h6>
-
     <div class="col-md-3">
         <a class="nav-link" href="{% url 'adminpanel:low_stock_products' %}">
         <div class="card stat p-3 text-center" width="100%">
             <h5>Low Stock Alerts</h5>
             <h3>{{ low_stock }}</h5>
-            {% if low_stock_products %}
-                {% for product in low_stock_products %}
-                    <div class="text-danger">
-                        {{ product.name }} — Stock: {{ product.stock }}
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No low stock products</p>
-            {% endif %}
-
         </div>
         </a>
     </div>

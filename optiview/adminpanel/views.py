@@ -77,6 +77,10 @@ def dashboard(request):
 
 
 # --------------------------- NOTIFICATIONS ---------------------------
+def apply_discount(products, discount_percent):
+    for product in products:
+        product.discount_percent = discount_percent
+        product.save()
 
 @login_required
 def notifications(request):

@@ -42,6 +42,10 @@
             </div>
             {% empty %}
                 <p class="empty-cart">Your cart is empty 😔</p>
+                <!-- Continue Shopping Button -->
+                <a href="{% url 'shop' %}" class="btn btn-lg btn-success rounded-pill px-5 py-2" style="margin: right 10px ;">
+                    Continue Shopping
+                </a>
             {% endfor %}
         </div>
 

@@ -46,15 +46,6 @@ def shop(request):
     if category_name:
         products = products.filter(category__name__iexact=category_name)
 
-    # Calculate discount percentage for each product
-    for product in products:
-        if product.discount_price:
-            product.discount_percentage = round(
-                (product.price - product.discount_price) / product.price * 100
-            )
-        else:
-            product.discount_percentage = 0
-
     wishlist_ids = []
     if request.user.is_authenticated:
         wishlist_ids = Wishlist.objects.filter(
@@ -67,11 +58,17 @@ def shop(request):
         'wishlist_ids': wishlist_ids,
     })
 
+
 # -------------------- CART --------------------
 
 @login_required
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
+
+    # ❌ Block out-of-stock products
+    if product.stock <= 0:
+        messages.error(request, "This product is out of stock.")
+        return redirect('shop')
 
     cart_item, created = Cart.objects.get_or_create(
         user=request.user,
@@ -87,20 +84,24 @@ def add_to_cart(request, product_id):
 
 
 
+
+
 @login_required
 def toggle_wishlist(request, product_id):
-    product = get_object_or_404(Product, pk=product_id)
-    wishlist_item = Wishlist.objects.filter(user=request.user, product=product).first()
+    product = get_object_or_404(Product, id=product_id)
+
+    wishlist_item = Wishlist.objects.filter(
+        user=request.user,
+        product=product
+    ).first()
 
     if wishlist_item:
-        # Already in wishlist → remove it
         wishlist_item.delete()
     else:
-        # Not in wishlist → add it
         Wishlist.objects.create(user=request.user, product=product)
 
-    # Redirect back to the same page
-    return redirect(request.META.get('HTTP_REFERER', 'shop'))
+    return redirect('shop')
+
 
 
 

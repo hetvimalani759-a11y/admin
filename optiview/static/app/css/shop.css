@@ -1,66 +1,91 @@
-/* ================= PRODUCT GRID ================= */
 .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 20px;
+    justify-content: start;
 }
 
-/* ================= PRODUCT CARD ================= */
 .product-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 10px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 15px;
+    width: 200px;
     text-align: center;
-    transition: 0.3s;
-    background-color: #fff;
+    transition: transform 0.2s ease;
 }
 
 .product-card:hover {
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
 }
 
-/* ================= PRODUCT IMAGE ================= */
 .product-image img {
     width: 100%;
-    height: 200px; /* same height for all images */
-    object-fit: contain;
-    margin-bottom: 10px;
+    height: auto;
+    border-radius: 10px;
 }
 
-/* ================= PRODUCT NAME ================= */
+.product-rating {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.product-rating .rating {
+    font-weight: bold;
+    color: #1a73e8;
+}
+
+.product-brand {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
 .product-name {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.price-row {
+    font-size: 14px;
     margin-bottom: 8px;
 }
 
-/* ================= PRICE ROW ================= */
-.price-row {
-    margin-bottom: 10px;
+.discounted-price {
+    font-weight: bold;
 }
 
-.price-row .original-price {
+.original-price {
     text-decoration: line-through;
     color: #888;
     margin-left: 5px;
 }
 
-.price-row .discount-percentage {
-    color: #0dcaf0;
-    font-weight: 500;
+.discount-percentage {
+    color: #00b894;
     margin-left: 5px;
 }
 
-.price-row .discounted-price {
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: #000;
+.card-actions a, .card-actions button {
+    font-size: 12px;
+    padding: 4px 8px;
 }
 
-/* ================= CARD ACTIONS ================= */
-.card-actions {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 10px;
+.btn-view-similar {
+    display: inline-block;
+    width: 100%;
+    padding: 6px 0;
+    background: #fff;
+    border: 1px solid #1a73e8;
+    color: #1a73e8;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-view-similar:hover {
+    background: #1a73e8;
+    color: #fff;
 }
