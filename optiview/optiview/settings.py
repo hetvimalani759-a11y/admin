@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'channels',
     'adminpanel',
     'app',
-    'delivery'
-    
+    'delivery',
+  
 ]
 
 

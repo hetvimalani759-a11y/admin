@@ -1,37 +1,11 @@
-<!-- {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Delivery Dashboard</title>
-    <link rel="stylesheet" href="{% static 'delivery/css/dashboard.css' %}">
-</head>
-<body>
-
-<div class="navbar">
-    Delivery Dashboard
-</div>
-
-<div class="container">
-    {% for order in orders %}
-        <div class="order-card">
-            <h3>Order #{{ order.id }}</h3>
-            <p>Customer: {{ order.user.username }}</p>
-            <p>Total: ₹{{ order.total_amount }}</p>
-            <p class="status">Status: {{ order.status }}</p>
-        </div>
-    {% empty %}
-        <p class="empty">No orders assigned</p>
-    {% endfor %}
-</div>
-
-</body>
-</html> -->
-
+ 
 {% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Delivery Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <link rel="stylesheet" href="{% static 'delivery/css/dashboard.css' %}">
 </head>
 <body>
@@ -40,57 +14,97 @@
     
      <div class="nav-left">
         <h2>🚚 Delivery Dashboard</h2>
-    </div>
-    <div class="nav-right">
-        <span>Hi, {{ request.user.username }}</span>
-       
-        <form method="post" action="{% url 'logout' %}" onsubmit="return confirmLogout();" class="logout-form">
-            {% csrf_token %}
-            <button type="submit" class="logout-btn">🔒 Logout</button>
-        </form>
 
-<script>
-function confirmLogout() {
-    return confirm("Are you sure you want to logout?");
-}
-</script>
-
-
-    </div>
+     </div>
 </header>
 
-<section class="dashboard">
-    {% if orders %}
-        <div class="orders">
-            {% for order in orders %}
-                <div class="order-card">
-                    <h3>Order #{{ order.id }}</h3>
-                    <p><strong>Total:</strong> ₹{{ order.total_amount }}</p>
-                    <p><strong>Status:</strong>
-                        <span class="status {{ order.status|lower }}">
-                            {{ order.status }}
-                        </span>
-                    </p>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p class="empty">No orders assigned yet 🚫</p>
-    {% endif %}
-</section>
 
-</body>
-</html>
-<div class="sidebar">
-    <div class="logo">🚚 Delivery</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delivery Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
 
-    <ul class="menu">
-        <li class="active">🏠 Dashboard</li>
-        <li>📦 My Orders</li>
-        <li>🔄 Update Status</li>
-        <li>👤 Profile</li>
-        <li class="logout">🚪 Logout</li>
-    </ul>
+
+ 
+<div class="container"></div>
+     
+    <div class="sidebar">
+        <h3></h3>
+        <a class="active"><i class="fa fa-home"></i> Dashboard</a>
+        <a href="{% url 'my_orders' %}" class="nav-link">  
+         <i class="fa fa-box"></i> My Orders
+         </a>
+        <a><i class="fa fa-sync"></i> Update Status</a>
+        <a><i class="fa fa-user"></i> Profile</a>
+        <a href="{% url 'logout' %}" onclick="return confirmLogout();">
+    <i class="fa fa-sign-out-alt"></i> Logout
+</a> 
+ <script>
+function confirmLogout() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You will be logged out!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3b8132',
+        confirmButtonText: 'Yes, logout',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{% url 'logout' %}";
+        }
+    });
+
+    return false; // 🔥 THIS LINE STOPS DIRECT LOGOUT
+}
+</script>
+     
+    </div>
+
+     
+     <div class="main">
+        <h2>Welcome, hetvi 👋</h2>
+       
+ 
+     
+         <div class="cards">
+            <div class="card">
+                <h4>Assigned</h4>
+                <span>0</span>
+            </div>
+            <div class="card green">
+                <h4>Delivered</h4>
+                <span>0</span>
+            </div>
+            <div class="card orange">
+                <h4>Pending</h4>
+                <span>0</span>
+            </div>
+        </div> 
+
+        <!-- TABLE -->
+         <h3>Assigned Orders</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2" class="empty">🚫 No orders assigned yet</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-
+</body>
+</html> 

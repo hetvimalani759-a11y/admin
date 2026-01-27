@@ -28,6 +28,7 @@ urlpatterns = [
     path('admin-panel/', include('adminpanel.urls')),
     path('delivery/', include('delivery.urls')),
     path('logout/', auth_views.LogoutView.as_view(), name='logoutview'),
+    
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
