@@ -61,18 +61,18 @@ def shop(request):
 # -------------------- CART --------------------
 
 @login_required
-
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     item, created = Cart.objects.get_or_create(
         user=request.user,
-        product=product  # ✅ Must be a Product instance, not a string
+        product=product  # ✅ This is correct if 'product' is a Product instance
     )
     if not created:
         item.quantity += 1
         item.save()
 
     return redirect('cart')
+
 
 
 

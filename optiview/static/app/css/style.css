@@ -343,7 +343,73 @@ body {
 .footer-col a:hover {
     color: #fff;
     text-decoration: underline;
+}.header {
+    background-color: #000;
+    color: #fff;
+    padding: 10px 20px;
 }
+
+.header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.nav-menu a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-menu a.active {
+    text-decoration: underline;
+}
+
+/* Account Dropdown */
+.account-dropdown {
+    position: relative;
+}
+
+.account-btn {
+    cursor: pointer;
+}
+
+.account-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    color: #000;
+    min-width: 150px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 100;
+    border-radius: 5px;
+}
+
+.account-dropdown:hover .account-menu {
+    display: block;
+}
+
+.account-menu a, .account-menu p {
+    display: block;
+    padding: 5px 0;
+    margin: 0;
+    color: #000;
+    text-decoration: none;
+}
+
+.account-menu a:hover {
+    text-decoration: underline;
+}
+
 
 /* BRAND BOTTOM AREA */
 .footer-brand {
@@ -370,8 +436,6 @@ body {
         gap: 30px;
     }
 }
-<<<<<<< HEAD
-=======
 
 
 /* WHY US SECTION */
@@ -679,4 +743,3 @@ body {
 }
 
 
->>>>>>> e0030119b09632d1eaaedbea888f87081bf3b8c6

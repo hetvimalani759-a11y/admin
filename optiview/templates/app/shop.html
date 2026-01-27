@@ -1,42 +1,64 @@
 {% extends 'app/base.html' %}
 {% load static %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'app/css/shop.css' %}">
 {% endblock %}
 
 {% block content %}
+<div class="container py-4">
 
-<div class="shop-page">
+    <!-- Page Title -->
+    <h2 class="text-center mb-4">🛍 Shop Goggles</h2>
 
-    <h2 style="text-align:center; margin-bottom:20px;">Shop Goggles</h2>
-
-    <!-- CATEGORY BUTTONS CENTERED -->
-    <div class="category-buttons" style="text-align:center; margin-bottom:20px;">
-        <a href="{% url 'shop' %}" class="btn">All</a>
+    <!-- CATEGORY FILTER -->
+    <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
+        <a href="{% url 'shop' %}" class="btn btn-outline-dark">All</a>
         {% for cat in categories %}
-            <a href="?category={{ cat.name }}" class="btn">
-                {{ cat.name }}
-            </a>        
+            <a href="?category={{ cat.name }}" class="btn btn-outline-dark">{{ cat.name }}</a>
         {% endfor %}
     </div>
 
     <!-- PRODUCTS GRID -->
-   <div class="shop-container">
+    <div class="product-grid">
         {% for product in products %}
         <div class="product-card">
-            <a href="/product/{{ product.id }}/">
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width:150px;height:auto;">
-                <h3>{{ product.name }}</h3>
-                <p>₹{{ product.price }}</p>
+
+            <!-- PRODUCT IMAGE -->
+            <a href="{% url 'product_detail' product.id %}" class="product-image">
+                <img src="{{ product.image.url|default:'/static/app/images/default.png' }}" 
+                     alt="{{ product.name }}">
             </a>
-             <a href="{% url 'add_to_cart' product.id %}">Add to Cart</a>
-             <a href="{% url 'add_to_wishlist' product.id %}">Add to Wishlist</a>
+
+            <!-- PRODUCT INFO -->
+            <div class="product-body">
+                <h5 class="product-name">{{ product.name }}</h5>
+
+                <!-- Price -->
+                <div class="price-row mb-2">
+                    <span class="price">₹{{ product.price }}</span>
+                </div>
+
+                <!-- Actions: Add to Cart / Wishlist -->
+                <div class="card-actions d-flex gap-2">
+                    <!-- ✅ Pass product.id, not product.name -->
+                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark btn-sm">Add to Cart</a>
+
+
+                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger btn-sm">
+                        {% if product.id in wishlist_ids %}
+                            <i class="fa-solid fa-heart"></i>
+                        {% else %}
+                            <i class="fa-regular fa-heart"></i>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
         </div>
         {% empty %}
-            <p style="text-align:center;">No products found in this category.</p>
+            <p class="text-center">No products found.</p>
         {% endfor %}
     </div>
 
 </div>
-
 {% endblock %}
