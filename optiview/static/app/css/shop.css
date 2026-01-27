@@ -1,84 +1,66 @@
-/* ================== Product Grid ================== */
+/* ================= PRODUCT GRID ================= */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
 }
 
-/* ================== Product Card ================== */
+/* ================= PRODUCT CARD ================= */
 .product-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,.1);
-    overflow: hidden;
-    transition: .2s ease;
-    display: flex;
-    flex-direction: column;
-    min-height: 380px; /* ensures all cards have same height */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    transition: 0.3s;
+    background-color: #fff;
 }
 
 .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 26px rgba(0,0,0,.16);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
-/* ================== Product Image ================== */
-.product-image {
-    width: 100%;
-    height: 210px;
-    background: #f7f7f7;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
+/* ================= PRODUCT IMAGE ================= */
 .product-image img {
     width: 100%;
-    height: 100%;
-    object-fit: cover; /* ensures all images fill the box uniformly */
-}
-
-/* ================== Product Body ================== */
-.product-body {
-    padding: 14px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.product-body h5 {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-/* ================== Price ================== */
-.price {
-    font-size: 14px;
-    font-weight: 600;
-    color: #198754;
+    height: 200px; /* same height for all images */
+    object-fit: contain;
     margin-bottom: 10px;
 }
 
-.old-price {
-    font-size: 13px;
+/* ================= PRODUCT NAME ================= */
+.product-name {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+/* ================= PRICE ROW ================= */
+.price-row {
+    margin-bottom: 10px;
+}
+
+.price-row .original-price {
     text-decoration: line-through;
     color: #888;
-    margin-left: 6px;
+    margin-left: 5px;
 }
 
-.off {
-    font-size: 13px;
-    color: #dc3545;
-    margin-left: 4px;
+.price-row .discount-percentage {
+    color: #0dcaf0;
+    font-weight: 500;
+    margin-left: 5px;
 }
 
-/* ================== Card Actions ================== */
+.price-row .discounted-price {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #000;
+}
+
+/* ================= CARD ACTIONS ================= */
 .card-actions {
-    margin-top: auto; /* pushes buttons to the bottom */
     display: flex;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    margin-top: 10px;
 }

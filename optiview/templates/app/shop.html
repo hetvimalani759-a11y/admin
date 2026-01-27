@@ -35,23 +35,27 @@
                 <h5 class="product-name">{{ product.name }}</h5>
 
                 <!-- Price -->
-                <div class="price-row mb-2">
-                    <span class="price">₹{{ product.price }}</span>
+                <div class="price-row">
+                    {% if product.discount_price %}
+                        <span class="discounted-price">₹{{ product.discount_price|floatformat:0 }}</span>
+                        <span class="original-price">₹{{ product.price|floatformat:0 }}</span>
+                        <span class="discount-percentage">({{ product.discount_percentage }}% OFF)</span>
+                    {% else %}
+                        <span class="discounted-price">₹{{ product.price|floatformat:0 }}</span>
+                    {% endif %}
                 </div>
 
                 <!-- Actions: Add to Cart / Wishlist -->
                 <div class="card-actions d-flex gap-2">
-                    <!-- ✅ Pass product.id, not product.name -->
                     <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark btn-sm">Add to Cart</a>
 
-
-                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger btn-sm">
+                    <a href="{% url 'toggle_wishlist' product.id %}" class="btn btn-outline-danger btn-sm">
                         {% if product.id in wishlist_ids %}
                             <i class="fa-solid fa-heart"></i>
                         {% else %}
                             <i class="fa-regular fa-heart"></i>
                         {% endif %}
-                    </a>
+                    </a>    
                 </div>
             </div>
         </div>

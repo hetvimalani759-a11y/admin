@@ -1,0 +1,96 @@
+<!-- {% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Dashboard</title>
+    <link rel="stylesheet" href="{% static 'delivery/css/dashboard.css' %}">
+</head>
+<body>
+
+<div class="navbar">
+    Delivery Dashboard
+</div>
+
+<div class="container">
+    {% for order in orders %}
+        <div class="order-card">
+            <h3>Order #{{ order.id }}</h3>
+            <p>Customer: {{ order.user.username }}</p>
+            <p>Total: ₹{{ order.total_amount }}</p>
+            <p class="status">Status: {{ order.status }}</p>
+        </div>
+    {% empty %}
+        <p class="empty">No orders assigned</p>
+    {% endfor %}
+</div>
+
+</body>
+</html> -->
+
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Dashboard</title>
+    <link rel="stylesheet" href="{% static 'delivery/css/dashboard.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+    
+     <div class="nav-left">
+        <h2>🚚 Delivery Dashboard</h2>
+    </div>
+    <div class="nav-right">
+        <span>Hi, {{ request.user.username }}</span>
+       
+        <form method="post" action="{% url 'logout' %}" onsubmit="return confirmLogout();" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">🔒 Logout</button>
+        </form>
+
+<script>
+function confirmLogout() {
+    return confirm("Are you sure you want to logout?");
+}
+</script>
+
+
+    </div>
+</header>
+
+<section class="dashboard">
+    {% if orders %}
+        <div class="orders">
+            {% for order in orders %}
+                <div class="order-card">
+                    <h3>Order #{{ order.id }}</h3>
+                    <p><strong>Total:</strong> ₹{{ order.total_amount }}</p>
+                    <p><strong>Status:</strong>
+                        <span class="status {{ order.status|lower }}">
+                            {{ order.status }}
+                        </span>
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="empty">No orders assigned yet 🚫</p>
+    {% endif %}
+</section>
+
+</body>
+</html>
+<div class="sidebar">
+    <div class="logo">🚚 Delivery</div>
+
+    <ul class="menu">
+        <li class="active">🏠 Dashboard</li>
+        <li>📦 My Orders</li>
+        <li>🔄 Update Status</li>
+        <li>👤 Profile</li>
+        <li class="logout">🚪 Logout</li>
+    </ul>
+</div>
+
+

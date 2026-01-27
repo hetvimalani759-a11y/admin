@@ -4,6 +4,8 @@ from django.db import models
 from django.conf import settings
 from delivery.models import DeliveryPerson 
 
+
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
 

@@ -11,8 +11,3 @@ admin.site.register(Order)
 admin.site.register(Notification)
 admin.site.register(CompanyInfo)
 admin.site.register(Category)
-
-
-
-
-

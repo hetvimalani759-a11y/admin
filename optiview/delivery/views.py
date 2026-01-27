@@ -12,27 +12,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 
 
-
-# def delivery_login(request):
-#     if request.method == "POST":
-#         username = request.POST.get("username")
-#         password = request.POST.get("password")
-
-#         user = authenticate(request, username=username, password=password)
-
-#         if user is None:
-#             messages.error(request, "Invalid username or password")
-
-#         elif not hasattr(user, "deliveryperson"):
-#             messages.error(request, "You are not a delivery person")
-
-#         else:
-#             login(request, user)
-#             return redirect("delivery_dashboard")
-
-#     return render(request, "delivery/login.html")
-
-
 @login_required
 def delivery_dashboard(request):
     # Safety check (extra protection)
@@ -128,36 +107,4 @@ def delivery_login(request):
     return render(request, "delivery/login.html")
 
 
-
-
-# import re
-
-
-
-# def delivery_login(request):
-#     if request.method == "POST":
-#         username = request.POST.get("username", "").strip()
-#         password = request.POST.get("password", "").strip()
-
-#         if not is_strong_password(password):
-#             return render(request, "delivery/login.html", {
-#                 "error": "Password must be strong (8+ chars, uppercase, lowercase, number, special char)"
-#             })
-
-#         user = authenticate(request, username=username, password=password)
-
-#         if user is None:
-#             return render(request, "delivery/login.html", {
-#                 "error": "Invalid username or password"
-#             })
-
-#         if not hasattr(user, "deliveryperson"):
-#             return render(request, "delivery/login.html", {
-#                 "error": "You are not authorized"
-#             })
-
-#         login(request, user)
-#         return redirect("delivery_dashboard")
-
-#     return render(request, "delivery/login.html")
 

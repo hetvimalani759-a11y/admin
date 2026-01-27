@@ -84,6 +84,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'optiview.wsgi.application'
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases

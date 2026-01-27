@@ -25,13 +25,13 @@
                 <!-- ✅ Pass product.id -->
                 <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark btn-sm">Add to Cart</a>
 
-                <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger btn-sm">
-                    {% if product.id in wishlist_ids %}
-                        <i class="fa-solid fa-heart"></i>
-                    {% else %}
-                        <i class="fa-regular fa-heart"></i>
+                <a href="{% url 'toggle_wishlist' product.id %}" class="btn btn-outline-danger btn-sm">
+                     {% if product.id in wishlist_ids %}
+                         <i class="fa-solid fa-heart"></i>
+                     {% else %}
+                         <i class="fa-regular fa-heart"></i>
                     {% endif %}
-                </a>
+                </a>    
             </div>
         </div>
     </div>
