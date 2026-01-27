@@ -1,75 +1,77 @@
 .shop-page {
-    padding: 30px;
+    max-width: 1200px;
+    margin: auto;
+    padding: 25px 15px 50px;
 }
 
 .shop-title {
     text-align: center;
-    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
 }
 
-/* CATEGORY BUTTONS */
+/* ===== CATEGORY BUTTONS ===== */
+
 .category-buttons {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
     margin-bottom: 30px;
 }
 
 .cat-btn {
-    display: inline-block;
-    padding: 8px 16px;
-    margin: 5px;
-    border: 1px solid #333;
+    padding: 8px 18px;
     border-radius: 20px;
-    text-decoration: none;
-    color: #333;
+    border: 1px solid #111;
+    background: transparent;
+    color: #111;
     font-weight: 500;
-    transition: 0.3s;
+    text-decoration: none;
+    transition: .25s ease;
 }
 
-.cat-btn:hover {
-    background: #333;
-    color: #fff;
-}
-
+.cat-btn:hover,
 .cat-btn.active {
-    background: #333;
-    color: #fff;
+    background: #111;
+    color: white;
 }
 
-/* PRODUCTS GRID */
+/* ===== PRODUCT GRID ===== */
+
 .shop-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 22px;
 }
 
+/* ===== PRODUCT CARD ===== */
+
 .product-card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 15px;
-    text-align: center;
-    transition: 0.3s;
     background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    overflow: hidden;
+    transition: .25s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,.12);
 }
 
-.product-card img {
-    width: 140px;
-    height: auto;
-    object-fit: contain;
-}
-
-.product-card a {
+.product-link {
     text-decoration: none;
     color: inherit;
+    flex-grow: 1;
 }
 
-.no-products {
-    grid-column: 1 / -1;
-    text-align: center;
-    font-size: 18px;
-    color: #777;
-}
+/* ===== IMAGE ===== */
+
+.image-box {
+    height: 200px;
+    background: #f5f5f5;
+    disp

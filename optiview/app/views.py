@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from adminpanel.models import Product, Lens, Order, Category
-from .models import Product, Cart, Wishlist, Notification
+from .models import Cart, Wishlist, Notification
 
 
 
@@ -41,11 +41,9 @@ def shop(request):
     category_name = request.GET.get('category')
     categories = Category.objects.all()
 
-    products = Product.objects.all()
+    products = Product.objects.all()  # ✅ Now pulling real products
     if category_name:
         products = products.filter(category__name__iexact=category_name)
-        products = products.filter(is_active=True, stock__gt=0)
-
 
     wishlist_ids = []
     if request.user.is_authenticated:
