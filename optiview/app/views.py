@@ -37,13 +37,23 @@ def home(request):
 
 # -------------------- SHOP --------------------
 
+# -------------------- SHOP --------------------
 def shop(request):
     category_name = request.GET.get('category')
     categories = Category.objects.all()
 
-    products = Product.objects.all()  # ✅ Now pulling real products
+    products = Product.objects.all()
     if category_name:
         products = products.filter(category__name__iexact=category_name)
+
+    # Calculate discount percentage for each product
+    for product in products:
+        if product.discount_price:
+            product.discount_percentage = round(
+                (product.price - product.discount_price) / product.price * 100
+            )
+        else:
+            product.discount_percentage = 0
 
     wishlist_ids = []
     if request.user.is_authenticated:
@@ -57,22 +67,40 @@ def shop(request):
         'wishlist_ids': wishlist_ids,
     })
 
-
 # -------------------- CART --------------------
 
 @login_required
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    item, created = Cart.objects.get_or_create(
+
+    cart_item, created = Cart.objects.get_or_create(
         user=request.user,
-        product=product  # ✅ This is correct if 'product' is a Product instance
+        product=product,
+        defaults={'quantity': 1}
     )
+
     if not created:
-        item.quantity += 1
-        item.save()
+        cart_item.quantity += 1
+        cart_item.save()
 
     return redirect('cart')
 
+
+
+@login_required
+def toggle_wishlist(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    wishlist_item = Wishlist.objects.filter(user=request.user, product=product).first()
+
+    if wishlist_item:
+        # Already in wishlist → remove it
+        wishlist_item.delete()
+    else:
+        # Not in wishlist → add it
+        Wishlist.objects.create(user=request.user, product=product)
+
+    # Redirect back to the same page
+    return redirect(request.META.get('HTTP_REFERER', 'shop'))
 
 
 
@@ -82,7 +110,7 @@ def cart_view(request):
     total = sum(item.total_price() for item in cart_items)
 
     return render(request, 'app/cart.html', {
-        'cart_items': cart_items,
+        'items': cart_items,   # ✅ not cart_items
         'total': total
     })
 
