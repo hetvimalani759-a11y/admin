@@ -13,7 +13,7 @@ from .models import DeliveryPerson
 
 
 def delivery_logout(request):
-    logout(request)
+    delivery_logout(request)
     return redirect('delivery_login')
 
 

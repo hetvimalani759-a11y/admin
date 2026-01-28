@@ -93,17 +93,21 @@
     color: #fff;
 }
 
-.wishlist-btn {
+
+/* Remove border on wishlist icon/button */
+.wishlist-btn, .wishlist-icon {
     border: none;
+    outline: none;
     background: transparent;
-    padding: 0;
-    font-size: 18px;
-    color: #dc3545;
+    cursor: pointer;
+    transition: transform 0.2s;
 }
 
-.wishlist-btn:hover {
+.wishlist-btn:hover, .wishlist-icon:hover {
     color: #b02a37;
+    transform: scale(1.1);
 }
+
 /* --- Toast Notifications --- */
 #toast {
     visibility: hidden;
@@ -126,4 +130,10 @@
 #toast.show {
     visibility: visible;
     opacity: 1;
+}
+.toggle-wishlist-btn i.fa-solid {
+    color: red;
+}
+.toggle-wishlist-btn i.fa-regular {
+    color: #000000;
 }

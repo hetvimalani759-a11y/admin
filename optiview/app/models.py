@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from adminpanel.models import Product
 
 class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="app_notifications")
     title = models.CharField(max_length=255)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
@@ -11,11 +11,6 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.user.username}"
-
-
-
-
-
 
 
 class Cart(models.Model):

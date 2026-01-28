@@ -1,82 +1,121 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 
-    function getCSRFToken() {
-        return document.getElementById("csrf-token").value;
+    const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]")?.value
+        || document.getElementById("csrf-token")?.value;
+
+    /* ---------- TOAST ---------- */
+    let toastEl = null;
+    let hideTimer = null;
+
+    function showToast(message, type = "success") {
+        if (!toastEl) {
+            toastEl = document.createElement("div");
+            toastEl.style.position = "fixed";
+            toastEl.style.top = "20px";
+            toastEl.style.right = "20px";
+            toastEl.style.zIndex = "9999";
+            document.body.appendChild(toastEl);
+        }
+
+        toastEl.innerHTML = `
+            <div style="
+                background:${type === "success" ? "#5ec8ec" : "#dc3545"};
+                color:white;
+                padding:10px 16px;
+                border-radius:6px;
+                box-shadow:0 4px 10px rgba(0,0,0,.15);
+                margin-bottom:8px;
+            ">${message}</div>
+        `;
+
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+            toastEl.innerHTML = "";
+        }, 2500);
     }
 
-    // ----- LIVE CART COUNT -----
+    /* ---------- CART COUNT ---------- */
     async function updateCartCount() {
         try {
             const res = await fetch("/cart/count/");
             const data = await res.json();
-            const cartBadge = document.querySelector("#cart-count");
-            if (cartBadge) cartBadge.textContent = data.count;
-        } catch (err) {
-            console.error("Failed to update cart count", err);
-        }
-    }
-    updateCartCount();
-
-    // ----- TOAST FUNCTION -----
-    function showToast(message) {
-        let toast = document.getElementById("toast");
-        if (!toast) {
-            toast = document.createElement("div");
-            toast.id = "toast";
-            toast.className = "toast";
-            document.body.appendChild(toast);
-        }
-        toast.textContent = message;
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 3000);
+            const badge = document.getElementById("cart-count");
+            if (badge) badge.textContent = data.count;
+        } catch (e) {}
     }
 
-    // ----- ADD TO CART -----
-    document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const productId = this.dataset.id;
+    /* ---------- CLICK HANDLER ---------- */
+    document.body.addEventListener("click", async (e) => {
 
-            fetch(`/add-to-cart/${productId}/`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": getCSRFToken(),
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.login_required) {
-                    showToast("⚠️ Please login to add items to cart.");
-                } else if (data.success) {
-                    updateCartCount(); // Update badge immediately
-                    showToast("🛒 Added to cart!");
-                }
-            });
-        });
-    });
+        /* ===== ADD TO CART ===== */
+        const cartBtn = e.target.closest(".add-to-cart-btn");
+        if (cartBtn) {
+            e.preventDefault();
+            e.stopPropagation();
 
-    // ----- WISHLIST TOGGLE (UNCHANGED) -----
-    document.querySelectorAll(".toggle-wishlist-btn").forEach(btn => {
-        btn.addEventListener("click", function () {
-            const productId = this.dataset.id;
-            const el = this;
+            if (cartBtn.dataset.loading === "true") return;
+            cartBtn.dataset.loading = "true";
 
-            fetch(`/wishlist/toggle/${productId}/`, {
-                method: "POST",
-                headers: {
-                    "X-CSRFToken": getCSRFToken(),
-                }
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.login_required) {
-                    alert("Please login to use wishlist.");
+            const productId = cartBtn.dataset.id;
+
+            try {
+                const res = await fetch(`/add-to-cart/${productId}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    updateCartCount();
+                    showToast("🛒 Added to cart");
                 } else {
-                    el.innerHTML = data.status === "added"
-                        ? '<i class="fa-solid fa-heart"></i>'
-                        : '<i class="fa-regular fa-heart"></i>';
+                    showToast(data.error || "Failed", "error");
                 }
-            });
-        });
+            } catch (err) {
+                showToast("Please register or login before adding to cart", "error");
+            } finally {
+                cartBtn.dataset.loading = "false";
+            }
+            return;
+        }
+
+        /* ===== WISHLIST ===== */
+        const wishBtn = e.target.closest(".toggle-wishlist-btn");
+        if (wishBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const productId = wishBtn.dataset.id;
+            const icon = wishBtn.querySelector("i");
+
+            try {
+                const res = await fetch(`/wishlist/toggle/${productId}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+                const data = await res.json();
+
+                if (data.status === "added") {
+                    icon.classList.remove("fa-regular");
+                    icon.classList.add("fa-solid", "text-danger");
+                    showToast("💖 Added to wishlist");
+                } else if (data.status === "removed") {
+                    icon.classList.remove("fa-solid", "text-danger");
+                    icon.classList.add("fa-regular");
+                    showToast("💔 Removed from wishlist");
+                }
+            } catch (err) {
+                showToast("Please register or login before adding to wishlist", "error");
+            }
+        }
+
     });
 
+    updateCartCount();
 });

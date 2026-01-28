@@ -590,12 +590,86 @@ body {
 .cart-icon i {
     font-size: 20px;       /* size of icon */
     color: white;          /* color */
-    margin: 0 10px;        /* spacing */
+    margin: 0 10px;
+    position: relative        /* spacing */
 }
 .cart-icon i:hover {
-    color: #890dfd;        /* change color on hover */
+    color: #73ccef;        /* change color on hover */
 }
 
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    font-size: 14px;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    line-height: 20px;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* Remove border on wishlist icon/button */
+.wishlist-btn, .wishlist-icon {
+    border: none;
+    outline: none;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.wishlist-btn:hover, .wishlist-icon:hover {
+    color: #b02a37;
+    transform: scale(1.1);
+}
+/* Empty Cart Styling */
+.cart-empty {
+    max-width: 600px;          /* Limit the width */
+    margin: 50px auto;         /* Center horizontally and add top margin */
+    padding: 40px 30px;        /* Add inner spacing */
+    background: #fff;          /* White card */
+    border-radius: 12px;       /* Rounded corners */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1); /* Soft shadow */
+    text-align: center;        /* Center text and button */
+}
+
+.cart-empty h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.cart-empty p {
+    font-size: 16px;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+.cart-empty .btn-continue {
+    padding: 12px 30px;
+    font-size: 16px;
+    background-color: #2e7d32; /* Green */
+    color: #fff;
+    border: none;
+    border-radius: 50px; /* Pill shape */
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.cart-empty .btn-continue:hover {
+    background-color: #1b5e20;
+    transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .cart-empty {
+        margin: 30px 15px;
+        padding: 30px 20px;
+    }
+}
 
 /* SHOP PAGE LAYOUT CSS */
 .shop-container {

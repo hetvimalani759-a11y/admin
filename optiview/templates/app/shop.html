@@ -4,8 +4,14 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'app/css/shop.css' %}">
 {% endblock %}
+<script>
+    
+</script>
+
 
 {% block content %}
+
+<!-- Hidden CSRF token for JS -->
 <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
 
 <div class="container py-4">
@@ -59,21 +65,25 @@
 
                 <!-- Actions -->
                 <div class="card-actions d-flex gap-2 mt-2">
+
                     {% if product.stock > 0 %}
-                        <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ product.id }}">
-                            🛒Add to Cart
-                        </button>
+                    <!-- AJAX Add to Cart Button -->
+                    <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ product.id }}">
+                        🛒 Add to Cart
+                    </button>
                     {% else %}
                         <button class="btn btn-secondary btn-sm" disabled>Out of Stock</button>
                     {% endif %}
 
-                    <button class="wishlist-btn btn-sm toggle-wishlist-btn" data-id="{{ product.id }}">
+                    <!-- Wishlist Toggle -->
+                    <button class="btn btn-sm toggle-wishlist-btn" data-id="{{ product.id }}">
                         {% if product.id in wishlist_ids %}
                             <i class="fa-solid fa-heart"></i>
                         {% else %}
                             <i class="fa-regular fa-heart"></i>
                         {% endif %}
                     </button>
+
                 </div>
 
             </div>

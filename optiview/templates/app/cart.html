@@ -1,32 +1,50 @@
 {% extends 'app/base.html' %}
 {% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/cart.css' %}">
+{% endblock %}
+
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'app/css/cart.css' %}">
+<!-- Hidden CSRF token for JS -->
+<input type="hidden" id="csrf-token" value="{{ csrf_token }}">
 
 <div class="cart-page">
 
     <h2 class="cart-title">🛒 My Cart</h2>
 
+    <!-- Django Messages / Notifications -->
+    <!-- {% if messages %}
+    <div class="notifications mb-3">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %} -->
+    {% if items %}
+
     <div class="cart-layout">
 
-        <!-- LEFT SIDE -->
+        <!-- LEFT SIDE: Cart Items -->
         <div class="cart-items">
             {% for item in items %}
             <div class="cart-row">
 
                 <div class="cart-img">
-                    <img src="{{ item.product.image.url }}">
+                    <img src="{{ item.product.image.url|default:'/static/app/images/default.png' }}" alt="{{ item.product.name }}">
                 </div>
 
                 <div class="cart-info">
                     <div class="cart-name">{{ item.product.name }}</div>
                     <div class="cart-price">
                         {% if item.product.discount_price %}
-                            <del>₹{{ item.product.price }}</del>
-                            <strong>₹{{ item.product.discount_price }}</strong>
+                            <del>₹{{ item.product.price|floatformat:0 }}</del>
+                            <strong>₹{{ item.product.discount_price|floatformat:0 }}</strong>
                         {% else %}
-                            ₹{{ item.product.price }}
+                            ₹{{ item.product.price|floatformat:0 }}
                         {% endif %}
                     </div>
                 </div>
@@ -40,16 +58,12 @@
                 <a href="{% url 'remove_from_cart' item.id %}" class="remove-btn">Remove</a>
 
             </div>
-            {% empty %}
-                <p class="empty-cart">Your cart is empty 😔</p>
-                <!-- Continue Shopping Button -->
-                <a href="{% url 'shop' %}" class="btn btn-lg btn-success rounded-pill px-5 py-2" style="margin: right 10px ;">
-                    Continue Shopping
-                </a>
             {% endfor %}
+            
         </div>
 
-        <!-- RIGHT SIDE -->
+        <!-- RIGHT SIDE: Order Summary -->
+        
         <div class="cart-summary">
             <h5>Order Summary</h5>
 
@@ -73,10 +87,26 @@
                 <span>₹{{ total }}</span>
             </div>
 
-            <button class="checkout-btn">Checkout</button>
+            <button class="checkout-btn btn btn-primary btn-lg w-100">Checkout</button>
         </div>
+        
 
     </div>
+    {% else %}
+    <div class="cart-empty">
+    
+
+    <!-- Continue Shopping Button -->
+        <p class="empty-cart">Your cart is empty 😔</p>
+
+            <!-- Continue Shopping Button -->
+            <button class="btn-continue" onclick="window.location.href='/shop/'">Continue Shopping</button>
+            
+    </div>
+    {% endif %}
 </div>
+
+<!-- Scripts -->
+<script src="{% static 'app/js/shop.js' %}"></script>
 
 {% endblock %}

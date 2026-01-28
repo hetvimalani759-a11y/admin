@@ -3,185 +3,145 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from adminpanel.models import Product, Lens, Order, Category
 from .models import Cart, Wishlist, Notification
 
 
-
-# -------------------- CART QUANTITY --------------------
-
-def increase_qty(request, item_id):
-    if not request.user.is_authenticated:
-        messages.warning(request, "Please login to modify your cart.")
-        return redirect('login')
-
-    cart_item = get_object_or_404(Cart, id=item_id, user=request.user)
-    cart_item.quantity += 1
-    cart_item.save()
-    return redirect('cart')
-
-
-def decrease_qty(request, item_id):
-    if not request.user.is_authenticated:
-        messages.warning(request, "Please login to modify your cart.")
-        return redirect('login')
-
-    cart_item = get_object_or_404(Cart, id=item_id, user=request.user)
-    if cart_item.quantity > 1:
-        cart_item.quantity -= 1
-        cart_item.save()
-    else:
-        cart_item.delete()
-    return redirect('cart')
-
-
-
 # -------------------- HOME --------------------
-
 def home(request):
     return render(request, "app/index.html")
 
 
 # -------------------- SHOP --------------------
-
-# -------------------- SHOP --------------------
 def shop(request):
     category_name = request.GET.get('category')
     categories = Category.objects.all()
-
     products = Product.objects.all()
     if category_name:
         products = products.filter(category__name__iexact=category_name)
 
     wishlist_ids = []
     if request.user.is_authenticated:
-        wishlist_ids = Wishlist.objects.filter(
-            user=request.user
-        ).values_list('product_id', flat=True)
+        wishlist_ids = Wishlist.objects.filter(user=request.user).values_list('product_id', flat=True)
 
-    return render(request, 'app/shop.html', {
-        'products': products,
-        'categories': categories,
-        'wishlist_ids': wishlist_ids,
+    return render(request, "app/shop.html", {
+        "products": products,
+        "categories": categories,
+        "wishlist_ids": wishlist_ids
     })
 
 
+def product_detail(request, id):
+    product = get_object_or_404(Product, id=id)
+    return render(request, "app/product_detail.html", {"product": product})
+
+
 # -------------------- CART --------------------
-from django.http import JsonResponse
-
+@login_required
 def add_to_cart(request, product_id):
-    if not request.user.is_authenticated:
-        return JsonResponse({"login_required": True}, status=401)
-
     product = get_object_or_404(Product, id=product_id)
 
     if product.stock <= 0:
-        return JsonResponse({"error": "Out of stock"}, status=400)
+        return JsonResponse({"success": False, "error": "Out of stock"})
 
     cart_item, created = Cart.objects.get_or_create(
         user=request.user,
         product=product,
-        defaults={'quantity': 1}
+        defaults={"quantity": 1}
     )
-
     if not created:
         cart_item.quantity += 1
         cart_item.save()
 
-    return JsonResponse({"success": True})
+    # ✅ Remove from wishlist
+    Wishlist.objects.filter(user=request.user, product=product).delete()
 
+    # ✅ Save notification
+    Notification.objects.create(
+        user=request.user,
+        message=f"{product.name} added to cart"
+    )
 
+    # ✅ Django message (backup toast)
+    messages.success(request, f"{product.name} added to cart")
 
+    if request.headers.get("x-requested-with") == "XMLHttpRequest":
+        count = Cart.objects.filter(user=request.user).count()
+        return JsonResponse({"success": True, "count": count})
 
-
-from django.http import JsonResponse
-
-def toggle_wishlist(request, product_id):
-    if not request.user.is_authenticated:
-        return JsonResponse({"login_required": True}, status=401)
-
-    product = get_object_or_404(Product, id=product_id)
-
-    wishlist_item = Wishlist.objects.filter(user=request.user, product=product).first()
-
-    if wishlist_item:
-        wishlist_item.delete()
-        return JsonResponse({"status": "removed"})
-    else:
-        Wishlist.objects.create(user=request.user, product=product)
-        return JsonResponse({"status": "added"})
-
-
+    return redirect("shop")
 
 
 @login_required
-def cart_view(request):
-    cart_items = Cart.objects.filter(user=request.user)
-    total = sum(item.total_price() for item in cart_items)
+def increase_qty(request, item_id):
+    cart_item = get_object_or_404(Cart, id=item_id, user=request.user)
+    cart_item.quantity += 1
+    cart_item.save()
+    return redirect("cart")
 
-    return render(request, 'app/cart.html', {
-        'items': cart_items,   # ✅ not cart_items
-        'total': total
-    })
+
+@login_required
+def decrease_qty(request, item_id):
+    cart_item = get_object_or_404(Cart, id=item_id, user=request.user)
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+    else:
+        cart_item.delete()
+    return redirect("cart")
 
 
 @login_required
 def remove_from_cart(request, item_id):
-    item = get_object_or_404(Cart, id=item_id, user=request.user)
-    item.delete()
-    return redirect('cart')
+    cart_item = get_object_or_404(Cart, id=item_id, user=request.user)
+    cart_item.delete()
+    return redirect("cart")
+
+
+@login_required
+def cart_view(request):
+    items = Cart.objects.filter(user=request.user)
+    total = sum(item.total_price() for item in items)
+    return render(request, "app/cart.html", {"items": items, "total": total})
+
+
+@login_required
+def cart_count(request):
+    count = Cart.objects.filter(user=request.user).count()
+    return JsonResponse({"count": count})
 
 
 # -------------------- WISHLIST --------------------
-
-def add_to_wishlist(request, product_id):
-    if not request.user.is_authenticated:
-        messages.warning(request, "Please register or login to use wishlist.")
-        return redirect('shop')
-
-    product = get_object_or_404(Product, pk=product_id)
-    Wishlist.objects.get_or_create(user=request.user, product=product)
-    return redirect('shop')
-
+@login_required
+def toggle_wishlist(request, product_id):
+    if request.method == "POST":
+        product = get_object_or_404(Product, id=product_id)
+        wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
+        if not created:
+            wishlist_item.delete()
+            return JsonResponse({"status": "removed"})
+        return JsonResponse({"status": "added"})
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @login_required
 def wishlist_view(request):
     items = Wishlist.objects.filter(user=request.user)
-    return render(request, 'app/wishlist.html', {'items': items})
+    return render(request, "app/wishlist.html", {"items": items})
 
 
 @login_required
 def remove_from_wishlist(request, item_id):
     item = get_object_or_404(Wishlist, id=item_id, user=request.user)
     item.delete()
-    return redirect('wishlist')
-
-
-# -------------------- PRODUCT --------------------
-
-def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'app/product_list.html', {'products': products})
-
-
-def product_detail(request, id):
-    product = get_object_or_404(Product, id=id)
-    return render(request, 'app/product_detail.html', {'product': product})
-
-
-# -------------------- LENS --------------------
-
-def lens_list(request):
-    lenses = Lens.objects.all()
-    return render(request, 'app/lens_list.html', {'lenses': lenses})
+    return redirect("wishlist")
 
 
 # -------------------- AUTH --------------------
-
 def register_view(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect("home")
 
     if request.method == "POST":
         username = request.POST.get("username")
@@ -191,58 +151,81 @@ def register_view(request):
 
         if password != password2:
             messages.error(request, "Passwords do not match!")
-            return redirect('register')
+            return redirect("register")
 
         if User.objects.filter(username=username).exists():
             messages.error(request, "Username already exists!")
-            return redirect('register')
+            return redirect("register")
 
         User.objects.create_user(username=username, email=email, password=password)
         messages.success(request, "Account created successfully! Please login.")
-        return redirect('login')
+        return redirect("login")
 
     return render(request, "app/register.html")
 
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('home')
+        return redirect("home")
 
     if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
-
         user = authenticate(request, username=username, password=password)
         if user:
             login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, "Invalid username or password!")
-            return redirect('login')
+            return redirect("home")
+        messages.error(request, "Invalid username or password!")
+        return redirect("login")
 
     return render(request, "app/login.html")
 
 
 def logout_view(request):
-    user = request.user
-    logout(request)
-    user.is_active = False
-    user.save()
-    return redirect("home")
+    if request.user.is_authenticated:
+        # Deactivate the user
+        request.user.is_active = False
+        request.user.save()
+        # Logout the user
+        logout(request)
+    return redirect('/')
+    # logout(request)
+    # return redirect("home")
+
 
 
 # -------------------- STATIC PAGES --------------------
-
 def about(request):
-    return render(request, 'app/about.html')
+    return render(request, "app/about.html")
+
+
+# Get notifications for the current user
+@login_required
+def get_notifications(request):
+    notifications = Notification.objects.filter(user=request.user, is_read=False).order_by('-created_at')
+    data = [{"id": n.id, "title": n.title, "message": n.message} for n in notifications]
+    return JsonResponse({"notifications": data})
+
+# Mark a notification as read
+@login_required
+def mark_notification_as_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.is_read = True
+    notification.save()
+    return JsonResponse({"status": "success"})
+
+# Send a notification to all users
+def send_notification_to_all(title, message):
+    users = User.objects.all()
+    for user in users:
+        Notification.objects.create(user=user, title=title, message=message)
 
 
 def contact(request):
-    return render(request, 'app/contact.html')
+    return render(request, "app/contact.html")
 
 
 # -------------------- NOTIFICATIONS --------------------
-
 @login_required
 def notifications(request):
     data = Notification.objects.filter(user=request.user).order_by("-created_at")
