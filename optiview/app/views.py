@@ -10,16 +10,22 @@ from .models import Cart, Wishlist, Notification
 
 # -------------------- CART QUANTITY --------------------
 
-@login_required
 def increase_qty(request, item_id):
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please login to modify your cart.")
+        return redirect('login')
+
     cart_item = get_object_or_404(Cart, id=item_id, user=request.user)
     cart_item.quantity += 1
     cart_item.save()
     return redirect('cart')
 
 
-@login_required
 def decrease_qty(request, item_id):
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please login to modify your cart.")
+        return redirect('login')
+
     cart_item = get_object_or_404(Cart, id=item_id, user=request.user)
     if cart_item.quantity > 1:
         cart_item.quantity -= 1
@@ -27,6 +33,7 @@ def decrease_qty(request, item_id):
     else:
         cart_item.delete()
     return redirect('cart')
+
 
 
 # -------------------- HOME --------------------
@@ -60,15 +67,16 @@ def shop(request):
 
 
 # -------------------- CART --------------------
+from django.http import JsonResponse
 
-@login_required
 def add_to_cart(request, product_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"login_required": True}, status=401)
+
     product = get_object_or_404(Product, id=product_id)
 
-    # ❌ Block out-of-stock products
     if product.stock <= 0:
-        messages.error(request, "This product is out of stock.")
-        return redirect('shop')
+        return JsonResponse({"error": "Out of stock"}, status=400)
 
     cart_item, created = Cart.objects.get_or_create(
         user=request.user,
@@ -80,27 +88,28 @@ def add_to_cart(request, product_id):
         cart_item.quantity += 1
         cart_item.save()
 
-    return redirect('cart')
+    return JsonResponse({"success": True})
 
 
 
 
 
-@login_required
+from django.http import JsonResponse
+
 def toggle_wishlist(request, product_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"login_required": True}, status=401)
+
     product = get_object_or_404(Product, id=product_id)
 
-    wishlist_item = Wishlist.objects.filter(
-        user=request.user,
-        product=product
-    ).first()
+    wishlist_item = Wishlist.objects.filter(user=request.user, product=product).first()
 
     if wishlist_item:
         wishlist_item.delete()
+        return JsonResponse({"status": "removed"})
     else:
         Wishlist.objects.create(user=request.user, product=product)
-
-    return redirect('shop')
+        return JsonResponse({"status": "added"})
 
 
 
@@ -125,11 +134,15 @@ def remove_from_cart(request, item_id):
 
 # -------------------- WISHLIST --------------------
 
-@login_required
 def add_to_wishlist(request, product_id):
+    if not request.user.is_authenticated:
+        messages.warning(request, "Please register or login to use wishlist.")
+        return redirect('shop')
+
     product = get_object_or_404(Product, pk=product_id)
     Wishlist.objects.get_or_create(user=request.user, product=product)
     return redirect('shop')
+
 
 
 @login_required

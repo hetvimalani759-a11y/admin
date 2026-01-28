@@ -569,6 +569,33 @@ body {
 .header-search input:focus {
     border-color: #000;
 }
+.social-icons i {
+    font-size: 22px;
+    color: #333;
+    margin: 0 10px;
+}
+.social-icons i:hover {
+    color: #0d6efd;
+}
+.heart-icon i {
+    font-size: 20px;       /* size of heart */
+    color: white;          /* border color / icon color */
+    background-color: transparent; /* ensures no fill */
+    padding: 5px;          /* optional spacing */
+}
+.heart-icon i:hover {
+    color: red;            /* changes to red on hover if you like */
+}
+
+.cart-icon i {
+    font-size: 20px;       /* size of icon */
+    color: white;          /* color */
+    margin: 0 10px;        /* spacing */
+}
+.cart-icon i:hover {
+    color: #890dfd;        /* change color on hover */
+}
+
 
 /* SHOP PAGE LAYOUT CSS */
 .shop-container {

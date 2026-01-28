@@ -27,8 +27,9 @@
             <a href="/shop/" class="{% if request.path == '/shop/' %}active{% endif %}">Shop</a>
             <a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">About</a>
             <a href="/contact/" class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a>
-            <a href="/cart/" class="{% if request.path == '/cart/' %}active{% endif %}">Cart</a>
-            <a href="/wishlist/" class="{% if request.path == '/wishlist/' %}active{% endif %}">Wishlist</a>
+            <a href="/cart/" class="cart-icon" class="{% if request.path == '/cart/' %}active{% endif %}"><i class="fas fa-shopping-cart"></i></a>
+            <a href="/wishlist/" class="heart-icon" class="{% if request.path == '/wishlist/' %}active{% endif %}"><i class="far fa-heart"></i> <!-- far = regular (outline), fas = solid (filled) --></a>
+            <p></p>
 
             <!-- ACCOUNT DROPDOWN -->
             <div class="account-dropdown position-relative">
@@ -48,9 +49,15 @@
 </header>
 
 <!-- PAGE CONTENT -->
-{% block content %}
-{% endblock %}
 
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} text-center">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+{% block content %}{% endblock %}
 <!-- FOOTER -->
 <footer class="figma-footer mt-5">
     <div class="footer-grid container">
@@ -73,9 +80,9 @@
         </div>
         <div class="footer-col">
             <h4>Follow Us</h4>
-            <p>Facebook</p>
-            <p>Instagram</p>
-            <p>Twitter</p>
+            <p><a href="#"><i class="fab fa-instagram"></i> Instagram</a></p>
+            <p><a href="#"><i class="fab fa-facebook"></i> Facebook</a></p>
+            <p><a href="#"><i class="fab fa-x-twitter"></i> Twitter</a></p>
         </div>
     </div>
     <div class="footer-brand text-center mt-3">

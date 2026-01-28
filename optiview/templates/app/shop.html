@@ -6,6 +6,8 @@
 {% endblock %}
 
 {% block content %}
+<input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+
 <div class="container py-4">
 
     <!-- Page Title -->
@@ -31,7 +33,7 @@
 
             <!-- PRODUCT INFO -->
             <div class="product-body">
-                
+
                 <!-- Rating -->
                 <div class="product-rating">
                     <span class="rating">{{ product.rating|default:4.5 }} ★</span>
@@ -58,17 +60,20 @@
                 <!-- Actions -->
                 <div class="card-actions d-flex gap-2 mt-2">
                     {% if product.stock > 0 %}
-                        <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary btn-sm">Add to Cart</a>
+                        <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ product.id }}">
+                            🛒Add to Cart
+                        </button>
                     {% else %}
                         <button class="btn btn-secondary btn-sm" disabled>Out of Stock</button>
                     {% endif %}
-                    <a href="{% url 'toggle_wishlist' product.id %}" class="btn btn-outline-danger btn-sm">
+
+                    <button class="wishlist-btn btn-sm toggle-wishlist-btn" data-id="{{ product.id }}">
                         {% if product.id in wishlist_ids %}
                             <i class="fa-solid fa-heart"></i>
                         {% else %}
                             <i class="fa-regular fa-heart"></i>
                         {% endif %}
-                    </a>  
+                    </button>
                 </div>
 
             </div>
@@ -80,4 +85,6 @@
     </div>
 
 </div>
+
+<script src="{% static 'app/js/shop.js' %}"></script>
 {% endblock %}

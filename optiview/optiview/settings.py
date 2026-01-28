@@ -152,7 +152,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'harshanavadiya074@gmail.com'
 EMAIL_HOST_PASSWORD = 'qybe darg xxqe yphb'
 
-LOGOUT_REDIRECT_URL = '/delivery/login/'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
