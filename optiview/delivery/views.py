@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-#from .models import DeliveryPerson
 from adminpanel.models import Order
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -10,48 +9,11 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
-
-
-
-# def delivery_login(request):
-#     if request.method == "POST":
-#         username = request.POST.get("username")
-#         password = request.POST.get("password")
-
-#         user = authenticate(request, username=username, password=password)
-
-#         if user is None:
-#             messages.error(request, "Invalid username or password")
-
-#         elif not hasattr(user, "deliveryperson"):
-#             messages.error(request, "You are not a delivery person")
-
-#         else:
-#             login(request, user)
-#             return redirect("delivery_dashboard")
-
-#     return render(request, "delivery/login.html")
-
-
-@login_required
-def delivery_dashboard(request):
-    # Safety check (extra protection)
-    if not hasattr(request.user, "deliveryperson"):
-        return redirect("delivery_login")
-
-    assigned_orders = (
-        Order.objects
-        .select_related("delivery_person")
-        .filter(delivery_person=request.user.deliveryperson)
-    )
-
-    return render(request, "delivery/dashboard.html", {
-        "orders": assigned_orders
-    })
+from .models import DeliveryPerson
 
 
 def delivery_logout(request):
-    logout(request)
+    delivery_logout(request)
     return redirect('delivery_login')
 
 
@@ -129,35 +91,26 @@ def delivery_login(request):
 
 
 
+def delivery_dashboard(request):
+    try:
+        delivery_person = DeliveryPerson.objects.get(user=request.user)
+    except DeliveryPerson.DoesNotExist:
+        return redirect("login")
 
-# import re
+    orders = Order.objects.filter(delivery_person=delivery_person)
+
+    context = {
+        "orders": orders,
+        "assigned_orders_count": orders.count(),
+        "delivered_orders_count": orders.filter(status="Delivered").count(),
+        "pending_orders_count": orders.filter(status="Pending").count(),
+    }
+
+    return render(request, "delivery/dashboard.html", context)  
 
 
-
-# def delivery_login(request):
-#     if request.method == "POST":
-#         username = request.POST.get("username", "").strip()
-#         password = request.POST.get("password", "").strip()
-
-#         if not is_strong_password(password):
-#             return render(request, "delivery/login.html", {
-#                 "error": "Password must be strong (8+ chars, uppercase, lowercase, number, special char)"
-#             })
-
-#         user = authenticate(request, username=username, password=password)
-
-#         if user is None:
-#             return render(request, "delivery/login.html", {
-#                 "error": "Invalid username or password"
-#             })
-
-#         if not hasattr(user, "deliveryperson"):
-#             return render(request, "delivery/login.html", {
-#                 "error": "You are not authorized"
-#             })
-
-#         login(request, user)
-#         return redirect("delivery_dashboard")
-
-#     return render(request, "delivery/login.html")
-
+@login_required
+def my_orders(request):
+    delivery_person = request.user.deliveryperson
+    orders = Order.objects.filter(delivery_person=delivery_person)
+    return render(request, "delivery/my_orders.html", {"orders": orders})

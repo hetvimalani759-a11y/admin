@@ -4,8 +4,16 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'app/css/shop.css' %}">
 {% endblock %}
+<script>
+    
+</script>
+
 
 {% block content %}
+
+<!-- Hidden CSRF token for JS -->
+<input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+
 <div class="container py-4">
 
     <!-- Page Title -->
@@ -26,34 +34,60 @@
 
             <!-- PRODUCT IMAGE -->
             <a href="{% url 'product_detail' product.id %}" class="product-image">
-                <img src="{{ product.image.url|default:'/static/app/images/default.png' }}" 
-                     alt="{{ product.name }}">
+                <img src="{{ product.image.url|default:'/static/app/images/default.png' }}" alt="{{ product.name }}">
             </a>
 
             <!-- PRODUCT INFO -->
             <div class="product-body">
+
+                <!-- Rating -->
+                <div class="product-rating">
+                    <span class="rating">{{ product.rating|default:4.5 }} ★</span>
+                    <span class="reviews">({{ product.review_count|default:100 }})</span>
+                </div>
+
+                <!-- Brand -->
+                <div class="product-brand">{{ product.brand|default:"Brand Name" }}</div>
+
+                <!-- Product Name -->
                 <h5 class="product-name">{{ product.name }}</h5>
 
                 <!-- Price -->
-                <div class="price-row mb-2">
-                    <span class="price">₹{{ product.price }}</span>
+                <div class="price-row">
+                    {% if product.discount_price %}
+                        <span class="discounted-price">₹{{ product.discount_price|floatformat:0 }}</span>
+                        <span class="original-price">₹{{ product.price|floatformat:0 }}</span>
+                        <span class="discount-percentage">({{ product.discount_percentage }}% OFF)</span>
+                    {% else %}
+                        <span class="discounted-price">₹{{ product.price|floatformat:0 }}</span>
+                    {% endif %}
                 </div>
 
-                <!-- Actions: Add to Cart / Wishlist -->
-                <div class="card-actions d-flex gap-2">
-                    <!-- ✅ Pass product.id, not product.name -->
-                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark btn-sm">Add to Cart</a>
+                <!-- Actions -->
+                <div class="card-actions d-flex gap-2 mt-2">
 
+                    {% if product.stock > 0 %}
+                    <!-- AJAX Add to Cart Button -->
+                    <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ product.id }}">
+                        🛒 Add to Cart
+                    </button>
+                    {% else %}
+                        <button class="btn btn-secondary btn-sm" disabled>Out of Stock</button>
+                    {% endif %}
 
-                    <a href="{% url 'add_to_wishlist' product.id %}" class="btn btn-outline-danger btn-sm">
+                    <!-- Wishlist Toggle -->
+                    <button class="btn btn-sm toggle-wishlist-btn" data-id="{{ product.id }}">
                         {% if product.id in wishlist_ids %}
                             <i class="fa-solid fa-heart"></i>
                         {% else %}
                             <i class="fa-regular fa-heart"></i>
                         {% endif %}
-                    </a>
+                    </button>
+
                 </div>
+
             </div>
+
         </div>
         {% empty %}
             <p class="text-center">No products found.</p>
@@ -61,4 +95,6 @@
     </div>
 
 </div>
+
+<script src="{% static 'app/js/shop.js' %}"></script>
 {% endblock %}
