@@ -1,7 +1,6 @@
 {% extends 'app/base.html' %}
 
 {% block content %}
-
 <h2 style="text-align:center;">My Cart</h2>
 
 <table class="cart-table">
@@ -13,23 +12,20 @@
         <th>Action</th>
     </tr>
 
-    {% for item in items %}
+    {% for item in cart_items %}
     <tr>
         <td>
             <img src="{{ item.product.image.url }}" width="80">
         </td>
         <td>{{ item.product.name }}</td>
         <td>₹{{ item.product.price }}</td>
-        <!-- <td>{{ item.quantity }}</td> -->
         <td>
-    <div class="qty-box">
-        <a href="{% url 'decrease_qty' item.id %}" class="qty-btn">−</a>
-
-        <span class="qty-number">{{ item.quantity }}</span>
-
-        <a href="{% url 'increase_qty' item.id %}" class="qty-btn">+</a>
-    </div>
-</td>
+            <div class="qty-box">
+                <a href="{% url 'decrease_qty' item.id %}" class="qty-btn">−</a>
+                <span class="qty-number">{{ item.quantity }}</span>
+                <a href="{% url 'increase_qty' item.id %}" class="qty-btn">+</a>
+            </div>
+        </td>
         <td>
             <a href="{% url 'remove_from_cart' item.id %}" class="btn danger">
                 Remove
@@ -37,11 +33,11 @@
         </td>
     </tr>
     {% endfor %}
+    
+    <!-- Total row -->
+    <tr>
+        <td colspan="4" style="text-align:right;"><strong>Total</strong></td>
+        <td><strong>₹{{ total }}</strong></td>
+    </tr>
 </table>
-<tr>
-    <td colspan="4" style="text-align:right;"><strong>Total</strong></td>
-    <td><strong>₹{{ total }}</strong></td>
-</tr>
-
-
 {% endblock %}
