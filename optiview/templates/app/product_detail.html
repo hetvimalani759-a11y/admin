@@ -1,87 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ product.name }}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-<header class="header">
-    <div class="logo">Optiview</div>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/shop/">Shop</a>
-        <a href="/contact/">Contact</a>
-        <a href="/about/">About</a>
-        <a href="/products/">products</a>
-        <a href="/lenses/">lenses</a>
-    </nav>
-</header>
+{% extends 'app/base.html' %}
+{% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/shop.css' %}">
+{% endblock %}
+
+{% block content %}
 <section class="product-detail">
     <div class="detail-container">
-
-        <img src="{% static product.image %}" alt="{{ product.name }}">
+        <img src="{{ product.image.url|default:'/static/app/images/default.png' }}" 
+             alt="{{ product.name }}" style="width:150px;height:auto;">
 
         <div class="detail-info">
             <h2>{{ product.name }}</h2>
             <p class="price">₹{{ product.price }}</p>
 
-            <p class="desc">{{ product.description }}</p>
+            <p class="desc">{{ product.description|default:"No description available." }}</p>
 
             <p><strong>Category:</strong> {{ product.category }}</p>
-            <p><strong>Sub-Category:</strong> {{ product.subcategory }}</p>
+            <p><strong>Sub-Category:</strong> {{ product.subcategory|default:"-" }}</p>
 
-            <button class="btn primary">Add to Cart</button>
+            <!-- Actions: Add to Cart / Wishlist -->
+            <div class="card-actions d-flex gap-2">
+                <!-- ✅ Pass product.id -->
+                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-dark btn-sm">Add to Cart</a>
+
+                <a href="{% url 'toggle_wishlist' product.id %}" class="btn btn-outline-danger btn-sm">
+                     {% if product.id in wishlist_ids %}
+                         <i class="fa-solid fa-heart"></i>
+                     {% else %}
+                         <i class="fa-regular fa-heart"></i>
+                    {% endif %}
+                </a>    
+            </div>
         </div>
-
     </div>
 </section>
-
-<footer class="figma-footer">
-
-    <div class="footer-grid">
-
-        <div class="footer-col">
-            <h4>Optiview</h4>
-            <p>
-                Premium goggles designed for style,
-                comfort and eye protection.
-            </p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Quick Links</h4>
-            <p><a href="/">Home</a></p>
-            <p><a href="/shop/">Shop</a></p>
-            <p><a href="/about/">About Us</a></p>
-            <p><a href="/contact/">Contact</a></p>
-            <p><a href="/products/">products</a></p>
-            <p><a href="/lenses/">lenses</a></p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p>Email: info@optiview.com</p>
-            <p>Phone: +91 98765 43210</p>
-            <p>Mon - Sat: 9AM - 8PM</p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Follow Us</h4>
-            <p>Facebook</p>
-            <p>Instagram</p>
-            <p>Twitter</p>
-        </div>
-
-    </div>
-
-    <div class="footer-brand">
-        <h2>Optiview</h2>
-        <p>© 2026 Optiview. All rights reserved.</p>
-    </div>
-
-</footer>
-
-</body>
-</html>
+{% endblock %}

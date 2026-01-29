@@ -1,103 +1,26 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Contact Us</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
+{% extends 'app/base.html' %}
 
-<header class="header">
-    <div class="logo">Optiview</div>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/about/">About </a>
-        <a href="/contact/">Contact </a>
-        <a href="/shop/">Shop</a>
-        <a href="/products/">products</a>
-        <a href="/lenses/">lenses</a>
+{% block content %}<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet">
+
+<section class="contact-box">
+    <div class="contact-part">
+        <h3>Address</h3>
+        <p>Optiview Store<br>Ahmedabad, India</p>
+    </div>
+
+    <div class="contact-part">
+        <h3>Email</h3>
+        <p>info@optiview.com</p>
+    </div>
+
+    <div class="contact-part">
+        <h3>Phone</h3>
+        <p>+91 98765 43210</p>
         
-    </nav>
-</header>
-
-<section class="contact-section">
-    <h2>Contact Us</h2>
-    <p class="subtitle"><h1>CALL US FOR VISIT PLACE</h1></p>
-
-    <div class="contact-box">
-        <div class="contact-part">
-            <h3>Adress</h3>
-            <p>28,vaibhav park society,nikol</p>
-            
-        </div>
-        <div class="contact-part">
-            <h3>📧 Email Us</h3>
-            <p>info@optiview.com</p>
-            <p>support@optiview.com</p>
-        </div>
-
-        <div class="contact-part">
-            <h3>📞 Call Us</h3>
-            <p>+91 98765 43210</p>
-            <p>+91 91234 56789</p>
-        </div>
-
-        <div class="contact-part">
-            <h3>Opening time</h3>
-            <p>Monday – Saturday: 8am – 4pm </p>
-            <p>Sunday: 9am – 5pm</p>
-            
-        </div>
-
     </div>
 </section>
 
-<footer class="figma-footer">
-
-    <div class="footer-grid">
-
-        <div class="footer-col">
-            <h4>Optiview</h4>
-            <p>
-                Premium goggles designed for style,
-                comfort and eye protection.
-            </p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Quick Links</h4>
-            <p><a href="/">Home</a></p>
-            <p><a href="/shop/">Shop</a></p>
-            <p><a href="/about/">About Us</a></p>
-            <p><a href="/contact/">Contact</a></p>
-            <p><a href="/products/">products</a></p>
-            <p><a href="/lenses/">lenses</a></p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p>Email: info@optiview.com</p>
-            <p>Phone: +91 98765 43210</p>
-            <p>Mon - Sat: 9AM - 8PM</p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Follow Us</h4>
-            <p>Facebook</p>
-            <p>Instagram</p>
-            <p>Twitter</p>
-        </div>
-
-    </div>
-
-    <div class="footer-brand">
-        <h2>Optiview</h2>
-        <p>© 2026 Optiview. All rights reserved.</p>
-    </div>
-
-</footer>
-
-
-
-</body>
-</html>
+{% endblock %}

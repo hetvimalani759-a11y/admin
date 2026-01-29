@@ -117,15 +117,21 @@ def delivery_dashboard(request):
 
     return render(request, "delivery/dashboard.html", context)  
 
+
 @login_required
 def my_orders(request):
     delivery_person = DeliveryPerson.objects.get(user=request.user)
-
     orders = Order.objects.filter(delivery_person=delivery_person)
 
-    return render(request, 'delivery/my_orders.html', {
-        'orders': orders
-    })
+    return render(request, 'delivery/my_orders.html', {'orders': orders})
+
+
+# def update_order_status(request, pk):
+#     order = Order.objects.get(id=pk)
+#     order.status = request.POST.get("status")
+#     order.save()
+#     return redirect('my_orders')
+
 
 
 @login_required
@@ -164,7 +170,7 @@ def edit_profile(request):
 
     context = {
         'user': user,
-        'delivery_person': delivery_person,
+        'delivery_person': delivery_person, 
         'redirect_after': redirect_after
     }
     return render(request, 'delivery/edit_profile.html', context)

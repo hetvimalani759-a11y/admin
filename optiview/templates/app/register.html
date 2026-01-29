@@ -2,91 +2,93 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Register | Optiview</title>
+
 <style>
     body {
         font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(to right, #43e97b, #38f9d7);
+        background: linear-gradient(to right, #7ebaee, #ffffff);
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
         margin: 0;
     }
+
     .container {
         background: white;
         padding: 40px;
         border-radius: 12px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         width: 100%;
-        max-width: 400px;
+        max-width: 420px;
         text-align: center;
     }
+
     h2 {
         margin-bottom: 20px;
-        color: #333;
     }
-    input[type="text"], input[type="password"], input[type="email"] {
+
+    input {
         width: 100%;
-        padding: 12px 15px;
-        margin: 8px 0 16px 0;
-        border: 1px solid #ccc;
+        padding: 12px;
+        margin-bottom: 14px;
         border-radius: 8px;
-        box-sizing: border-box;
-        transition: 0.3s;
+        border: 1px solid #ccc;
     }
-    input:focus {
-        border-color: #43e97b;
-        box-shadow: 0 0 8px rgba(67, 233, 123, 0.3);
-        outline: none;
-    }
+
     button {
         width: 100%;
         padding: 12px;
         border: none;
         border-radius: 8px;
-        background: linear-gradient(to right, #43e97b, #38f9d7);
+        background: linear-gradient(to right, #634ffe, #3700fe);
         color: white;
         font-size: 16px;
         cursor: pointer;
-        transition: 0.3s;
     }
-    button:hover {
-        background: linear-gradient(to right, #38f9d7, #43e97b);
-    }
-    a {
-        display: inline-block;
-        margin-top: 15px;
-        text-decoration: none;
-        color: #43e97b;
-        font-weight: bold;
-    }
-    .messages p {
-        color: red;
-        margin: 10px 0 0 0;
+
+    .error {
+        background: #ffe6e6;
+        color: #d8000c;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 12px;
         font-size: 14px;
+    }
+
+    a {
+        display: block;
+        margin-top: 15px;
+        color: #4facfe;
+        font-weight: bold;
+        text-decoration: none;
     }
 </style>
 </head>
+
 <body>
+
 <div class="container">
     <h2>Register</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <input type="password" name="password2" placeholder="Confirm Password" required>
-        <button type="submit">Register</button>
-    </form>
-    <a href="{% url 'login' %}">Already have an account? Login</a>
 
-    <div class="messages">
-        {% for message in messages %}
-        <p>{{ message }}</p>
-        {% endfor %}
-    </div>
+    {% for message in messages %}
+        <div class="error">{{ message }}</div>
+    {% endfor %}
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <input type="password" name="password2" placeholder="Confirm Password" required>
+
+    <button type="submit">Register</button>
+
+
+
+</form>
+
+    <a href="{% url 'login' %}">Already have an account? Login</a>
 </div>
 </body>
 </html>

@@ -1,0 +1,17 @@
+<h2>Notifications</h2>
+
+{% for n in notifications %}
+<div style="border:1px solid #ccc;padding:10px;margin-bottom:10px;
+{% if not n.is_read %}background:#eef2ff{% endif %}">
+    <b>{{ n.title }}</b>
+    <p>{{ n.message }}</p>
+    <small>{{ n.created_at }}</small>
+
+    {% if not n.is_read %}
+        <br>
+        <a href="{% url 'mark_read' n.id %}">Mark as read</a>
+    {% endif %}
+</div>
+{% empty %}
+<p>No notifications</p>
+{% endfor %}

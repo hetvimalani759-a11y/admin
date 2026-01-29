@@ -75,6 +75,7 @@ TEMPLATES = [
                 'adminpanel.context_processors.notification_count',  # ✅
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'app.context_processors.cart_count'
             ],
         },
     },
@@ -84,6 +85,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'optiview.wsgi.application'
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -151,6 +153,11 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'harshanavadiya074@gmail.com'
 EMAIL_HOST_PASSWORD = 'qybe darg xxqe yphb'
 
-LOGOUT_REDIRECT_URL = '/delivery/login/'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
 
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 

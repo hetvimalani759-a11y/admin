@@ -1,0 +1,84 @@
+/* ================== Product Grid ================== */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+}
+
+/* ================== Product Card ================== */
+.product-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.1);
+    overflow: hidden;
+    transition: .2s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 380px; /* ensures all cards have same height */
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 26px rgba(0,0,0,.16);
+}
+
+/* ================== Product Image ================== */
+.product-image {
+    width: 100%;
+    height: 210px;
+    background: #f7f7f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* ensures all images fill the box uniformly */
+}
+
+/* ================== Product Body ================== */
+.product-body {
+    padding: 14px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-body h5 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+/* ================== Price ================== */
+.price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #198754;
+    margin-bottom: 10px;
+}
+
+.old-price {
+    font-size: 13px;
+    text-decoration: line-through;
+    color: #888;
+    margin-left: 6px;
+}
+
+.off {
+    font-size: 13px;
+    color: #dc3545;
+    margin-left: 4px;
+}
+
+/* ================== Card Actions ================== */
+.card-actions {
+    margin-top: auto; /* pushes buttons to the bottom */
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}

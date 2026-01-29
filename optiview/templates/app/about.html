@@ -1,140 +1,61 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>About Us | Optiview</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
+{% extends 'app/base.html' %}
+{% load static %}
 
-<header class="header">
-    <div class="logo">Optiview</div>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/shop/">Shop</a>
-        <a href="/about/">About</a>
-        <a href="/contact/">Contact</a>
-        <a href="/products/">products</a>
-        <a href="/lenses/">lenses</a>
-    </nav>
-</header>
-     <div class="about-center"><h1>Elevate Your Look with our Fashion Forward Eyewear</h1></div>    
+{% block content %}
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet">
+
+<div class="about-center">
+    <h1>Elevate Your Look with our Fashion Forward Eyewear</h1>
+</div>
+
 <section class="about-main">
     <div class="about-left">
-        <img src="{% static 'images/product1.jpg' %}">
+        <img src="{% static 'app/images/product1.jpg' %}">
     </div>
+
 
     <div class="about-right">
         <h2>Explore the Latest Eyewear Trends</h2>
         <p>
-            For those who appreciate simplicity and clean design, our minimalist eyewear collection is a perfect fit. These frames feature sleek lines, understated accents, and a minimalist aesthetic that effortlessly complements any outfit or personal style. Embrace the beauty of minimalism and let your confidence shine through. Fashionable Sun Protection: Our sunglasses collection merges fashion with UV protection. Explore an array of styles, from oversized frames to retro-inspired designs, all crafted with high-quality lenses that shield your eyes from harmful UV rays. Stay stylish and safeguarded under the sun with our fashionable sunglasses.
+            Our minimalist eyewear blends simplicity with elegance.
+            Crafted for comfort and clarity, each frame reflects modern
+            aesthetics while ensuring all-day wearability.
         </p>
     </div>
 </section>
 
-<!-- ABOUT SECTION 2 -->
 <section class="about-main reverse">
     <div class="about-left">
-        <img src="{% static 'images/product2.jpg' %}">
+        <img src="{% static 'app/images/product2.jpg' %}">
     </div>
 
     <div class="about-right">
-        <h2>Find the Perfect Pair in our Eyewear Selection</h2>
+        <h2>Find the Perfect Pair</h2>
         <p>
-            Stay on the cutting edge of fashion with our collection of eyewear that embraces the latest trends. From bold oversized frames to unique geometric shapes, these glasses add a contemporary and fashion-forward touch to any outfit. Active Lifestyle: Designed for those with an active lifestyle, our sports eyewear combines durability, functionality, and style. With lightweight frames, impact-resistant lenses, and comfortable fit, these glasses are perfect for outdoor adventures and athletic pursuits. Step back in time with our retro-inspired eyewear collection. Channel the iconic styles of the past with cat-eye frames, round lenses, or aviator sunglasses.
+            From bold fashion statements to lightweight sports eyewear,
+            Optiview delivers quality frames designed for every lifestyle.
         </p>
     </div>
 </section>
 
-<!-- FEATURES SECTION -->
 <section class="feature-section">
     <div class="feature">
         <h3>Premium Quality</h3>
-        <p>High durability lenses with crystal clarity.</p>
+        <p>Durable lenses with crystal clarity.</p>
     </div>
 
     <div class="feature">
         <h3>Modern Design</h3>
-        <p>Stylish frames suitable for all age groups.</p>
+        <p>Trendy frames for every age.</p>
     </div>
 
     <div class="feature">
         <h3>Trusted Brand</h3>
-        <p>Thousands of satisfied customers worldwide.</p>
+        <p>Loved by thousands of customers.</p>
     </div>
 </section>
 
-<!-- FOOTER -->
-<!-- <footer class="footer">
-    <div class="footer-row">
-        <div>
-            <h4>Optiview</h4>
-            <p>Premium Goggles Brand</p>
-        </div>
-
-        <div>
-            <h4>Quick Links</h4>
-            <p>Home</p>
-            <p>Shop</p>
-            <p>About</p>
-            <p>Contact</p>
-        </div>
-
-        <div>
-            <h4>Contact</h4>
-            <p>Email: info@optiview.com</p>
-            <p>Phone: +91 98765 43210</p>
-        </div>
-    </div>
-
-    <p class="copyright">© 2026 Optiview. All Rights Reserved.</p>
-</footer> -->
-
-<footer class="figma-footer">
-
-    <div class="footer-grid">
-
-        <div class="footer-col">
-            <h4>Optiview</h4>
-            <p>
-                Premium goggles designed for style,
-                comfort and eye protection.
-            </p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Quick Links</h4>
-            <p><a href="/">Home</a></p>
-            <p><a href="/shop/">Shop</a></p>
-            <p><a href="/about/">About Us</a></p>
-            <p><a href="/contact/">Contact</a></p>
-            <p><a href="/products/">products</a></p>
-            <p><a href="/lenses/">lenses</a></p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p>Email: info@optiview.com</p>
-            <p>Phone: +91 98765 43210</p>
-            <p>Mon - Sat: 9AM - 8PM</p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Follow Us</h4>
-            <p>Facebook</p>
-            <p>Instagram</p>
-            <p>Twitter</p>
-        </div>
-
-    </div>
-
-    <div class="footer-brand">
-        <h2>Optiview</h2>
-        <p>© 2026 Optiview. All rights reserved.</p>
-    </div>
-
-</footer>
-
-
-</body>
-</html>
+{% endblock %}

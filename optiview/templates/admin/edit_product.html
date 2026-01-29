@@ -1,45 +1,75 @@
-{% extends 'admin/base.html' %}
-{% block content %}
+ {% extends 'admin/base.html' %}
 
+{% block content %}
 <h4>Edit Product</h4>
 
 <form method="POST" enctype="multipart/form-data" class="card p-4">
     {% csrf_token %}
 
+    <!-- Category -->
     <div class="mb-3">
-    <label>Product Name</label>
-    <select name="name" class="form-control" required>
-      <option>eyeglasses</option>
-      <option>lens</option>
-      <option>frame</option>
-    </select>
-  </div>
+        <label>Category</label>
+        <select name="category" id="category" class="form-control" required valau>
+            <option value="">Select Category</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
 
+    <!-- Subcategory -->
+    <div class="mb-3">
+        <label>Subcategory</label>
+        <select name="subcategory" id="subcategory" class="form-control" required>
+            <option value="">Select Subcategory</option>
+            {% for subcat in subcategories %}
+                <option value="{{ subcat.id }}" {% if product.subcategory.id == subcat.id %}selected{% endif %}>
+                    {{ subcat.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Product Name -->
+    <div class="mb-3">
+        <label>Product Name</label>
+        <select name="name" class="form-control" required>
+            <option value="eyeglasses" {% if product.name == 'eyeglasses' %}selected{% endif %}>Eyeglasses</option>
+            <option value="lens" {% if product.name == 'lens' %}selected{% endif %}>Lens</option>
+            <option value="frame" {% if product.name == 'frame' %}selected{% endif %}>Frame</option>
+        </select>
+    </div>
+
+    <!-- Brand -->
     <div class="mb-3">
         <label>Brand</label>
         <input type="text" name="brand" class="form-control" value="{{ product.brand }}">
     </div>
 
+    <!-- Price -->
     <div class="mb-3">
         <label>Price</label>
         <input type="number" name="price" class="form-control" value="{{ product.price }}">
     </div>
 
+    <!-- Stock -->
     <div class="mb-3">
         <label>Stock</label>
         <input type="number" name="stock" class="form-control" value="{{ product.stock }}">
     </div>
 
+    <!-- Image -->
     <div class="mb-3">
         <label>Image</label><br>
-        <img src="{{ product.image.url }}" width="80" class="mb-2"><br>
+        {% if product.image %}
+            <img src="{{ product.image.url }}" width="80" class="mb-2"><br>
+        {% endif %}
         <input type="file" name="image" class="form-control">
     </div>
 
     <button class="btn btn-success">Update</button>
     <a href="{% url 'adminpanel:product_list' %}" class="btn btn-secondary">Back</a>
 </form>
-
-
-
 {% endblock %}
