@@ -92,21 +92,35 @@
     background: #1a73e8;
     color: #fff;
 }
-
-
-/* Remove border on wishlist icon/button */
-.wishlist-btn, .wishlist-icon {
+.wishlist-btn {
+    display: inline-block;
+    width: 100%;
+    padding: 8px 0;
+    background: #fff;
     border: none;
-    outline: none;
-    background: transparent;
-    cursor: pointer;
-    transition: transform 0.2s;
+    color: black;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.wishlist-heart {
+    display: inline-block;
+    border: 2px solid black;
+    color: black;
+    background: white;
+    padding: 6px 10px;
+    font-size: 18px;
+    text-decoration: none;
+    transition: 0.3s;
 }
 
-.wishlist-btn:hover, .wishlist-icon:hover {
-    color: #b02a37;
-    transform: scale(1.1);
+.wishlist-heart.active {
+    background: red;
+    color: white;
+    border-color: red;
 }
+
 
 /* --- Toast Notifications --- */
 #toast {

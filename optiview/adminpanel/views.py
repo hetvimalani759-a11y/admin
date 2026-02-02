@@ -10,8 +10,8 @@ from .models import Order, DeliveryPerson
 from django.contrib.admin.views.decorators import staff_member_required
 
 from .models import (
-    Product, Category, SubCategory,
-    Order, Lens, Notification, CompanyInfo
+    Product, Category, SubCategory,Offer,
+    Order,OrderItem, Lens, Notification, CompanyInfo
 )
 
 LOW_STOCK_THRESHOLD = 50
@@ -264,19 +264,27 @@ def delete_product(request, id):
 
 # --------------------------- ORDER VIEWS ---------------------------
 
+
+
 @login_required
 def order_list(request):
     orders = Order.objects.all().order_by("-created_at")
-    return render(request, "admin/order_list.html", {"orders": orders})
+    orderitems = OrderItem.objects.select_related("order", "product")
+
+    return render(request, "admin/order_list.html", {
+        "orders": orders,
+        "orderitems": orderitems
+    })
 
 
 @login_required
-def update_order_status(request, id):
-    order = get_object_or_404(Order, id=id)
-    if request.method == "POST":
-        order.status = request.POST.get("status")
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
+        new_status = request.POST.get('status')
+        order.status = new_status
         order.save()
-    return redirect("adminpanel:order_list")
+    return redirect('adminpanel:order_list')
 
 
 # --------------------------- LENS VIEWS ---------------------------
@@ -356,6 +364,7 @@ def revenue_dashboard(request):
 
 
 
+<<<<<<< HEAD
 def assign_order(request):
     orders = Order.objects.filter(status='Pending')
     delivery_persons = DeliveryPerson.objects.all()
@@ -400,3 +409,98 @@ def delivery_person_list(request):
     return render(request, 'admin/delivery_person_list.html', {
         'delivery_persons': delivery_persons
     })
+=======
+# ---------------- CREATE ----------------
+def create_offer(request):
+    products = Product.objects.all()
+    categories = Category.objects.all()
+
+    if request.method == "POST":
+        name = request.POST.get('name')
+        discount_type = request.POST.get('discount_type')
+        discount_value = request.POST.get('discount_value')
+        product_id = request.POST.get('product')
+        category_id = request.POST.get('category')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        is_active = request.POST.get('is_active') == 'on'
+
+        if product_id and category_id:
+            messages.error(request, "Select either Product OR Category.")
+            return redirect('create_offer')
+
+        if not product_id and not category_id:
+            messages.error(request, "Select at least Product or Category.")
+            return redirect('create_offer')
+
+        Offer.objects.create(
+            name=name,
+            discount_type=discount_type,
+            discount_value=discount_value,
+            product_id=product_id or None,
+            category_id=category_id or None,
+            start_date=start_date,
+            end_date=end_date,
+            is_active=is_active,
+        )
+
+        messages.success(request, "Offer created successfully!")
+        return redirect('adminpanel:offer_list')
+
+    return render(request, 'admin/create_offer.html', {
+        'products': products,
+        'categories': categories
+    })
+
+
+# ---------------- LIST ----------------
+def offer_list(request):
+    offers = Offer.objects.all().order_by('-id')
+    return render(request, 'admin/offer_list.html', {'offers': offers})
+
+
+# ---------------- EDIT ----------------
+def edit_offer(request, pk):
+    offer = get_object_or_404(Offer, pk=pk)
+    products = Product.objects.all()
+    categories = Category.objects.all()
+
+    if request.method == "POST":
+        offer.name = request.POST.get('name')
+        offer.discount_type = request.POST.get('discount_type')
+        offer.discount_value = request.POST.get('discount_value')
+        product_id = request.POST.get('product')
+        category_id = request.POST.get('category')
+        offer.start_date = request.POST.get('start_date')
+        offer.end_date = request.POST.get('end_date')
+        offer.is_active = request.POST.get('is_active') == 'on'
+
+        if product_id and category_id:
+            messages.error(request, "Select either Product OR Category.")
+            return redirect('edit_offer', pk=pk)
+
+        if not product_id and not category_id:
+            messages.error(request, "Select at least Product or Category.")
+            return redirect('edit_offer', pk=pk)
+
+        offer.product_id = product_id or None
+        offer.category_id = category_id or None
+        offer.save()
+
+        messages.success(request, "Offer updated successfully!")
+        return redirect('adminpanel:offer_list')
+
+    return render(request, 'admin/edit_offer.html', {
+        'offer': offer,
+        'products': products,
+        'categories': categories
+    })
+
+
+# ---------------- DELETE ----------------
+def delete_offer(request, pk):
+    offer = get_object_or_404(Offer, pk=pk)
+    offer.delete()
+    messages.success(request, "Offer deleted successfully!")
+    return redirect('adminpanel:offer_list')
+>>>>>>> 7d674ccc50a9472b9e26c1754b4d21ef8493d40e
