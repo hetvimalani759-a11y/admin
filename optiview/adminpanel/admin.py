@@ -1,6 +1,6 @@
 from django.contrib import admin
-<<<<<<< HEAD
-from .models import Order
+from .models import *
+from django.contrib.auth.models import User
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -15,9 +15,8 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('status', 'delivery_person')
     list_editable = ('delivery_person','status')
     search_fields = ('user__username',)  # search by username
-=======
-from django.contrib.auth.models import User
-from .models import *
+
+
 
 
 @admin.register(Notification)
@@ -53,4 +52,4 @@ admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(CompanyInfo)
 admin.site.register(Category)
->>>>>>> 7d674ccc50a9472b9e26c1754b4d21ef8493d40e
+
