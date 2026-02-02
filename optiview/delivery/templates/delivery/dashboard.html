@@ -1,0 +1,161 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delivery Dashboard</title>
+    
+    <link rel="stylesheet" href="{% static 'delivery/css/dashboard.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<header class="navbar">
+    <h2>🚚 Delivery Dashboard</h2>
+</header>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+       
+             <a href="{% url 'delivery_dashboard' %}" class="nav-link">
+            <i class= Dashboard></i> 🏠Dashboard</a>
+             <a href="{% url 'my_orders' %}" class="nav-link">
+                 <i class= MyOrders></i> 📦My Orders </a>
+
+                  <a><i class=UpdateStatus></i>🔄Update Status</a>
+                  <a href="{% url 'delivery_profile' %}" class="nav-link">
+                   <i class= Profile></i> 👤Profile</a> 
+                   <a href="javascript:void(0);" class="nav-link" onclick="confirmLogout()">
+                   <i class="fa fa-sign-out-alt"> </i> Logout
+                    </a>
+
+
+    </div>
+
+{% if messages %}
+<div id="django-messages"
+     data-messages='[
+        {% for message in messages %}
+            {"tag":"{{ message.tags }}","text":"{{ message|escapejs }}"}{% if not forloop.last %},{% endif %}
+        {% endfor %}
+     ]'>
+</div>
+{% endif %}
+    <main class="content">
+
+        <!-- DASHBOARD CARDS -->
+        <div class="cards">
+            <div class="card">
+                📦
+                <h3>{{ total_orders }}</h3>
+                <p>Total Orders</p>
+            </div>
+
+            <div class="card">
+                🚚
+                <h3>{{ out_for_delivery }}</h3>
+                <p>Out for Delivery</p>
+            </div>
+
+            <div class="card">
+                ✅
+                <h3>{{ delivered_orders }}</h3>
+                <p>Delivered</p>
+            </div>
+
+            <div class="card">
+                ⏳
+                <h3>{{ pending_orders }}</h3>
+                <p>Pending</p>
+            </div>
+        </div>
+
+        <!-- ACTIVE ORDERS -->
+        <h2 class="section-title">Active Orders</h2>
+
+        <table class="orders-table">
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Address</th>
+                <th>Status</th>
+            </tr>
+
+            {% if active_orders %}
+                {% for order in active_orders %}
+                <tr>
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.customer_name }}</td>
+                    <td>{{ order.address }}</td>
+                    <td>
+                        <span class="status {{ order.status|lower|cut:' ' }}">
+                            {{ order.status }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4" class="no-orders">
+                        🚫 No active deliveries assigned
+                    </td>
+                </tr>
+            {% endif %}
+        </table>
+
+    </main>
+</div>
+
+<!-- LOGOUT CONFIRM -->
+<script>
+function confirmLogout() {
+    Swal.fire({
+        title: 'Are you sure?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#2563eb',
+        confirmButtonText: 'Yes, logout'
+    }).then((result) => {
+        if (result.isConfirmed) {
+
+            Swal.fire({
+                icon: 'success',
+                text: 'You have been logged out successfully.',
+                timer: 1500,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = "{% url 'delivery_logout' %}";
+            });
+
+        }
+    });
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const msgDiv = document.getElementById("django-messages");
+    if (!msgDiv) return;
+
+    const messages = JSON.parse(msgDiv.dataset.messages);
+
+    messages.forEach(msg => {
+        Swal.fire({
+            icon: msg.tag === "success" ? "success" : "error",
+            title: msg.text,
+            timer: 2000,
+            showConfirmButton: false
+        });
+    });
+});
+</script>
+
+
+</body>
+</html>

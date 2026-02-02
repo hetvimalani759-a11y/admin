@@ -35,11 +35,12 @@ urlpatterns = [
     path('orders/', views.order_list, name='order_list'),
     path('low_stock/',views.low_stock_products, name="low_stock_products"),
     path("revenue/", views.revenue_dashboard, name="revenue_dashboard"),
-    # path('add-order/',views.add_order, name='add_order'),
+   # path('add-order/',views.add_order, name='add_order'),
     path("company/add/", views.company_create, name="company_create"),
     path("company/edit/", views.company_update, name="company_update"),
     path("notifications/read/", views.mark_notifications_read, name="mark_notifications_read"),
     path('assign-order/', views.assign_order, name='assign_order'),
+    path('delivery-persons/', views.delivery_person_list, name='delivery_person_list'),
     
 
 

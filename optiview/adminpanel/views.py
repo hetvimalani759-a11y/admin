@@ -7,6 +7,7 @@ from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.models import User
 from .models import Order, DeliveryPerson
+from django.contrib.admin.views.decorators import staff_member_required
 
 from .models import (
     Product, Category, SubCategory,
@@ -390,3 +391,12 @@ def update_order_status(request, order_id):
             order.save()
 
     return redirect("adminpanel:order_list")
+
+
+@staff_member_required
+def delivery_person_list(request):
+    delivery_persons = DeliveryPerson.objects.select_related('user')
+
+    return render(request, 'admin/delivery_person_list.html', {
+        'delivery_persons': delivery_persons
+    })
