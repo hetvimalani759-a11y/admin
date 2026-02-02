@@ -1,0 +1,81 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/order_success.css' %}">
+{% endblock %}
+
+{% block content %}
+<div style="max-width:500px;margin:80px auto;text-align:center;">
+
+  <!-- SUCCESS POPUP -->
+  <div id="ov-success-popup" class="ov-success-popup ov-hidden">
+    <div class="ov-popup-card">
+      <svg class="ov-checkmark" viewBox="0 0 52 52">
+        <circle class="ov-checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+        <path class="ov-checkmark-check" fill="none" d="M14 27l7 7 17-17"/>
+      </svg>
+      <h3>Order Placed!</h3>
+      <p>Thank you for your purchase</p>
+    </div>
+
+    <canvas id="ov-confetti-canvas"></canvas>
+  </div>
+
+  <h2>✅ Order Placed Successfully</h2>
+  <p>Thank you for shopping with Optiview 👓</p>
+  <button onclick="window.location.href='/shop/'" class="btn">Continue Shopping</button>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("ov-success-popup");
+  const canvas = document.getElementById("ov-confetti-canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  popup.classList.remove("ov-hidden");
+
+  const confetti = Array.from({ length: 150 }).map(() => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    r: Math.random() * 6 + 4,
+    d: Math.random() * 3 + 2,
+    color: `hsl(${Math.random() * 360}, 90%, 60%)`,
+    tilt: Math.random() * 10 - 10
+  }));
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confetti.forEach(p => {
+      ctx.beginPath();
+      ctx.lineWidth = p.r;
+      ctx.strokeStyle = p.color;
+      ctx.moveTo(p.x + p.tilt, p.y);
+      ctx.lineTo(p.x, p.y + p.tilt + p.r);
+      ctx.stroke();
+    });
+    update();
+  }
+
+  function update() {
+    confetti.forEach(p => {
+      p.y += p.d;
+      p.x += Math.sin(p.y * 0.01);
+      if (p.y > canvas.height) {
+        p.y = -10;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+  }
+
+  const animation = setInterval(draw, 20);
+
+  setTimeout(() => {
+    clearInterval(animation);
+    popup.classList.add("ov-hidden");
+  }, 3500);
+});
+</script>
+{% endblock %}

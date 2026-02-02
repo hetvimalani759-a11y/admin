@@ -1,0 +1,38 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>My Order History</h2>
+
+{% if orders %}
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Total Price</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+            {% for item in order.items.all %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+            <td>₹{{item.product.get_final_price }}</td>
+            <td>{{ order.status }}</td>
+            <td>
+            <a href="{% url 'order_detail' order.id %}" class="btn">🚚 Track Order</a>
+    
+</td>
+
+        </tr>
+        {% endfor %}
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>You have no orders yet.</p>
+{% endif %}
+{% endblock %}

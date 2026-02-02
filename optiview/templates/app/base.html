@@ -5,12 +5,11 @@
     <title>Optiview Goggles</title>
     {% load static %}
 
-    <!-- External CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/> 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
@@ -28,8 +27,23 @@
             <a href="/shop/" class="{% if request.path == '/shop/' %}active{% endif %}">Shop</a>
             <a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">About</a>
             <a href="/contact/" class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a>
+            <a href="/orders/history/" class="{% if request.path == '/orders/history/' %}active{% endif %}">My Orders</a>
+            <!-- 🔔 NOTIFICATIONS -->
+            {% if user.is_authenticated %}
+            <div class="position-relative" id="notif-wrapper" style="display:none;">
+                <button id="notif-btn" style="background:none;border:none;font-size:20px;cursor:pointer;">
+                    🔔 <span id="notif-count"
+                        style="background:red;color:white;border-radius:50%;padding:2px 6px;font-size:12px;display:none;">0</span>
+                </button>
 
-            <!-- CART ICON -->
+                <div id="notif-box"
+                    style="display:none;position:absolute;right:0;top:30px;width:300px;background:white;color:#000;border:1px solid #ddd;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:999;">
+                    <div id="notif-items"></div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- CART -->
             <a href="/cart/" class="cart-icon position-relative {% if request.path == '/cart/' %}active{% endif %}">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="cart-count" id="cart-count">{{ cart_count }}</span>
@@ -57,7 +71,7 @@
     </div>
 </header>
 
-<!-- MESSAGES -->
+<!-- TOAST MESSAGES -->
 {% if messages %}
 <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999;">
   {% for message in messages %}
@@ -69,85 +83,7 @@
   </div>
   {% endfor %}
 </div>
-<!-- Notification Bell -->
-<div class="notification-wrapper" style="position: relative;">
-    <button id="notification-bell">
-        🔔
-        <span id="notification-count" style="background:red;color:white;border-radius:50%;padding:2px 6px;font-size:12px;">0</span>
-    </button>
-
-    <div id="notification-dropdown" style="display:none; position:absolute; right:0; top:30px; background:white; border:1px solid #ccc; width:300px; max-height:400px; overflow:auto; z-index:1000;">
-        <div id="notification-items"></div>
-    </div>
-</div>
-
-<script>
-// Toggle dropdown
-const bell = document.getElementById("notification-bell");
-const dropdown = document.getElementById("notification-dropdown");
-
-bell.addEventListener("click", () => {
-    dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
-});
-
-// Browser notifications
-function sendBrowserNotification(title, message) {
-    if ("Notification" in window && Notification.permission === "granted") {
-        new Notification(title, { body: message });
-    }
-}
-
-// Fetch notifications from server
-async function fetchNotifications() {
-    const res = await fetch("{% url 'get_notifications' %}");
-    const data = await res.json();
-
-    const countSpan = document.getElementById("notification-count");
-    const itemsDiv = document.getElementById("notification-items");
-
-    itemsDiv.innerHTML = ""; // clear dropdown
-
-    if (data.notifications.length === 0) {
-        countSpan.textContent = "0";
-        itemsDiv.innerHTML = "<p style='padding:10px;'>No new notifications</p>";
-    } else {
-        countSpan.textContent = data.notifications.length;
-        data.notifications.forEach(n => {
-            // Add to dropdown
-            const div = document.createElement("div");
-            div.className = "notification-item";
-            div.style.padding = "10px; border-bottom:1px solid #eee; cursor:pointer;";
-            div.innerHTML = `<strong>${n.title}</strong><p>${n.message}</p>`;
-            div.addEventListener("click", async () => {
-                await fetch(`/notifications/mark-as-read/${n.id}/`);
-                fetchNotifications(); // refresh
-            });
-            itemsDiv.appendChild(div);
-
-            // Send browser notification
-            sendBrowserNotification(n.title, n.message);
-        });
-    }
-}
-
-// Request permission
-document.addEventListener("DOMContentLoaded", () => {
-    if ("Notification" in window && Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
-    fetchNotifications();
-    setInterval(fetchNotifications, 10000); // refresh every 10 sec
-});
-</script>
-
-<script>
-  setTimeout(() => {
-    document.querySelectorAll('.toast').forEach(t => t.remove());
-  }, 3000);
-</script>
 {% endif %}
-
-
 
 <!-- MAIN CONTENT -->
 {% block content %}{% endblock %}
@@ -176,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <h4>Follow Us</h4>
             <p><a href="#"><i class="fab fa-instagram"></i> Instagram</a></p>
             <p><a href="#"><i class="fab fa-facebook"></i> Facebook</a></p>
-            <p><a href="#"><i class="fab fa-x-twitter"></i> Twitter</a></p>
+            <p><a href="#"><i class="fab fa-twitter"></i> Twitter</a></p>
         </div>
     </div>
     <div class="footer-brand text-center mt-3">
@@ -186,37 +122,84 @@ document.addEventListener("DOMContentLoaded", () => {
 </footer>
 
 <!-- JS -->
+<script src="{% static 'app/js/shop.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+
+{% if user.is_authenticated %}
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-    if ("Notification" in window) {
-        if (Notification.permission !== "granted") {
-            Notification.requestPermission();
+const notifWrapper = document.getElementById("notif-wrapper");
+const btn = document.getElementById("notif-btn");
+const box = document.getElementById("notif-box");
+const countBadge = document.getElementById("notif-count");
+const itemsBox = document.getElementById("notif-items");
+
+// Toggle notification box
+btn.onclick = () => {
+    box.style.display = box.style.display === "none" ? "block" : "none";
+};
+
+// Browser notification helper
+function showBrowserNotification(title, message) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        try {
+            new Notification(title, { body: message });
+        } catch(e) {
+            console.log("Notification failed", e);
         }
     }
-});
-</script>
-<script>
-function sendBrowserNotification(title, message) {
-    if (Notification.permission === "granted") {
-        new Notification(title, {
-            body: message,
-            icon: "/static/app/images/notification-icon.png", // optional, put your icon
-        });
-    }
-}
-</script>
-<script>
-async function checkNotifications() {
-    const res = await fetch("/notifications/");
-    const data = await res.json();
-    data.notifications.forEach(n => sendBrowserNotification(n.title, n.message));
 }
 
-// check every 10 seconds
-setInterval(checkNotifications, 10000);
+// Load notifications from backend
+async function loadNotifications() {
+    const res = await fetch("{% url 'get_notifications' %}");
+    const data = await res.json();
+
+    if (!data.notifications || data.notifications.length === 0) {
+        notifWrapper.style.display = "none"; // hide if no notifications
+        return;
+    }
+
+    notifWrapper.style.display = "inline-block"; // show notification icon
+
+    countBadge.style.display = "inline";
+    countBadge.textContent = data.notifications.length;
+
+    itemsBox.innerHTML = "";
+    data.notifications.forEach(n => {
+        const div = document.createElement("div");
+        div.style.padding = "12px";
+        div.style.borderBottom = "1px solid #eee";
+        div.style.cursor = "pointer";
+        div.innerHTML = `
+            <strong style="color:#000">${n.title}</strong>
+            <p style="color:#555;margin:0">${n.message}</p>
+        `;
+
+        div.onclick = async () => {
+            await fetch(`/notifications/read/${n.id}/`);
+            loadNotifications();
+        };
+        itemsBox.appendChild(div);
+        showBrowserNotification(n.title, n.message);
+    });
+}
+
+// Account dropdown toggle
+const accountDropdown = document.querySelector(".account-dropdown");
+const accountMenu = accountDropdown.querySelector(".account-menu");
+accountDropdown.addEventListener("mouseenter", () => { accountMenu.style.display = "block"; });
+accountDropdown.addEventListener("mouseleave", () => { accountMenu.style.display = "none"; });
+
+document.addEventListener("DOMContentLoaded", () => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+    loadNotifications();
+    setInterval(loadNotifications, 8000);
+});
 </script>
+{% endif %}
 
 </body>
 </html>
