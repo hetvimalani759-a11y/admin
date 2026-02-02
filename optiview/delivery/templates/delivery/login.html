@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delivery Login</title>
+    <link rel="stylesheet" href="{% static 'delivery/css/login.css' %}">
+</head>
+<body>
+
+
+<div class="overlay">
+    <div class="login-box">
+        <h2>Delivery Login</h2>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+<form method="post" onsubmit="return validateLogin()">
+    
+    {% csrf_token %}
+
+    <input type="text" id="username" name="username" placeholder="Username">
+    <span id="userError" class="error"></span>
+
+    <input type="password" id="password" name="password" placeholder="Password">
+    <span id="passError" class="error"></span>
+
+    <button type="submit">Login</button>
+    <br><br>
+    <a href="{% url 'forgot_password' %}">Forgot Password?</a>
+   
+
+
+</form>
+
+<script>
+function validateLogin() {
+    let valid = true;
+
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    document.getElementById("userError").innerText = "";
+    document.getElementById("passError").innerText = "";
+
+    if (username === "") {
+        document.getElementById("userError").innerText = "Username is required";
+        valid = false;
+    }
+
+    if (password === "") {
+        document.getElementById("passError").innerText = "Password is required";
+        valid = false;
+    }
+
+    return valid;
+}
+</script>
+
+</body>
+</html>

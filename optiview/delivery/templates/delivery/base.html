@@ -3,16 +3,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Delivery Dashboard</title>
+    <title>{% block title %}Delivery Dashboard{% endblock %}</title>
 
-    <!-- CSS -->
+    <!-- Base CSS -->
     <link rel="stylesheet" href="{% static 'delivery/css/style.css' %}">
+
+    <!-- ✅ REQUIRED for child-page CSS -->
+    {% block extra_css %}{% endblock %}
 
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-
 
 <!-- NAVBAR -->
 <div class="navbar">
@@ -24,10 +26,11 @@
         <span class="username">
             Welcome {{ request.user.username }}
         </span>
-   
+
         <a href="{% url 'edit_profile' %}" class="edit-profile-btn">
             ✏️ Edit Profile
         </a>
+
         <button class="logout-btn" onclick="confirmLogout()">Logout</button>
     </div>
 </div>
@@ -36,6 +39,8 @@
 <div class="page-content">
     {% block content %}{% endblock %}
 </div>
+
+
 
 <!-- LOGOUT CONFIRM SCRIPT -->
 <script>
@@ -50,7 +55,6 @@ function confirmLogout() {
         cancelButtonText: 'Cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-
             Swal.fire({
                 icon: 'success',
                 text: 'You have been logged out successfully',
@@ -59,12 +63,12 @@ function confirmLogout() {
             }).then(() => {
                 window.location.href = "{% url 'delivery_logout' %}";
             });
-
         }
     });
 }
-
 </script>
+
+
 
 </body>
 </html>

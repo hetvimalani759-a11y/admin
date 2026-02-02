@@ -126,13 +126,6 @@ def my_orders(request):
     return render(request, 'delivery/my_orders.html', {'orders': orders})
 
 
-# def update_order_status(request, pk):
-#     order = Order.objects.get(id=pk)
-#     order.status = request.POST.get("status")
-#     order.save()
-#     return redirect('my_orders')
-
-
 
 @login_required
 def  delivery_profile(request):
@@ -174,3 +167,38 @@ def edit_profile(request):
         'redirect_after': redirect_after
     }
     return render(request, 'delivery/edit_profile.html', context)
+
+def delivery_person_list(request):
+    # fetch delivery persons and send to template
+    return render(request, 'admin/delivery_person_list.html')
+
+
+def delivery_person_list(request):
+    delivery_persons = DeliveryPerson.objects.all()
+    return render(request, 'admin/delivery_person_list.html', {
+        'delivery_persons': delivery_persons
+    })
+
+
+def add_delivery_person(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        phone = request.POST['phone']
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        DeliveryPerson.objects.create(
+            user=user,
+            phone=phone,
+            is_active=True
+        )
+
+        return redirect('delivery_person_list')
+
+    return render(request, 'admin/add_delivery_person.html')

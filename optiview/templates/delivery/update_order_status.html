@@ -1,8 +1,0 @@
-<form method="POST" action="{% url 'update_order_status' order.id %}">
-  {% csrf_token %}
-  <select name="status">
-    <option value="Picked">Picked</option>
-    <option value="Delivered">Delivered</option>
-  </select>
-  <button type="submit">Update</button>
-</form>
