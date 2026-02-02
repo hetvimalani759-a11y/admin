@@ -1,15 +1,16 @@
 from django.contrib import admin
-from .models import *
+from .models import Order
 
-
- # Must be an actual model field, not a property
-
-
-
-admin.site.register(Product,)
-admin.site.register(Lens)
-admin.site.register(Order)
-admin.site.register(Notification)
-admin.site.register(CompanyInfo)
-admin.site.register(Category)
-
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',              # this replaces customer_name
+        'delivery_person',
+        'total_amount',
+        'status',
+        'created_at',
+    )
+    list_filter = ('status', 'delivery_person')
+    list_editable = ('delivery_person','status')
+    search_fields = ('user__username',)  # search by username

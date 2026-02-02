@@ -39,8 +39,9 @@ urlpatterns = [
     path("company/add/", views.company_create, name="company_create"),
     path("company/edit/", views.company_update, name="company_update"),
     path("notifications/read/", views.mark_notifications_read, name="mark_notifications_read"),
+    path('assign-order/', views.assign_order, name='assign_order'),
     
 
 
-    # path('orders/update/<int:order_id>/',views.update_order_status,name='update_order_status')
+    path('orders/update/<int:order_id>/',views.update_order_status,name='update_order_status')
 ]

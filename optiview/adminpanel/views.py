@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.models import User
+from .models import Order, DeliveryPerson
 
 from .models import (
     Product, Category, SubCategory,
@@ -351,3 +352,41 @@ def revenue_dashboard(request):
     }
 
     return render(request, 'admin/revenue_dashboard.html', data)   
+
+
+
+def assign_order(request):
+    orders = Order.objects.filter(status='Pending')
+    delivery_persons = DeliveryPerson.objects.all()
+
+    if request.method == "POST":
+        order_id = request.POST.get("order")
+        dp_id = request.POST.get("delivery_person")
+
+        order = Order.objects.get(id=order_id)
+        dp = DeliveryPerson.objects.get(id=dp_id)
+
+        order.assigned_to = dp
+        order.status = 'Assigned'
+        order.save()
+
+        return redirect('assign_order')
+
+    return render(request, 'assign_order.html', {
+        'orders': orders,
+        'delivery_persons': delivery_persons
+    })
+
+
+
+@login_required
+def update_order_status(request, order_id):
+    if request.method == "POST":
+        order = get_object_or_404(Order, id=order_id)
+        new_status = request.POST.get("status")
+
+        if new_status:
+            order.status = new_status
+            order.save()
+
+    return redirect("adminpanel:order_list")

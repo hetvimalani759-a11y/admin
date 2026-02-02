@@ -1,0 +1,88 @@
+{% extends 'delivery/base.html' %}
+{% block content %}
+
+<div class="card">
+    <h3>Edit Profile</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Username</label>
+        <input type="text" name="username" value="{{ user.username }}" required>
+
+        <label>Email</label>
+        <input type="email" name="email" value="{{ user.email }}" required>
+
+        <label>New Password</label>
+        <input type="password" name="password" placeholder="Leave blank to keep same">
+
+        <label>Joined Date</label>
+        <input type="text" value="{{ user.date_joined|date:'d M Y' }}" disabled>
+
+        <label>Phone</label>
+        <input type="text" name="phone" value="{{ delivery_person.phone }}" required>
+
+        <label>Address</label>
+        <input type="text" name="address" value="{{ delivery_person.address }}" required>
+
+        <br><br>
+
+        <button type="submit" class="btn save">Save Changes</button>
+        <a href="{% url 'delivery_profile' %}" class="btn cancel">Cancel</a>
+    </form>
+</div>
+
+<!-- Success message -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Redirect after 2 seconds if saved -->
+{% if redirect_after %}
+<script>
+    setTimeout(function () {
+        window.location.href = "{% url 'delivery_profile' %}";
+    }, 2000);
+</script>
+{% endif %}
+
+<!-- CSS for buttons -->
+<style>
+
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.btn.save {
+    background-color: #4a99b8;
+    color: white;
+    border: none;
+}
+
+.btn.save:hover {
+    background-color: #218838;
+}
+
+.btn.cancel {
+    background-color: #4a99b8;
+    color: white;
+    border: none;
+}
+
+.btn.cancel:hover {
+    background-color: #c82333;
+}
+
+</style>
+
+{% endblock %}
