@@ -180,7 +180,43 @@ body.dark-mode .login-box {
     margin-bottom: 22px;
     box-shadow: var(--shadow);
 }
+.account-dropdown {
+    position: relative;
+}
 
+.account-btn {
+    cursor: pointer;
+}
+
+.account-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #fff;
+    color: #000;
+    min-width: 150px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 100;
+    border-radius: 5px;
+}
+
+.account-dropdown:hover .account-menu {
+    display: block;
+}
+
+.account-menu a, .account-menu p {
+    display: block;
+    padding: 5px 0;
+    margin: 0;
+    color: #000;
+    text-decoration: none;
+}
+
+.account-menu a:hover {
+    text-decoration: underline;
+}
 body.dark-mode .navbar {
     background: var(--card-dark);
 }

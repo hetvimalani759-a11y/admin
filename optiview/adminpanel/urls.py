@@ -39,7 +39,13 @@ urlpatterns = [
     path("company/add/", views.company_create, name="company_create"),
     path("company/edit/", views.company_update, name="company_update"),
     path("notifications/read/", views.mark_notifications_read, name="mark_notifications_read"),
-    
+    path('offers/create/', views.create_offer, name='create_offer'),
+    path('offers/', views.offer_list, name='offer_list'),
+    path('offers/edit/<int:pk>/', views.edit_offer, name='edit_offer'),
+    path('offers/delete/<int:pk>/', views.delete_offer, name='delete_offer'),
+    path("orders/<int:order_id>/status/", views.update_order_status, name="update_order_status"),
+
+
 
 
     # path('orders/update/<int:order_id>/',views.update_order_status,name='update_order_status')

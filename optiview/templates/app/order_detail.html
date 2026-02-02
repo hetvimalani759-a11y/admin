@@ -1,0 +1,36 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Order #{{ order.id }}</h2>
+
+<h3>Items:</h3>
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
+            <td>{{ order.status }}</td>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>₹{{ item.price }}</td>
+            <td>₹{{ item.total_price }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'order_history' %} " class="btn ">Back to Order History</a>
+{% endblock %}
