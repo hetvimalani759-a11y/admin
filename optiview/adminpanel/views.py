@@ -6,6 +6,8 @@ from django.http import JsonResponse
 from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.models import User
+from .models import Order, DeliveryPerson
+from django.contrib.admin.views.decorators import staff_member_required
 
 from .models import (
     Product, Category, SubCategory,Offer,
@@ -344,23 +346,26 @@ def low_stock_products(request):
         "data": data
     })
 
+
+
+
 def revenue_dashboard(request):
     monthly_revenue = (
         Order.objects
-        .annotate(month=TruncMonth("created_at"))
-        .values("month")
-        .annotate(total=Sum("total_amount"))
-        .order_by("month")
+        .annotate(month=TruncMonth('created_at'))
+        .values('month')
+        .annotate(total=Sum('total_amount'))
+        .order_by('month')
     )
 
-    data = {
-        "months": [r["month"].strftime("%b %Y") for r in monthly_revenue],
-        "revenues": [r["total"] for r in monthly_revenue],
-    }
+    revenue_months = [r['month'].strftime('%b %Y') for r in monthly_revenue if r['total']]
+    revenue_values = [float(r['total']) for r in monthly_revenue if r['total']]
 
-    return render(request, 'admin/revenue_dashboard.html', data)   
-
-
+    return render(request, 'admin/revenue_dashboard.html', {
+        'monthly_revenue': monthly_revenue,
+        'revenue_months': revenue_months,
+        'revenue_values': revenue_values,
+    })
 
 # ---------------- CREATE ----------------
 def create_offer(request):
@@ -455,3 +460,85 @@ def delete_offer(request, pk):
     offer.delete()
     messages.success(request, "Offer deleted successfully!")
     return redirect('adminpanel:offer_list')
+def assign_order(request):
+    orders = Order.objects.filter(status='Pending')
+    delivery_persons = DeliveryPerson.objects.all()
+
+    if request.method == "POST":
+        order_id = request.POST.get("order")
+        dp_id = request.POST.get("delivery_person")
+
+        order = Order.objects.get(id=order_id)
+        dp = DeliveryPerson.objects.get(id=dp_id)
+
+        order.assigned_to = dp
+        order.status = 'Assigned'
+        order.save()
+
+        return redirect('assign_order')
+
+    return render(request, 'assign_order.html', {
+        'orders': orders,
+        'delivery_persons': delivery_persons
+    })
+
+
+
+@login_required
+def update_order_status(request, order_id):
+    if request.method == "POST":
+        order = get_object_or_404(Order, id=order_id)
+        new_status = request.POST.get("status")
+
+        if new_status:
+            order.status = new_status
+            order.save()
+
+    return redirect("adminpanel:order_list")
+
+
+@staff_member_required
+def delivery_person_list(request):
+    delivery_persons = DeliveryPerson.objects.select_related('user')
+
+    return render(request, 'admin/delivery_person_list.html', {
+        'delivery_persons': delivery_persons
+    })
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.db import IntegrityError
+from .models import DeliveryPerson
+
+def add_delivery_person(request):
+    if request.method == "POST":
+        username = request.POST.get("username").strip()
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        phone = request.POST.get("phone")
+
+        # ✅ First check (fast)
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect("delivery_person_add")
+
+        try:
+            # ✅ Second safety layer (database level)
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+        except IntegrityError:
+            messages.error(request, "Username already exists.")
+            return redirect("delivery_person_add")
+
+        DeliveryPerson.objects.create(
+            user=user,
+            phone=phone
+        )
+
+        messages.success(request, "Delivery person added successfully.")
+        return redirect("delivery_person_list")
+
+    return render(request, "delivery/add_delivery_person.html")

@@ -1,0 +1,445 @@
+/* ================================
+   DASHBOARD RESET SAFETY
+================================ */
+.dashboard-grid,
+.dash-section,
+.company-card {
+    all: unset;
+}
+
+/* ================================
+   TITLE
+================================ */
+.dashboard-title {
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 24px;
+    color: var(--text-main, #0f172a);
+}
+
+/* ================================
+   GRID
+================================ */
+.dashboard-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: 22px !important;
+    margin-bottom: 32px !important;
+}
+
+/* ================================
+   DASH CARDS (Glassmorphism)
+================================ */
+.dash-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 22px 24px !important;
+    border-radius: 22px !important;
+    text-decoration: none !important;
+    color: #fff !important;
+    position: relative !important;
+    overflow: hidden !important;
+    isolation: isolate !important;
+    min-height: 110px !important;
+    backdrop-filter: blur(16px) saturate(160%) !important;
+    box-shadow:
+        0 16px 40px rgba(0,0,0,.35),
+        inset 0 0 0 1px rgba(255,255,255,.22) !important;
+    transition: transform .3s cubic-bezier(.4,0,.2,1),
+                box-shadow .3s cubic-bezier(.4,0,.2,1),
+                filter .3s ease !important;
+}
+
+.dash-card:hover {
+    transform: translateY(-7px) scale(1.04) !important;
+    box-shadow:
+        0 28px 60px rgba(0,0,0,.45),
+        inset 0 0 0 1px rgba(255,255,255,.35) !important;
+    filter: brightness(1.1) saturate(1.1);
+}
+
+/* Glow aura */
+.dash-card::after {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(circle at top left,
+        rgba(255,255,255,.35),
+        transparent 60%);
+    opacity: .6;
+    z-index: 0;
+}
+
+/* Glass sweep shine */
+.dash-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        transparent 20%,
+        rgba(255,255,255,.45) 40%,
+        transparent 60%
+    );
+    transform: translateX(-120%);
+    transition: .8s ease;
+    z-index: 1;
+}
+
+.dash-card:hover::before {
+    transform: translateX(120%);
+}
+
+.dash-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.dash-card p {
+    margin: 0 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    opacity: .9 !important;
+}
+
+.dash-card h3 {
+    margin: 4px 0 0 !important;
+    font-size: 28px !important;
+    font-weight: 900 !important;
+    letter-spacing: .3px !important;
+}
+
+/* ================================
+   ICON
+================================ */
+.dash-icon {
+    width: 60px !important;
+    height: 60px !important;
+    border-radius: 18px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 28px !important;
+    background: rgba(255,255,255,.28) !important;
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.45),
+        0 10px 22px rgba(0,0,0,.35) !important;
+}
+
+/* ================================
+   COLOR THEMES
+================================ */
+.blue { background: linear-gradient(135deg,#2563eb,#38bdf8) !important; }
+.purple { background: linear-gradient(135deg,#7c3aed,#c084fc) !important; }
+.green { background: linear-gradient(135deg,#16a34a,#4ade80) !important; }
+.orange { background: linear-gradient(135deg,#f97316,#facc15) !important; }
+.teal { background: linear-gradient(135deg,#0ea5e9,#38bdf8) !important; }
+.red { background: linear-gradient(135deg,#dc2626,#fb7185) !important; }
+
+/* ================================
+   SPARKLINE
+================================ */
+.sparkline {
+    margin-top: 6px !important;
+    width: 100% !important;
+    height: 28px !important;
+    opacity: .85;
+}
+
+/* ================================
+   LATEST PRODUCTS
+================================ */
+.dash-section {
+    display: block !important;
+    background: var(--card-bg, #fff) !important;
+    border-radius: 22px !important;
+    padding: 22px 24px !important;
+    border: 1px solid var(--card-border, #e5e7eb) !important;
+    box-shadow: 0 14px 34px rgba(0,0,0,.22) !important;
+    margin-bottom: 28px !important;
+}
+
+.dash-section h4 {
+    margin-bottom: 14px !important;
+    font-weight: 900 !important;
+}
+
+.latest-products {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+}
+
+.latest-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
+    background: var(--bg-main, #f8fafc,#eef2ff) !important;
+    font-size: 14px !important;
+    transition: transform .25s ease,
+                background .25s ease,
+                box-shadow .25s ease !important;
+}
+
+.latest-item:hover {
+    background: #eef2ff !important;
+    transform: translateX(8px) scale(1.02) !important;
+    box-shadow: 0 10px 22px rgba(0,0,0,.18) !important;
+}
+
+.latest-item .price {
+    font-weight: 900 !important;
+    color: var(--primary, #2563eb) !important;
+}
+
+/* ================================
+   COMPANY CARD (Glass)
+================================ */
+.company-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 22px !important;
+    padding: 24px 28px !important;
+    border-radius: 26px !important;
+    background: linear-gradient(135deg,#f8fafc,#eef2ff) !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow:
+        0 18px 44px rgba(0,0,0,.28),
+        inset 0 0 0 1px rgba(255,255,255,.6) !important;
+    margin-bottom: 24px !important;
+    backdrop-filter: blur(18px) saturate(160%) !important;
+}
+
+.company-logo {
+    width: 92px !important;
+    height: 92px !important;
+    object-fit: contain !important;
+    border-radius: 18px !important;
+    background: #fff !important;
+    padding: 8px !important;
+    box-shadow: 0 12px 26px rgba(0,0,0,.3) !important;
+}
+
+.company-card h3 {
+    margin: 0 0 6px !important;
+    font-weight: 900 !important;
+}
+
+.company-card p {
+    margin: 2px 0 !important;
+    font-size: 14px !important;
+}
+
+/* ================================
+   ACTION BUTTONS
+================================ */
+.dashboard-actions {
+    text-align: right !important;
+    margin-bottom: 50px !important;
+}
+
+.btn-primary,
+.btn-success {
+    padding: 11px 22px !important;
+    border-radius: 14px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: transform .25s ease,
+                box-shadow .25s ease,
+                filter .25s ease !important;
+}
+
+.btn-primary {
+    background: #2563eb !important;
+    color: #fff !important;
+    box-shadow: 0 10px 22px rgba(37,99,235,.4) !important;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8 !important;
+    transform: translateY(-3px) scale(1.03) !important;
+    box-shadow: 0 16px 34px rgba(37,99,235,.55) !important;
+}
+
+.btn-success {
+    background: #16a34a !important;
+    color: #fff !important;
+    box-shadow: 0 10px 22px rgba(22,163,74,.4) !important;
+}
+
+.btn-success:hover {
+    background: #15803d !important;
+    transform: translateY(-3px) scale(1.03) !important;
+    box-shadow: 0 16px 34px rgba(22,163,74,.55) !important;
+}
+
+/* ================================
+   RIPPLE EFFECT
+================================ */
+.ripple::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    background: rgba(255,255,255,.6);
+    animation: ripple .6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* ================================
+   DARK MODE — PRO LEVEL
+================================ */
+[data-theme="dark"] .dash-section,
+[data-theme="dark"] .company-card {
+    background: rgba(15,23,42,.75) !important;
+    border-color: #1e293b !important;
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.6),
+        inset 0 0 0 1px rgba(255,255,255,.06) !important;
+    backdrop-filter: blur(20px) saturate(160%) !important;
+}
+
+[data-theme="dark"] .company-logo {
+    background: #020617 !important;
+}
+
+[data-theme="dark"] .latest-item {
+    background: #020617 !important;
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .latest-item:hover {
+    background: #020617 !important;
+    box-shadow: 0 10px 26px rgba(0,0,0,.6) !important;
+}
+
+[data-theme="dark"] .latest-item .price {
+    color: #93c5fd !important;
+}
+/* ==============================
+   Company Card + Latest Products Dark Mode Only
+============================== */
+[data-theme="dark"] .company-card,
+.dark-mode .company-card,
+body.dark .company-card {
+    background: #0f172a !important;
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .company-card p,
+[data-theme="dark"] .company-card h3,
+[data-theme="dark"] .company-card small,
+.dark-mode .company-card p,
+.dark-mode .company-card h3,
+.dark-mode .company-card small,
+body.dark .company-card p,
+body.dark .company-card h3,
+body.dark .company-card small {
+    color: #e5e7eb !important;
+}
+
+Latest Products box
+[data-theme="dark"] .dash-section,
+[data-theme="dark"] .latest-products,
+[data-theme="dark"] .latest-item,
+.dark-mode .dash-section,
+.dark-mode .latest-products,
+.dark-mode .latest-item,
+body.dark .dash-section,
+body.dark .latest-products,
+body.dark .latest-item {
+    background: #0f172a !important;
+    color: #e5e7eb !important;
+    border-color: #1e293b !important;
+}
+
+[data-theme="dark"] .latest-item span,
+.dark-mode .latest-item span,
+body.dark .latest-item span {
+    color: #e5e7eb !important;
+}
+/* ======================================
+   LATEST PRODUCTS — NEON GLASS DARK MODE
+====================================== */
+[data-theme="dark"] .dash-section {
+    background: rgba(0,0,0,.92) !important;
+    border: 1px solid rgba(56,189,248,.35) !important;
+    box-shadow:
+        0 0 0 1px rgba(56,189,248,.25),
+        0 0 22px rgba(56,189,248,.25),
+        0 0 48px rgba(56,189,248,.15),
+        inset 0 0 0 1px rgba(255,255,255,.03) !important;
+    backdrop-filter: blur(14px) saturate(160%) !important;
+}
+
+/* ===============================
+   EACH PRODUCT ROW
+=============================== */
+[data-theme="dark"] .latest-item {
+    position: relative !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 14px !important;
+    border: 1px solid rgba(56,189,248,.25) !important;
+    color: #000000 !important;
+    box-shadow:
+        0 0 12px rgba(56,189,248,.18),
+        inset 0 0 0 1px rgba(255,255,255,.04) !important;
+    overflow: hidden !important;
+    transition: .35s ease !important;
+}
+
+/* ===============================
+   NEON SHIMMER
+=============================== */
+[data-theme="dark"] .latest-item::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        transparent 20%,
+        rgba(56,189,248,.45) 40%,
+        transparent 60%
+    );
+    transform: translateX(-120%);
+    transition: .9s ease;
+}
+
+[data-theme="dark"] .latest-item:hover::before {
+    transform: translateX(120%);
+}
+
+/* ===============================
+   HOVER EFFECT
+=============================== */
+[data-theme="dark"] .latest-item:hover {
+    transform: translateX(8px) scale(1.03) !important;
+    box-shadow:
+        0 0 18px rgba(56,189,248,.35),
+        0 0 48px rgba(56,189,248,.2),
+        inset 0 0 0 1px rgba(255,255,255,.06) !important;
+}
+
+/* ===============================
+   PRICE GLOW
+=============================== */
+[data-theme="dark"] .latest-item .price {
+    color: #38bdf8 !important;
+    font-weight: 900 !important;
+    text-shadow:
+        0 0 8px rgba(56,189,248,.7),
+        0 0 18px rgba(56,189,248,.4);
+}

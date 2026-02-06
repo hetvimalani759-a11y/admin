@@ -1,0 +1,95 @@
+.product-edit-page {
+  padding: 24px;
+}
+
+/* Card */
+.category-form-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: var(--card-shadow);
+}
+
+.category-heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* Form */
+.category-form .form-group {
+  margin-bottom: 16px;
+}
+
+.category-form label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.category-form input,
+.category-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.category-form input[type="file"] {
+  padding: 6px;
+}
+
+.category-form input:focus,
+.category-form select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+}
+
+/* Image Preview */
+.preview-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  margin-bottom: 8px;
+}
+
+/* Buttons */
+.btn-primary {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  opacity: .9;
+}
+
+.btn-cancel {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  color: var(--text-main);
+  background: var(--bg-main);
+  text-decoration: none;
+}
+
+.btn-cancel:hover {
+  opacity: .85;
+}

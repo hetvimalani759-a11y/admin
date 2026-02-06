@@ -1,10 +1,38 @@
 {% extends "admin/base.html" %}
-{% block content %}
-<h2>Edit Category</h2>
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" name="name" value="{{ category.name }}" required>
-    <button type="submit">Update</button>
-</form>
+{% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/edit_category.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="categories-page">
+  <div class="row g-4 justify-content-center">
+
+    <!-- Edit Category Card -->
+    <div class="col-md-6">
+      <div class="category-form-card">
+        <h4 class="category-heading">✏️ Edit Category</h4>
+
+        <form method="post" id="editCategoryForm" class="category-form">
+          {% csrf_token %}
+          <div class="form-group">
+            <label>Category Name</label>
+            <input type="text" name="name" value="{{ category.name }}" required>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary w-100">Update</button>
+            <a href="{% url 'adminpanel:add_category' %}" class="btn-cancel w-100 mt-2">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'admin/js/edit_category.js' %}"></script>
 {% endblock %}

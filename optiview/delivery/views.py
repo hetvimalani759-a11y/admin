@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.decorators import login_required
@@ -13,7 +14,7 @@ from .models import DeliveryPerson
 
 
 def delivery_logout(request):
-    delivery_logout(request)
+    logout(request)
     return redirect('delivery_login')
 
 
@@ -83,13 +84,14 @@ def delivery_login(request):
             return render(request, "delivery/login.html", {
                 "error": "You are not authorized as delivery person"
             })
-
         login(request, user)
+
+# ✅ LOGIN SUCCESS MESSAGE
+        messages.success(request, f"You have been login successfully")
+
         return redirect("delivery_dashboard")
 
     return render(request, "delivery/login.html")
-
-
 
 def delivery_dashboard(request):
     try:
@@ -98,12 +100,20 @@ def delivery_dashboard(request):
         return redirect("login")
 
     orders = Order.objects.filter(delivery_person=delivery_person)
+    delivery_person = DeliveryPerson.objects.get(user=request.user)
+
+    all_orders = Order.objects.filter(delivery_person=delivery_person)
+
+    active_orders = all_orders.filter(
+        status__in=["Placed", "Out for Delivery"]
+    )
 
     context = {
-        "orders": orders,
-        "assigned_orders_count": orders.count(),
-        "delivered_orders_count": orders.filter(status="Delivered").count(),
-        "pending_orders_count": orders.filter(status="Pending").count(),
+        "total_orders": all_orders.count(),
+        "out_for_delivery": all_orders.filter(status="Out for Delivery").count(),
+        "delivered_orders": all_orders.filter(status="Delivered").count(),
+        "pending_orders": all_orders.filter(status="Pending").count(),
+        "active_orders": active_orders,
     }
 
     return render(request, "delivery/dashboard.html", context)  
@@ -111,6 +121,96 @@ def delivery_dashboard(request):
 
 @login_required
 def my_orders(request):
-    delivery_person = request.user.deliveryperson
+    delivery_person = DeliveryPerson.objects.get(user=request.user)
     orders = Order.objects.filter(delivery_person=delivery_person)
-    return render(request, "delivery/my_orders.html", {"orders": orders})
+
+    return render(request, 'delivery/my_orders.html', {'orders': orders})
+
+
+
+@login_required
+def  delivery_profile(request):
+    delivery_person = DeliveryPerson.objects.get(user=request.user)
+    return render(request, 'delivery/profile.html', {'delivery_person': delivery_person})
+
+
+@login_required
+def edit_profile(request):
+    user = request.user
+    delivery_person = user.deliveryperson  # assuming one-to-one relation
+    redirect_after = False  # initially False
+
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
+
+        # update user
+        user.username = username
+        user.email = email
+        if password:
+            user.set_password(password)
+        user.save()
+
+        # update delivery person
+        delivery_person.phone = phone
+        delivery_person.address = address
+        delivery_person.save()
+
+        messages.success(request, "Profile updated successfully!")
+        redirect_after = True  # enable redirect
+
+    context = {
+        'user': user,
+        'delivery_person': delivery_person, 
+        'redirect_after': redirect_after
+    }
+    return render(request, 'delivery/edit_profile.html', context)
+
+
+
+
+def delivery_person_list(request):
+    delivery_persons = DeliveryPerson.objects.select_related("user").all()
+    return render(request, 'admin/delivery_person_list.html', {
+        'delivery_persons': delivery_persons
+    })
+
+
+
+
+def add_delivery_person(request):
+    if request.method == "POST":
+        username = request.POST.get("username").strip()
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        phone = request.POST.get("phone")
+
+        # ✅ First check (fast)
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect("add_delivery_person")
+
+        try:
+            # ✅ Second safety layer (database level)
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+        except IntegrityError:
+            messages.error(request, "Username already exists.")
+            return redirect("delivery_person_add")
+
+        DeliveryPerson.objects.create(
+            user=user,
+            phone=phone
+        )
+
+        messages.success(request, "Delivery person added successfully.")
+        return redirect("delivery_person_list")
+
+    return render(request, "admin/add_delivery_person.html")
+

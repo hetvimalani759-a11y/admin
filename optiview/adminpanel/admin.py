@@ -30,9 +30,25 @@ class OfferAdmin(admin.ModelAdmin):
     list_display = ('name', 'discount_type', 'discount_value', 'start_date', 'end_date', 'is_active')
     list_filter = ('is_active', 'discount_type')
 
+
+from .models import Order
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',              # this replaces customer_name
+        'delivery_person',
+        'total_amount',
+        'status',
+        'created_at',
+    )
+    list_filter = ('status', 'delivery_person')
+    list_editable = ('delivery_person','status')
+    search_fields = ('user__username',)  # search by username
 admin.site.register(Product)
 admin.site.register(Lens)
-admin.site.register(Order)
+# admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(CompanyInfo)
 admin.site.register(Category)

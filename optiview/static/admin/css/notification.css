@@ -1,0 +1,165 @@
+/* =========================
+   GLOBAL STYLES
+========================= */
+.notifications-page * {
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.notifications-page h3 {
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111;
+}
+
+/* =========================
+   ALERT CARD STYLES
+========================= */
+.notifications-page .alert {
+    background: hsl(212, 100%, 85%);
+    border-left: 5px solid #2563eb;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.notifications-page .alert b {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.notifications-page .alert small {
+    display: block;
+    margin-top: 6px;
+    color: #555;
+    font-size: 12px;
+}
+
+/* Hover effect */
+.notifications-page .alert:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   ACTION BUTTONS (Optional)
+========================= */
+.notifications-page .actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
+}
+
+.notifications-page .btn-edit,
+.notifications-page .btn-delete {
+    border: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.notifications-page .btn-edit {
+    background: #eef4ff;
+    color: #2563eb;
+}
+
+.notifications-page .btn-edit:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.notifications-page .btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.notifications-page .btn-delete:hover {
+    background: #dc2626;
+    color: white;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+.notifications-page p {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+    font-style: italic;
+}
+
+/* /* =========================
+   DARK MODE
+========================= */
+.dark-mode .notifications-page h3 {
+    color: #e5e7eb;
+}
+
+.dark-mode .notifications-page .alert {
+    background: #1e293b;
+    border-left: 5px solid #3b82f6;
+    color: #e5e7eb;
+}
+/* ======================================
+   DASH CARDS — GLOW PULSE BORDER
+====================================== */
+.dash-card {
+    position: relative !important;
+}
+
+.dash-card::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(120deg,#38bdf8,#a855f7,#22c55e);
+    opacity: .35;
+    filter: blur(10px);
+    z-index: -1;
+    animation: glowPulse 3s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%,100% { opacity: .25; }
+    50% { opacity: .6; }
+}
+
+/* ======================================
+   RIPPLE CLICK EFFECT
+====================================== */
+.dash-card {
+    overflow: hidden !important;
+}
+
+.dash-card .ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,.5);
+    transform: scale(0);
+    animation: ripple .6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* ======================================
+   SPARKLINE CANVAS
+====================================== */
+.dash-spark {
+    width: 100%;
+    height: 36px;
+    margin-top: 6px;
+    opacity: .9;
+}

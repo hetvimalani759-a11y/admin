@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/delivery_persons.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="delivery-page">
+
+  <!-- Header + Add Button -->
+  <div class="page-header d-flex justify-content-between align-items-center mb-4">
+      <h2 class="ripple-text">🚚 Delivery Persons</h2>
+      <a href="{% url 'add_delivery_person' %}" class="btn-add">+ Add Delivery Person</a>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <table class="category-table">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dp in delivery_persons %}
+            <tr>
+                <td class="name">{{ dp.user.username }}</td>
+                <td>{{ dp.user.email }}</td>
+                <td>{{ dp.phone }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="no-data">No delivery persons added yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

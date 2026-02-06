@@ -1,14 +1,46 @@
 {% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/edit_subcategory.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Edit Subcategory</h2>
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" name="name" value="{{ subcategory.name }}" required>
-    <select name="category" required>
-        {% for cat in categories %}
-            <option value="{{ cat.id }}" {% if cat.id == subcategory.category.id %}selected{% endif %}>{{ cat.name }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Update</button>
-</form>
+<div class="subcategories-page">
+  <div class="row g-4 justify-content-center">
+
+    <!-- Edit Subcategory Card -->
+    <div class="col-md-6">
+      <div class="category-form-card">
+        <h4 class="category-heading ripple-text">✏️ Edit Subcategory</h4>
+
+        <form method="POST" class="category-form">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label>Subcategory Name</label>
+            <input type="text" name="name" value="{{ subcategory.name }}" required>
+          </div>
+
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category" required>
+              {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if cat.id == subcategory.category.id %}selected{% endif %}>
+                  {{ cat.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary w-100">💾 Update</button>
+            <a href="{% url 'adminpanel:add_subcategory' %}" class="btn-cancel w-100 mt-2">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
 {% endblock %}

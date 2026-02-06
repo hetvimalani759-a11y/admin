@@ -1,49 +1,75 @@
-{% extends 'admin/base.html' %}
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/orders.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="orders-page">
 
-<h2>Orders</h2>
+    <div class="page-header">
+        <h2 class="ripple-text">📦 Orders</h2>
+    </div>
 
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Created At</th>
-        </tr>
-    </thead>
+    <div class="table-card-wrapper">
+        <div class="table-card">
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.user.username }}</td>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td class="price">₹{{ item.product.get_final_price }}</td>
 
-    {% for order in orders %}
-        {% for item in order.items.all %}
-        <tr>
-            <td>{{ order.id }}</td>
-            <td>{{ order.user.username }}</td>
-            <td>{{ item.product.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>₹{{ item.product.get_final_price }}</td>
-
-            {% if forloop.first %}
-            <td rowspan="{{ order.items.count }}">
-                <form method="POST" action="{% url 'adminpanel:update_order_status' order.id %}">
-                    {% csrf_token %}
-                    <select name="status" onchange="this.form.submit()">
-                        {% for value,label in order.STATUS_CHOICES %}
-                        <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
-                            {{ label }}
-                        </option>
+                            {% if forloop.first %}
+                            <td rowspan="{{ order.items.count }}">
+                                <form method="POST"
+                                      action="{% url 'adminpanel:update_order_status' order.id %}"
+                                      class="status-form">
+                                    {% csrf_token %}
+                                    <select name="status" class="status-select">
+                                        {% for value,label in order.STATUS_CHOICES %}
+                                        <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </td>
+                            <td rowspan="{{ order.items.count }}">
+                                {{ order.created_at|date:"Y-m-d H:i" }}
+                            </td>
+                            {% endif %}
+                        </tr>
                         {% endfor %}
-                    </select>
-                </form>
-            </td>
-            <td rowspan="{{ order.items.count }}">{{ order.created_at|date:"Y-m-d H:i" }}</td>
-            {% endif %}
-        </tr>
-        {% endfor %}
-    {% endfor %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="no-data">No orders found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-</table>
+</div>
+{% endblock %}
 
+{% block extra_js %}
+<script src="{% static 'admin/js/orders.js' %}"></script>
 {% endblock %}
