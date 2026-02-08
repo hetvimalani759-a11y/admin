@@ -1,303 +1,466 @@
 /* ================================
-   DASHBOARD RESET SAFETY
+   ROOT THEME VARIABLES
+================================ */
+:root {
+  --bg-main: #f4f6fb;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --primary: #2563eb;
+}
+
+[data-theme="dark"] {
+  --bg-main: #020617;
+  --card-bg: #020617;
+  --card-border: #1e293b;
+  --text-main: #e5e7eb;
+  --text-muted: #94a3b8;
+  --primary: #60a5fa;
+}
+
+/* ================================
+   RESET SAFETY
 ================================ */
 .dashboard-grid,
 .dash-section,
 .company-card {
-    all: unset;
+  all: unset;
 }
 
 /* ================================
    TITLE
 ================================ */
 .dashboard-title {
-    font-size: 28px;
-    font-weight: 900;
-    margin-bottom: 24px;
-    color: var(--text-main, #0f172a);
+  font-size: 28px;
+  font-weight: 900;
+  margin-bottom: 24px;
+  color: var(--text-main);
 }
 
 /* ================================
    GRID
 ================================ */
 .dashboard-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
-    gap: 22px !important;
-    margin-bottom: 32px !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+  gap: 22px !important;
+  margin-bottom: 32px !important;
 }
 
 /* ================================
-   DASH CARDS (Glassmorphism)
+   DASH CARDS — PREMIUM GLASS
 ================================ */
 .dash-card {
-    display: flex !important;
-    align-items: center !important;
-    gap: 16px !important;
-    padding: 22px 24px !important;
-    border-radius: 22px !important;
-    text-decoration: none !important;
-    color: #fff !important;
-    position: relative !important;
-    overflow: hidden !important;
-    isolation: isolate !important;
-    min-height: 110px !important;
-    backdrop-filter: blur(16px) saturate(160%) !important;
-    box-shadow:
-        0 16px 40px rgba(0,0,0,.35),
-        inset 0 0 0 1px rgba(255,255,255,.22) !important;
-    transition: transform .3s cubic-bezier(.4,0,.2,1),
-                box-shadow .3s cubic-bezier(.4,0,.2,1),
-                filter .3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 22px 24px !important;
+  border-radius: 22px !important;
+  text-decoration: none !important;
+  color: #fff !important;
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate !important;
+  min-height: 110px !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  box-shadow:
+    0 16px 40px rgba(0,0,0,.35),
+    inset 0 0 0 1px rgba(255,255,255,.22) !important;
+  transition: transform .35s cubic-bezier(.4,0,.2,1),
+              box-shadow .35s cubic-bezier(.4,0,.2,1),
+              filter .35s ease !important;
 }
 
 .dash-card:hover {
-    transform: translateY(-7px) scale(1.04) !important;
-    box-shadow:
-        0 28px 60px rgba(0,0,0,.45),
-        inset 0 0 0 1px rgba(255,255,255,.35) !important;
-    filter: brightness(1.1) saturate(1.1);
+  transform: translateY(-7px) scale(1.04) !important;
+  box-shadow:
+    0 28px 60px rgba(0,0,0,.45),
+    inset 0 0 0 1px rgba(255,255,255,.35) !important;
+  filter: brightness(1.1) saturate(1.1);
 }
 
 /* Glow aura */
 .dash-card::after {
-    content: "";
-    position: absolute;
-    inset: -20px;
-    background: radial-gradient(circle at top left,
-        rgba(255,255,255,.35),
-        transparent 60%);
-    opacity: .6;
-    z-index: 0;
+  content: "";
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle at top left,
+    rgba(255,255,255,.35),
+    transparent 60%);
+  opacity: .6;
+  z-index: 0;
 }
 
 /* Glass sweep shine */
 .dash-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        120deg,
-        transparent 20%,
-        rgba(255,255,255,.45) 40%,
-        transparent 60%
-    );
-    transform: translateX(-120%);
-    transition: .8s ease;
-    z-index: 1;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(255,255,255,.45) 40%,
+    transparent 60%
+  );
+  transform: translateX(-120%);
+  transition: .9s ease;
+  z-index: 1;
 }
 
 .dash-card:hover::before {
-    transform: translateX(120%);
+  transform: translateX(120%);
 }
 
 .dash-card > * {
-    position: relative;
-    z-index: 2;
+  position: relative;
+  z-index: 2;
 }
 
 .dash-card p {
-    margin: 0 !important;
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    opacity: .9 !important;
+  margin: 0 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  opacity: .9 !important;
 }
 
 .dash-card h3 {
-    margin: 4px 0 0 !important;
-    font-size: 28px !important;
-    font-weight: 900 !important;
-    letter-spacing: .3px !important;
+  margin: 4px 0 0 !important;
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  letter-spacing: .3px !important;
 }
 
 /* ================================
    ICON
 ================================ */
 .dash-icon {
-    width: 60px !important;
-    height: 60px !important;
-    border-radius: 18px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 28px !important;
-    background: rgba(255,255,255,.28) !important;
-    box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,.45),
-        0 10px 22px rgba(0,0,0,.35) !important;
+  width: 60px !important;
+  height: 60px !important;
+  border-radius: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 28px !important;
+  background: rgba(255,255,255,.28) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.45),
+    0 10px 22px rgba(0,0,0,.35) !important;
 }
 
 /* ================================
    COLOR THEMES
 ================================ */
-.blue { background: linear-gradient(135deg,#2563eb,#38bdf8) !important; }
+.blue   { background: linear-gradient(135deg,#2563eb,#38bdf8) !important; }
 .purple { background: linear-gradient(135deg,#7c3aed,#c084fc) !important; }
-.green { background: linear-gradient(135deg,#16a34a,#4ade80) !important; }
+.green  { background: linear-gradient(135deg,#16a34a,#4ade80) !important; }
 .orange { background: linear-gradient(135deg,#f97316,#facc15) !important; }
-.teal { background: linear-gradient(135deg,#0ea5e9,#38bdf8) !important; }
-.red { background: linear-gradient(135deg,#dc2626,#fb7185) !important; }
+.teal   { background: linear-gradient(135deg,#0ea5e9,#38bdf8) !important; }
+.red    { background: linear-gradient(135deg,#dc2626,#fb7185) !important; }
 
 /* ================================
    SPARKLINE
 ================================ */
 .sparkline {
-    margin-top: 6px !important;
-    width: 100% !important;
-    height: 28px !important;
-    opacity: .85;
+  margin-top: 6px !important;
+  width: 100% !important;
+  height: 28px !important;
+  opacity: .85;
 }
 
 /* ================================
-   LATEST PRODUCTS
+   LATEST PRODUCTS PANEL
 ================================ */
 .dash-section {
-    display: block !important;
-    background: var(--card-bg, #fff) !important;
-    border-radius: 22px !important;
-    padding: 22px 24px !important;
-    border: 1px solid var(--card-border, #e5e7eb) !important;
-    box-shadow: 0 14px 34px rgba(0,0,0,.22) !important;
-    margin-bottom: 28px !important;
+  display: block !important;
+  background: var(--card-bg) !important;
+  border-radius: 22px !important;
+  padding: 22px 24px !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: 0 14px 34px rgba(0,0,0,.22) !important;
+  margin-bottom: 28px !important;
+  color: var(--text-main);
 }
 
 .dash-section h4 {
-    margin-bottom: 14px !important;
-    font-weight: 900 !important;
+  margin-bottom: 14px !important;
+  font-weight: 900 !important;
 }
 
 .latest-products {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
 }
 
 .latest-item {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 12px 14px !important;
-    border-radius: 14px !important;
-    background: var(--bg-main, #f8fafc,#eef2ff) !important;
-    font-size: 14px !important;
-    transition: transform .25s ease,
-                background .25s ease,
-                box-shadow .25s ease !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 12px 14px !important;
+  border-radius: 14px !important;
+  background: var(--bg-main) !important;
+  font-size: 14px !important;
+  color: var(--text-main) !important;
+  transition: transform .25s ease,
+              background .25s ease,
+              box-shadow .25s ease !important;
 }
 
 .latest-item:hover {
-    background: #eef2ff !important;
-    transform: translateX(8px) scale(1.02) !important;
-    box-shadow: 0 10px 22px rgba(0,0,0,.18) !important;
+  background: #eef2ff !important;
+  transform: translateX(8px) scale(1.02) !important;
+  box-shadow: 0 10px 22px rgba(0,0,0,.18) !important;
+}
+
+[data-theme="dark"] .latest-item:hover {
+  background: #020617 !important;
 }
 
 .latest-item .price {
-    font-weight: 900 !important;
-    color: var(--primary, #2563eb) !important;
+  font-weight: 900 !important;
+  color: var(--primary) !important;
 }
 
 /* ================================
-   COMPANY CARD (Glass)
+   CHART CARD
+================================ */
+.chart-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.12);
+  text-align: center;
+}
+
+.small-chart {
+  max-width: 300px;
+  height: 270px;
+  margin: auto;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 220px;
+}
+
+.chart-wrapper canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.chart-title {
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: var(--text-main);
+}
+
+.chart-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.chart-center .total {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--text-main);
+}
+
+.chart-center small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ================================
+   COMPANY CARD — GLASS
 ================================ */
 .company-card {
-    display: flex !important;
-    align-items: center !important;
-    gap: 22px !important;
-    padding: 24px 28px !important;
-    border-radius: 26px !important;
-    background: linear-gradient(135deg,#f8fafc,#eef2ff) !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow:
-        0 18px 44px rgba(0,0,0,.28),
-        inset 0 0 0 1px rgba(255,255,255,.6) !important;
-    margin-bottom: 24px !important;
-    backdrop-filter: blur(18px) saturate(160%) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 22px !important;
+  padding: 24px 28px !important;
+  border-radius: 26px !important;
+  background: linear-gradient(135deg,#f8fafc,#eef2ff) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.28),
+    inset 0 0 0 1px rgba(255,255,255,.6) !important;
+  margin-bottom: 24px !important;
+  backdrop-filter: blur(18px) saturate(160%) !important;
+  color: var(--text-main);
+}
+
+[data-theme="dark"] .company-card {
+  background: rgba(2,6,23,.85) !important;
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.7),
+    inset 0 0 0 1px rgba(255,255,255,.05) !important;
 }
 
 .company-logo {
-    width: 92px !important;
-    height: 92px !important;
-    object-fit: contain !important;
-    border-radius: 18px !important;
-    background: #fff !important;
-    padding: 8px !important;
-    box-shadow: 0 12px 26px rgba(0,0,0,.3) !important;
+  width: 92px !important;
+  height: 92px !important;
+  object-fit: contain !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  padding: 8px !important;
+  box-shadow: 0 12px 26px rgba(0,0,0,.3) !important;
+}
+
+[data-theme="dark"] .company-logo {
+  background: #020617 !important;
 }
 
 .company-card h3 {
-    margin: 0 0 6px !important;
-    font-weight: 900 !important;
+  margin: 0 0 6px !important;
+  font-weight: 900 !important;
 }
 
 .company-card p {
-    margin: 2px 0 !important;
-    font-size: 14px !important;
+  margin: 2px 0 !important;
+  font-size: 14px !important;
 }
 
 /* ================================
    ACTION BUTTONS
 ================================ */
 .dashboard-actions {
-    text-align: right !important;
-    margin-bottom: 50px !important;
+  text-align: right !important;
+  margin-bottom: 50px !important;
 }
 
 .btn-primary,
 .btn-success {
-    padding: 11px 22px !important;
-    border-radius: 14px !important;
-    font-weight: 800 !important;
-    text-decoration: none !important;
-    display: inline-block !important;
-    position: relative !important;
-    overflow: hidden !important;
-    transition: transform .25s ease,
-                box-shadow .25s ease,
-                filter .25s ease !important;
+  padding: 11px 22px !important;
+  border-radius: 14px !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: transform .25s ease,
+              box-shadow .25s ease,
+              filter .25s ease !important;
 }
 
 .btn-primary {
-    background: #2563eb !important;
-    color: #fff !important;
-    box-shadow: 0 10px 22px rgba(37,99,235,.4) !important;
+  background: #2563eb !important;
+  color: #fff !important;
+  box-shadow: 0 10px 22px rgba(37,99,235,.4) !important;
 }
 
 .btn-primary:hover {
-    background: #1d4ed8 !important;
-    transform: translateY(-3px) scale(1.03) !important;
-    box-shadow: 0 16px 34px rgba(37,99,235,.55) !important;
+  background: #1d4ed8 !important;
+  transform: translateY(-3px) scale(1.03) !important;
+  box-shadow: 0 16px 34px rgba(37,99,235,.55) !important;
 }
 
 .btn-success {
-    background: #16a34a !important;
-    color: #fff !important;
-    box-shadow: 0 10px 22px rgba(22,163,74,.4) !important;
+  background: #16a34a !important;
+  color: #fff !important;
+  box-shadow: 0 10px 22px rgba(22,163,74,.4) !important;
 }
 
 .btn-success:hover {
-    background: #15803d !important;
-    transform: translateY(-3px) scale(1.03) !important;
-    box-shadow: 0 16px 34px rgba(22,163,74,.55) !important;
+  background: #15803d !important;
+  transform: translateY(-3px) scale(1.03) !important;
+  box-shadow: 0 16px 34px rgba(22,163,74,.55) !important;
 }
 
 /* ================================
    RIPPLE EFFECT
 ================================ */
 .ripple::after {
-    content: "";
-    position: absolute;
-    border-radius: 50%;
-    transform: scale(0);
-    background: rgba(255,255,255,.6);
-    animation: ripple .6s linear;
-    pointer-events: none;
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: rgba(255,255,255,.6);
+  animation: ripple .6s linear;
+  pointer-events: none;
 }
 
 @keyframes ripple {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}/* ================================
+   CHART CARD — MATCH DASH CARDS
+================================ */
+.chart-card {
+  background: var(--card-bg);
+  border-radius: 22px;
+  padding: 18px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(16px) saturate(160%);
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.28),
+    inset 0 0 0 1px rgba(255,255,255,.35);
+  transition: transform .35s ease, box-shadow .35s ease, filter .35s ease;
 }
+
+.chart-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow:
+    0 30px 70px rgba(0,0,0,.45),
+    inset 0 0 0 1px rgba(255,255,255,.45);
+  filter: brightness(1.05) saturate(1.1);
+}
+
+/* Glow aura
+.chart-card::after {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle at top left,
+    rgba(255,255,255,.35),
+    transparent 60%);
+  opacity: .55;
+  z-index: 0;
+}
+
+/* Glass sweep shine 
+.chart-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(255,255,255,.45) 40%,
+    transparent 60%
+  );
+  transform: translateX(-120%);
+  transition: .9s ease;
+  z-index: 1;
+}
+
+.chart-card:hover::before {
+  transform: translateX(120%);
+}
+
+.chart-card > * {
+  position: relative;
+  z-index: 2;
+} */
+
+/* Dark mode */
+[data-theme="dark"] .chart-card {
+  background: rgba(2,6,23,.85);
+  box-shadow:
+    0 22px 55px rgba(0,0,0,.7),
+    inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
 
 /* ================================
    DARK MODE — PRO LEVEL

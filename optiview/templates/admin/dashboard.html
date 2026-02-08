@@ -84,8 +84,90 @@
     </div>
 </div>
 
+<div class="chart-card small-chart">
+  <h5 class="chart-title">📦 Order Status</h5>
+  <div class="chart-wrapper">
+    <canvas id="orderPieChart"></canvas>
+    <div class="chart-center">
+      <span class="total">{{ total_orders }}</span>
+      <small>Total</small>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+<script>
+const isDark = document.documentElement.classList.contains("dark");
+
+const textColor = isDark ? "#e5e7eb" : "#0f172a";
+const mutedText = isDark ? "#9ca3af" : "#64748b";
+const gridColor = isDark ? "#334155" : "#e5e7eb";
+
+const ctx = document.getElementById("orderPieChart").getContext("2d");
+
+const chart = new Chart(ctx, {
+  type: "doughnut",
+  data: {
+    labels: {{ order_labels|safe }},
+    datasets: [{
+      data: {{ order_values|safe }},
+      backgroundColor: isDark
+        ? ["#818cf8", "#4ade80", "#fbbf24", "#f87171", "#22d3ee"]
+        : ["#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#06b6d4"],
+      borderWidth: 2,
+      hoverOffset: 12,
+      cutout: "70%"
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 1000 },
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          color: textColor,
+          usePointStyle: true,
+          padding: 14,
+          font: { size: 12, weight: "600" }
+        }
+      },
+      tooltip: {
+        backgroundColor: isDark ? "#020617" : "#0f172a",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        cornerRadius: 10
+      },
+      datalabels: {
+        color: "#fff",
+        font: { weight: "700", size: 11 },
+        formatter: (value, ctx) => {
+          const total = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+          return ((value / total) * 100).toFixed(0) + "%";
+        }
+      }
+    },
+    onClick: (evt, elements) => {
+      if (elements.length) {
+        const index = elements[0].index;
+        const status = chart.data.labels[index];
+        window.location.href = `/admin/orders/?status=${encodeURIComponent(status)}`;
+      }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+</script>
+
+
+
+
 <!-- Company Card -->
-<div class="company-card glass">
+
+<div class="company-card ">
     {% if company.logo %}
         <img src="{{ company.logo.url }}" class="company-logo" alt="Logo">
     {% endif %}

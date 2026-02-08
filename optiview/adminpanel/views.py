@@ -7,6 +7,7 @@ from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
 from django.contrib.auth.models import User
 from .models import Order, DeliveryPerson
+from django.db.models import Count
 from django.contrib.admin.views.decorators import staff_member_required
 
 from .models import (
@@ -43,6 +44,8 @@ def logout_view(request):
 # --------------------------- DASHBOARD ---------------------------
 
 @login_required(login_url="adminpanel:login")
+
+
 def dashboard(request):
     total_products = Product.objects.count()
     total_orders = Order.objects.count()
@@ -60,6 +63,20 @@ def dashboard(request):
     notifications = Notification.objects.filter(user=request.user, is_read=False)
     low_stock = Product.objects.filter(stock__lte=LOW_STOCK_THRESHOLD).count()
 
+    # ✅ PIE CHART DATA (CLEANED)
+    order_status_data = Order.objects.values("status").annotate(count=Count("id"))
+
+    labels = []
+    values = []
+
+    for o in order_status_data:
+        status = " ".join(o["status"].strip().lower().split()).title()  # bulletproof clean
+        if status in labels:
+            values[labels.index(status)] += o["count"]
+        else:
+            labels.append(status)
+            values.append(o["count"])
+
     context = {
         "total_products": total_products,
         "total_orders": total_orders,
@@ -74,8 +91,12 @@ def dashboard(request):
         "notifications": notifications,
         "notification_count": notifications.count(),
         "low_stock": low_stock,
+        "order_labels": labels,
+        "order_values": values,
     }
+
     return render(request, "admin/dashboard.html", context)
+
 
 
 # --------------------------- NOTIFICATIONS ---------------------------
@@ -529,6 +550,8 @@ def add_delivery_person(request):
                 email=email,
                 password=password
             )
+            user.is_staff = True   # ✅ IMPORTANT
+            user.save()
         except IntegrityError:
             messages.error(request, "Username already exists.")
             return redirect("delivery_person_add")

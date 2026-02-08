@@ -200,6 +200,8 @@ def add_delivery_person(request):
                 email=email,
                 password=password
             )
+            user.is_staff = True   # ✅ THIS LINE
+            user.save()
         except IntegrityError:
             messages.error(request, "Username already exists.")
             return redirect("delivery_person_add")
