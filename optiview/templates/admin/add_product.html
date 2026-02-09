@@ -1,83 +1,78 @@
 {% extends 'admin/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/add_product.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="add-product-page">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="category-form-card">
+        <h4 class="category-heading ripple-text">🛒 Add Product</h4>
 
-<h4>Add Product</h4>
+        <form method="post" enctype="multipart/form-data" class="category-form">
+          {% csrf_token %}
 
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category" id="category" required>
+              <option value="">Select Category</option>
+              {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
 
-  <div class="mb-3">
-    <label>Category</label>
-    <select name="category" id="category" class="form-control" required>
-      <option value="">Select Category</option>
-      {% for category in categories %}
-        <option value="{{ category.id }}">{{ category.name }}</option>
-      {% endfor %}
-    </select>
+          <div class="form-group">
+            <label>Subcategory</label>
+            <select name="subcategory" id="subcategory" required>
+              <option value="">Select Subcategory</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Product Name</label>
+            <select name="name" required>
+              <option>eyeglasses</option>
+              <option>lens</option>
+              <option>frame</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Brand</label>
+            <input type="text" name="brand" required>
+          </div>
+
+          <div class="form-group">
+            <label>Price</label>
+            <input type="number" name="price" required>
+          </div>
+
+          <div class="form-group">
+            <label>Stock</label>
+            <input type="number" name="stock" required>
+          </div>
+
+          <div class="form-group">
+            <label>Image</label>
+            <input type="file" name="image" required>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary w-100">Save Product</button>
+            <a href="{% url 'adminpanel:product_list' %}" class="btn-cancel w-100 mt-2">Back</a>
+          </div>
+
+        </form>
+      </div>
+    </div>
   </div>
+</div>
+{% endblock %}
 
-  <div class="mb-3">
-    <label>Subcategory</label>
-    <select name="subcategory" id="subcategory" class="form-control" required>
-      <option value="">Select Subcategory</option>
-    </select>
-  </div>
-
-  <div class="mb-3">
-    <label>Product Name</label>
-    <select name="name" class="form-control" required>
-      <option>eyeglasses</option>
-      <option>lens</option>
-      <option>frame</option>
-    </select>
-  </div>
-
-  <div class="mb-3">
-    <label>Brand</label>
-    <input type="text" name="brand" class="form-control" required>
-  </div>
-
-  <div class="mb-3">
-    <label>Price</label>
-    <input type="number" name="price" class="form-control" required>
-  </div>
-
-  <div class="mb-3">
-    <label>Stock</label>
-    <input type="number" name="stock" class="form-control" required>
-  </div>
-
-  <div class="mb-3">
-    <label>Image</label>
-    <input type="file" name="image" class="form-control" required>
-  </div>
-
-  <button class="btn btn-success">Save Product</button>
-  <a href="{% url 'adminpanel:product_list' %}" class="btn btn-secondary">Back</a>
-</form>
-
-<script>
-document.getElementById("category").addEventListener("change", function () {
-    const categoryId = this.value;
-    const subcategorySelect = document.getElementById("subcategory");
-
-    subcategorySelect.innerHTML = "<option value=''>Loading...</option>";
-
-    if (!categoryId) {
-        subcategorySelect.innerHTML = "<option value=''>Select Subcategory</option>";
-        return;
-    }
-
-    fetch(`/admin-panel/ajax/subcategories/${categoryId}/`)
-        .then(res => res.json())
-        .then(data => {
-            let options = "<option value=''>Select Subcategory</option>";
-            data.forEach(sub => {
-                options += `<option value="${sub.id}">${sub.name}</option>`;
-            });
-            subcategorySelect.innerHTML = options;
-        });
-});
-</script>
-
+{% block extra_js %}
+<script src="{% static 'admin/js/add_product.js' %}"></script>
 {% endblock %}

@@ -2,36 +2,54 @@
 {% load static %}
 {% block title %}Revenue Dashboard{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/revenue.css' %}">
+{% endblock %}
+
 {% block content %}
-    <link rel="stylesheet" href="{% static 'admin/css/style.css' %}">
-<hr class="my-4">
+<div class="revenue-page">
 
-<h4>Monthly Revenue</h4>
+  <div class="page-header">
+    <h2 class="ripple-text">📊 Revenue Dashboard</h2>
+  </div>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
+  <!-- Table Card -->
+  <div class="table-card-wrapper">
+    <div class="table-card">
+      <h4 class="card-title">Monthly Revenue</h4>
+
+      <table class="revenue-table">
+        <thead>
+          <tr>
             <th>Month</th>
             <th>Total Revenue (₹)</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for r in monthly_revenue %}
-        <tr>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in monthly_revenue %}
+          <tr>
             <td>{{ r.month|date:"F Y" }}</td>
-            <td>₹{{ r.total }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="2">No revenue data</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            <td class="price">₹{{ r.total }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="2" class="no-data">No revenue data</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-<canvas id="revenueChart" height="120"></canvas>
+  <!-- Chart Card -->
+  <div class="chart-card">
+    <h4 class="card-title">Revenue Trend</h4>
+    <canvas id="revenueChart" height="120"></canvas>
+  </div>
 
-<!-- JSON safe data for revenue chart -->
+</div>
+
+<!-- JSON safe data for chart -->
 {{ revenue_months|json_script:"revenueLabels" }}
 {{ revenue_values|json_script:"revenueData" }}
 
@@ -39,29 +57,29 @@
 const revenueCtx = document.getElementById('revenueChart');
 
 if (revenueCtx) {
-    const revenueLabels = JSON.parse(document.getElementById('revenueLabels').textContent);
-    const revenueData = JSON.parse(document.getElementById('revenueData').textContent);
+  const revenueLabels = JSON.parse(document.getElementById('revenueLabels').textContent);
+  const revenueData = JSON.parse(document.getElementById('revenueData').textContent);
 
-    new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: revenueLabels,
-            datasets: [{
-                label: 'Revenue (₹)',
-                data: revenueData,
-                borderColor: 'rgba(13, 110, 253, 1)',
-                backgroundColor: 'rgba(13, 110, 253, 0.2)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
+  new Chart(revenueCtx, {
+    type: 'line',
+    data: {
+      labels: revenueLabels,
+      datasets: [{
+        label: 'Revenue (₹)',
+        data: revenueData,
+        borderColor: 'rgba(13, 110, 253, 1)',
+        backgroundColor: 'rgba(13, 110, 253, 0.2)',
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
 }
 </script>
 {% endblock %}

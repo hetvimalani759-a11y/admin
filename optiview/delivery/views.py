@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.decorators import login_required
@@ -168,37 +169,50 @@ def edit_profile(request):
     }
     return render(request, 'delivery/edit_profile.html', context)
 
-def delivery_person_list(request):
-    # fetch delivery persons and send to template
-    return render(request, 'admin/delivery_person_list.html')
+
 
 
 def delivery_person_list(request):
-    delivery_persons = DeliveryPerson.objects.all()
+    delivery_persons = DeliveryPerson.objects.select_related("user").all()
     return render(request, 'admin/delivery_person_list.html', {
         'delivery_persons': delivery_persons
     })
 
 
+
+
 def add_delivery_person(request):
     if request.method == "POST":
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        phone = request.POST['phone']
+        username = request.POST.get("username").strip()
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        phone = request.POST.get("phone")
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
+        # ✅ First check (fast)
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists.")
+            return redirect("add_delivery_person")
+
+        try:
+            # ✅ Second safety layer (database level)
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password
+            )
+            user.is_staff = True   # ✅ THIS LINE
+            user.save()
+        except IntegrityError:
+            messages.error(request, "Username already exists.")
+            return redirect("delivery_person_add")
 
         DeliveryPerson.objects.create(
             user=user,
-            phone=phone,
-            is_active=True
+            phone=phone
         )
 
-        return redirect('delivery_person_list')
+        messages.success(request, "Delivery person added successfully.")
+        return redirect("delivery_person_list")
 
-    return render(request, 'admin/add_delivery_person.html')
+    return render(request, "admin/add_delivery_person.html")
+

@@ -39,9 +39,12 @@ urlpatterns = [
     path("company/add/", views.company_create, name="company_create"),
     path("company/edit/", views.company_update, name="company_update"),
     path("notifications/read/", views.mark_notifications_read, name="mark_notifications_read"),
+<<<<<<< HEAD
     path('assign-order/', views.assign_order, name='assign_order'),
     path('delivery-persons/', views.delivery_person_list, name='delivery_person_list'),
     
+=======
+>>>>>>> 7ced781489db27d9c3e456467918a5ac88685510
     path('offers/create/', views.create_offer, name='create_offer'),
     path('offers/', views.offer_list, name='offer_list'),
     path('offers/edit/<int:pk>/', views.edit_offer, name='edit_offer'),
@@ -49,7 +52,13 @@ urlpatterns = [
     path("orders/<int:order_id>/status/", views.update_order_status, name="update_order_status"),
 
 
+<<<<<<< HEAD
 
 
+=======
+    path('assign-order/', views.assign_order, name='assign_order'),
+    path('delivery-persons/', views.delivery_person_list, name='delivery_person_list'),
+    path("delivery-persons/add/", views.add_delivery_person, name="delivery_person_add"),
+>>>>>>> 7ced781489db27d9c3e456467918a5ac88685510
     path('orders/update/<int:order_id>/',views.update_order_status,name='update_order_status')
 ]

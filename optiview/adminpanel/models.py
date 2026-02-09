@@ -106,12 +106,17 @@ class CompanyInfo(models.Model):
 # ------------------ 🛒 ORDER ------------------
 # orders/models.py
 class Order(models.Model):
-    STATUS_CHOICES = (
-        ('Pending', 'Pending'),
-        ('Assigned', 'Assigned'),
-        ('Delivered', 'Delivered'),
-        ('Cancelled', 'Cancelled'),
-    )
+    STATUS_CHOICES = [
+        ("Pending", "Pending"),
+        ("Placed", "Placed"),
+        ("Assigned", "Assigned"),
+        ("Out for Delivery", "Out for Delivery"),
+        ("Delivered", "Delivered"),
+        ("Cancelled", "Cancelled"),
+    ]
+
+    status = models.CharField(max_length=30, choices=STATUS_CHOICES, default="Pending")
+
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='customer_orders')
     delivery_person = models.ForeignKey(

@@ -1,30 +1,44 @@
-{% extends 'admin/base.html' %}
+{% extends "admin/base.html" %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/lens_list.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="lens-page">
+  <div class="lens-card">
+    <h2 class="page-title ripple-text">👓 Lenses</h2>
 
-<h4>Lenses</h4>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
+    <div class="table-wrapper">
+      <table class="lens-table">
+        <thead>
+          <tr>
             <th>Name</th>
             <th>Type</th>
             <th>Power Range</th>
             <th>Price</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for l in lenses %}
-        <tr>
+          </tr>
+        </thead>
+        <tbody>
+          {% for l in lenses %}
+          <tr>
             <td>{{ l.name }}</td>
             <td>{{ l.lens_type }}</td>
             <td>{{ l.power_range }}</td>
-            <td>₹{{ l.price }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="4">No lenses available</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+            <td class="price">₹{{ l.price }}</td>
+            <td class="actions">
+            <button class="btn-edit" onclick="location.href='{% url 'adminpanel:edit_lens' l.id %}'">Edit</button>
+            <button class="btn-delete" onclick="deleteLens({{ l.id }})">Delete</button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="empty">No lenses available</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 {% endblock %}
-

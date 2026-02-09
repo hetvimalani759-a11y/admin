@@ -1,56 +1,94 @@
 {% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/categories.css' %}">
+{% endblock %}
+
 {% block content %}
-<div class="row">
-  <!-- LEFT: Add Category -->
-  <div class="col-md-4">
-    <h5>Add Category</h5>
+<div class="categories-page">
+  <div class="row g-4">
 
-    <!-- {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-success">{{ message }}</div>
-      {% endfor %}
-    {% endif %} -->
+    <!-- LEFT: Add Category -->
+    <div class="col-md-4">
+      <div class="category-form-card">
+        <h4 class="category-heading ripple-text">➕ Add Category</h4>
 
-    <form method="post">
-      {% csrf_token %}
-      <div class="mb-3">
-        <label>Category Name</label>
-        <input type="text" name="name" class="form-control" required>
+        <form method="post" class="category-form">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label>Category Name</label>
+            <input type="text" name="name" required>
+          </div>
+
+          <button type="submit" class="btn-primary w-100">Add Category</button>
+        </form>
       </div>
-      <button class="btn btn-primary w-100">Add Category</button>
-    </form>
+    </div>
+
+    <!-- RIGHT: Category Table -->
+    <div class="col-md-8">
+      <div class="category-table-card">
+        <h4 class="category-heading ripple-text">📂 Categories</h4>
+
+        <table class="category-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Category</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for category in categories %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ category.name }}</td>
+              <td class="actions">
+                <button type="button"
+                        class="btn-edit"
+                        onclick="location.href='{% url 'adminpanel:edit_category' category.id %}'">
+                  Edit
+                </button>
+                <button type="button"
+                        class="btn-delete"
+                        data-id="{{ category.id }}"
+                        data-name="{{ category.name }}">
+                  Delete
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" class="no-data">No categories yet</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 
-  <!-- RIGHT: Category Table -->
-  <div class="col-md-8">
-    <h5>Categories</h5>
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>sr no.</th>
-          <th>Category Name</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for category in categories %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td>{{ category.name }}</td>
-          <td>
-                <!-- Update button -->
-                <a href="{% url 'adminpanel:edit_category' category.id %}" class="btn btn-sm btn-primary">Edit</a>
-                
-                <!-- Delete button -->
-                <a href="{% url 'adminpanel:delete_category' category.id %}" class="btn btn-sm btn-danger">Delete</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="2">No categories yet</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <!-- Delete Modal -->
+  <div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
+      <h5>Delete Category</h5>
+      <p id="deleteText"></p>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" id="cancelDelete">Cancel</button>
+        <form id="deleteForm" method="post">
+          {% csrf_token %}
+          <button type="submit" class="modal-confirm">Delete</button>
+        </form>
+      </div>
+    </div>
   </div>
+
 </div>
+{% endblock %}
 
-
+{% block extra_js %}
+<script src="{% static 'admin/js/categories.js' %}"></script>
 {% endblock %}

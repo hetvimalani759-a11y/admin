@@ -1,0 +1,75 @@
+.revenue-page {
+  padding: 24px;
+}
+
+/* Header */
+.revenue-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Table Card */
+.revenue-page .table-card-wrapper {
+  margin-bottom: 20px;
+}
+
+.revenue-page .table-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+  overflow-x: auto;
+}
+
+.revenue-page .card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+
+/* Table */
+.revenue-page .revenue-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+}
+
+.revenue-page .revenue-table thead {
+  background: var(--table-head);
+}
+
+.revenue-page .revenue-table th,
+.revenue-page .revenue-table td {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.revenue-page .revenue-table tbody tr:hover {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.revenue-page .price {
+  font-weight: 600;
+}
+
+/* Empty */
+.revenue-page .no-data {
+  text-align: center;
+  padding: 18px;
+  color: var(--text-muted);
+}
+
+/* Chart Card */
+.revenue-page .chart-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+}

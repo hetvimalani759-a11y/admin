@@ -8,6 +8,7 @@ class DeliveryPerson(models.Model):
     phone = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(null=True, blank=True) 
     joining_date = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=True) 
  
      
     def __str__(self):

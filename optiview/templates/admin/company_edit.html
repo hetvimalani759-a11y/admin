@@ -1,46 +1,61 @@
 {% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/company.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="company-page">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="category-form-card">
+        <h4 class="category-heading ripple-text">✏️ Edit Company Information</h4>
 
-<h3 class="mb-4">Edit Company Information</h3>
+        <form method="post" enctype="multipart/form-data" class="category-form">
+          {% csrf_token %}
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
+          <div class="form-group">
+            <label>Company Name</label>
+            <input type="text" name="name" value="{{ company.name }}" required>
+          </div>
 
-    <div class="mb-3">
-        <label>Company Name</label>
-        <input type="text" name="name" class="form-control" value="{{ company.name }}" required>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" value="{{ company.email }}" required>
+          </div>
+
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" name="phone" value="{{ company.phone }}" required>
+          </div>
+
+          <div class="form-group">
+            <label>Address</label>
+            <textarea name="address" rows="3" required>{{ company.address }}</textarea>
+          </div>
+
+          <div class="form-group">
+            <label>GST Number</label>
+            <input type="text" name="gst_number" value="{{ company.gst_number }}">
+          </div>
+
+          <div class="form-group">
+            <label>Current Logo</label>
+            {% if company.logo %}
+              <img src="{{ company.logo.url }}" width="120" class="mb-2 rounded border"><br>
+            {% endif %}
+            <input type="file" name="logo">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary w-100">Update</button>
+            <a href="{% url 'adminpanel:dashboard' %}" class="btn-cancel w-100 mt-2">Cancel</a>
+          </div>
+
+        </form>
+      </div>
     </div>
-
-    <div class="mb-3">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" value="{{ company.email }}" required>
-    </div>
-
-    <div class="mb-3">
-        <label>Phone</label>
-        <input type="text" name="phone" class="form-control" value="{{ company.phone }}" required>
-    </div>
-
-    <div class="mb-3">
-        <label>Address</label>
-        <textarea name="address" class="form-control" rows="3" required>{{ company.address }}</textarea>
-    </div>
-
-    <div class="mb-3">
-        <label>GST Number</label>
-        <input type="text" name="gst_number" class="form-control" value="{{ company.gst_number }}">
-    </div>
-
-    <div class="mb-3">
-        <label>Current Logo</label><br>
-        {% if company.logo %}
-            <img src="{{ company.logo.url }}" width="120" class="mb-2 rounded border"><br>
-        {% endif %}
-        <input type="file" name="logo" class="form-control">
-    </div>
-
-    <button type="submit" class="btn btn-primary">Update Company Info</button>
-    <a href="{% url 'adminpanel:dashboard' %}" class="btn btn-secondary">Cancel</a>
-</form>
-
+  </div>
+</div>
 {% endblock %}
