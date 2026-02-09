@@ -364,7 +364,6 @@ def revenue_dashboard(request):
 
 
 
-<<<<<<< HEAD
 def assign_order(request):
     orders = Order.objects.filter(status='Pending')
     delivery_persons = DeliveryPerson.objects.all()
@@ -409,7 +408,6 @@ def delivery_person_list(request):
     return render(request, 'admin/delivery_person_list.html', {
         'delivery_persons': delivery_persons
     })
-=======
 # ---------------- CREATE ----------------
 def create_offer(request):
     products = Product.objects.all()
@@ -503,4 +501,3 @@ def delete_offer(request, pk):
     offer.delete()
     messages.success(request, "Offer deleted successfully!")
     return redirect('adminpanel:offer_list')
->>>>>>> 7d674ccc50a9472b9e26c1754b4d21ef8493d40e
