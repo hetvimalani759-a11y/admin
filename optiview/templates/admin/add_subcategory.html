@@ -102,5 +102,36 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'admin/js/subcategories.js' %}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".btn-delete");
+    const modal = document.getElementById("deleteModal");
+    const deleteText = document.getElementById("deleteText");
+    const deleteForm = document.getElementById("deleteForm");
+    const cancelBtn = document.getElementById("cancelDelete");
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const subId = this.dataset.id;
+            const subName = this.dataset.name;
+
+            deleteText.textContent = `Are you sure you want to delete "${subName}"?`;
+            deleteForm.action = `/admin-panel/subcategory/delete/${subId}/`; // must match urls.py
+
+            modal.style.display = "flex";
+        });
+    });
+
+    // Close modal on cancel
+    cancelBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+    });
+
+    // Close modal when clicking outside modal box
+    modal.addEventListener("click", function (e) {
+        if (e.target === modal) modal.style.display = "none";
+    });
+});
+
+</script>
 {% endblock %}

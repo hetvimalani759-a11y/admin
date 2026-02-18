@@ -27,8 +27,23 @@ class NotificationAdmin(admin.ModelAdmin):
 
 @admin.register(Offer)
 class OfferAdmin(admin.ModelAdmin):
-    list_display = ('name', 'discount_type', 'discount_value', 'start_date', 'end_date', 'is_active')
-    list_filter = ('is_active', 'discount_type')
+    list_display = (
+        'name',
+        'discount_type',
+        'discount_value',
+        'start_date',
+        'end_date',
+        'is_active'
+    )
+
+    list_filter = (
+        'is_active',
+        'discount_type',
+        'start_date', 
+        'end_date'
+    )
+
+    search_fields = ('name',)
 
 
 from .models import Order
@@ -52,3 +67,10 @@ admin.site.register(Lens)
 admin.site.register(OrderItem)
 admin.site.register(CompanyInfo)
 admin.site.register(Category)
+
+admin.site.register(DashboardImage)
+
+@admin.register(Purchase)
+class PurchaseAdmin(admin.ModelAdmin):
+    list_display = ('product', 'dealer_name', 'quantity', 'purchase_date', 'cost_price')
+    list_filter = ('purchase_date', 'dealer_name', 'product')

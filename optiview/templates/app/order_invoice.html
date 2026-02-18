@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice - Order #{{ order.id }}</title>
+    <link rel="stylesheet" href="{% static 'app/css/invoice.css' %}">
+</head>
+<body>
+
+<div class="invoice-container">
+
+    <div class="invoice-header">
+        <h2>Optiview</h2>
+        <p>Order Invoice</p>
+    </div>
+
+    <div class="invoice-info">
+        <p><strong>Invoice No:</strong> INV-{{ order.id }}</p>
+        <p><strong>Date:</strong> {{ order.created_at|date:"M d, Y" }}</p>
+        <p><strong>Status:</strong> {{ order.status }}</p>
+    </div>
+
+    <hr>
+
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+  {% for item in items %}
+  <tr>
+    <td>{{ item.product.name }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>₹{{ item.product.get_final_price }}</td>
+    <td>₹{{ item.line_total }}</td>
+  </tr>
+  {% endfor %}
+</tbody>
+
+    </table>
+
+    <div class="invoice-total">
+        <h3>Total: ₹{{ order.total_amount }}</h3>
+    </div>
+
+    <a href="{% url 'app:order_invoice' order.id %}" class="invoice-btn">
+    🧾 Download PDF
+</a>
+
+
+</div>
+
+</body>
+</html>

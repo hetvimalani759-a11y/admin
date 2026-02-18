@@ -1,0 +1,11 @@
+<h2>Products in {{ category.name }}</h2>
+<div class="products-grid">
+    {% for product in products %}
+    <div class="product-box">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        <h4>{{ product.name }}</h4>
+        <p>{{ product.description }}</p>
+        <p>₹{{ product.price }}</p>
+    </div>
+    {% endfor %}
+</div>

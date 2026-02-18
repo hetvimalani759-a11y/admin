@@ -3,6 +3,11 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'admin/css/low_stock.css' %}">
+<style>
+  .stock-low { color: #dc3545; font-weight: bold; }
+  .table-card { margin-bottom: 2rem; }
+  .chart-card { width: 100%; max-width: 600px; margin: auto; }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -10,10 +15,10 @@
   <div class="low-stock-card">
     <h2 class="page-title ripple-text">📉 Low Stock Products</h2>
 
-    <div class="content-grid">
+    <div class="content-grid" style="display:flex; gap:2rem; flex-wrap:wrap;">
       <!-- Table -->
-      <div class="table-card">
-        <table class="stock-table">
+      <div class="table-card" style="flex:1 1 300px;">
+        <table class="stock-table" border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse: collapse;">
           <thead>
             <tr>
               <th>#</th>
@@ -22,19 +27,24 @@
             </tr>
           </thead>
           <tbody>
-            {% for p in products %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ p.name }}</td>
-              <td class="stock-low">{{ p.stock }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
+{% for p in low_stock_products %}
+<tr>
+  <td>{{ forloop.counter }}</td>
+  <td>{{ p.name }}</td>
+  <td class="{% if p.stock <= low_stock_threshold %}stock-low{% endif %}">{{ p.stock }}</td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="3">No low stock products!</td>
+</tr>
+{% endfor %}
+</tbody>
+
         </table>
       </div>
 
       <!-- Chart -->
-      <div class="chart-card">
+      <div class="chart-card" style="flex:1 1 300px;">
         <canvas id="lowStockChart"></canvas>
       </div>
     </div>
@@ -48,25 +58,25 @@
 <script>
 const labels = JSON.parse(document.getElementById('lowStockLabels').textContent);
 const values = JSON.parse(document.getElementById('lowStockData').textContent);
+const lowStockThreshold = {{ low_stock_threshold }};
 
-const ctx = document.getElementById('lowStockChart');
-new Chart(ctx, {
+const backgroundColors = values.map(v => v <= lowStockThreshold ? 'rgba(220,53,69,0.7)' : 'rgba(0,123,255,0.7)');
+
+new Chart(document.getElementById('lowStockChart'), {
   type: 'bar',
   data: {
     labels: labels,
     datasets: [{
       label: 'Stock Quantity',
       data: values,
-      backgroundColor: 'rgba(220, 53, 69, 0.7)',
+      backgroundColor: backgroundColors,
       borderRadius: 6
     }]
   },
   options: {
-    animation: false,
     responsive: true,
-    scales: {
-      y: { beginAtZero: true }
-    }
+    plugins: { legend: { display: false } },
+    scales: { y: { beginAtZero: true } }
   }
 });
 </script>

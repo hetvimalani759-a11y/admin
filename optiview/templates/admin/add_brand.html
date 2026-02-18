@@ -1,0 +1,16 @@
+<h2>Add Brand</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Brand Name" required>
+    <button type="submit">Add Brand</button>
+</form>
+
+<h3>Existing Brands</h3>
+<ul>
+    {% for brand in brands %}
+        <li>{{ brand.name }}</li>
+    {% empty %}
+        <li>No brands added yet.</li>
+    {% endfor %}
+</ul>

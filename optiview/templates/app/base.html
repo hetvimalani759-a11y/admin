@@ -1,205 +1,136 @@
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Optiview Goggles</title>
+    <title>Optiview | Premium Eyewear</title>
     {% load static %}
 
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'app/css/base.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+<body>
+    {% csrf_token %}
+    <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
-<!-- HEADER -->
-<header class="header">
-    <div class="container d-flex justify-content-between align-items-center">
-        <div class="logo">Optiview</div>
+<!-- ================= HEADER ================= -->
+<header class="main-header">
+    <div class="container header-container">
+        
 
-        <nav class="nav-menu d-flex align-items-center gap-3">
-            <a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a>
-            <a href="/shop/" class="{% if request.path == '/shop/' %}active{% endif %}">Shop</a>
-            <a href="/about/" class="{% if request.path == '/about/' %}active{% endif %}">About</a>
-            <a href="/contact/" class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a>
-            <a href="/orders/history/" class="{% if request.path == '/orders/history/' %}active{% endif %}">My Orders</a>
+        <div class="logo">
+            <span class="logo-main">Opti</span><span class="logo-accent">view</span>
+        </div>
+
+        <div class="search-bar">
+        <input type="text" placeholder="Search entire store here...">
+        <button>🔍</button>
+      </div>
+
+        <div class="nav-icons">
             <!-- 🔔 NOTIFICATIONS -->
             {% if user.is_authenticated %}
-            <div class="position-relative" id="notif-wrapper" style="display:none;">
-                <button id="notif-btn" style="background:none;border:none;font-size:20px;cursor:pointer;">
-                    🔔 <span id="notif-count"
-                        style="background:red;color:white;border-radius:50%;padding:2px 6px;font-size:12px;display:none;">0</span>
-                </button>
+            <div class="position-relative notif-wrapper" id="notif-wrapper">
 
-                <div id="notif-box"
-                    style="display:none;position:absolute;right:0;top:30px;width:300px;background:white;color:#000;border:1px solid #ddd;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:999;">
-                    <div id="notif-items"></div>
-                </div>
-            </div>
-            {% endif %}
+                <button id="notif-btn" class="notif-btn">
+                <i class="fa-regular fa-bell"></i>
+                <span id="notif-count" class="notif-count">0</span>
+            </button>
 
-            <!-- CART -->
-            <a href="/cart/" class="cart-icon position-relative {% if request.path == '/cart/' %}active{% endif %}">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count" id="cart-count">{{ cart_count }}</span>
-            </a>
+            <div id="notif-box" class="notif-box">
+            <div id="notif-items"></div>
+        </div>
 
-            <!-- WISHLIST -->
-            <a href="/wishlist/" class="heart-icon {% if request.path == '/wishlist/' %}active{% endif %}">
-                <i class="far fa-heart"></i>
-            </a>
-
-            <!-- ACCOUNT -->
-            <div class="account-dropdown position-relative">
-                <span class="account-btn">Account ▾</span>
-                <div class="account-menu position-absolute">
-                    {% if user.is_authenticated %}
-                        <p>Hi, {{ user.username }}</p>
-                        <a href="{% url 'logout' %}">Logout</a>
-                    {% else %}
-                        <a href="{% url 'login' %}">Login</a>
-                        <a href="{% url 'register' %}">Register</a>
-                    {% endif %}
-                </div>
-            </div>
-        </nav>
     </div>
+    {% endif %}
+
+
+            <!-- Cart -->
+            <a href="/cart/" class="icon {% if request.path == '/cart/' %}active-icon{% endif %}">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="count">{{ cart_count }}</span>
+            </a>
+
+            <!-- Wishlist -->
+            <a href="/wishlist/" class="icon {% if request.path == '/wishlist/' %}active-icon{% endif %}">
+                <i class="fa-regular fa-heart"></i>
+            </a>
+
+            <!-- Account -->
+            <div class="account">
+    <button id="accountBtn">
+        <i class="fa-regular fa-user"></i>
+    </button>
+
+    <div class="account-dropdown" id="accountDropdown">
+        {% if user.is_authenticated and not user.is_staff %}
+            <p class="welcome">Hi, {{ user.username }}</p>
+            <a href="/profile/" class="nav-link">Profile</a>
+            <a href="{% url 'app:logout' %}" class="nav-link">Logout</a>
+        {% else %}
+            <a href="{% url 'app:login' %}" class="nav-link">Login</a>
+            <a href="{% url 'app:register' %}" class="nav-link">Register</a>
+        {% endif %}
+    </div>
+</div>
+
+        </div>
+    </div><ul>
+        <nav class="nav-links">
+
+            <a href="/" class='nav-link' class="{% if request.path == '/' %}active{% endif %}">Home</a>
+            <a href="/shop/"class='nav-link' class="{% if request.path == '/shop/' %}active{% endif %}">Shop</a>
+            <a href="/about/" class='nav-link'class="{% if request.path == '/about/' %}active{% endif %}">About</a>
+            <a href="/contact/"class='nav-link' class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a>
+            <a href="/orders/history/" class='nav-link'class="{% if request.path == '/orders/history/' %}active{% endif %}">My Orders</a>
+
+        </nav>
+        
+    </nav>
 </header>
 
-<!-- TOAST MESSAGES -->
-{% if messages %}
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999;">
-  {% for message in messages %}
-  <div class="toast align-items-center text-white bg-success border-0 show mb-2">
-    <div class="d-flex">
-      <div class="toast-body">{{ message }}</div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-    </div>
-  </div>
-  {% endfor %}
-</div>
-{% endif %}
-
-<!-- MAIN CONTENT -->
+<!-- ================= CONTENT ================= -->
 {% block content %}{% endblock %}
 
-<!-- FOOTER -->
-<footer class="figma-footer mt-5">
-    <div class="footer-grid container">
-        <div class="footer-col">
+<!-- ================= FOOTER ================= -->
+<footer class="main-footer">
+    <div class="container footer-grid">
+        <div>
             <h4>Optiview</h4>
-            <p>Premium goggles designed for style, comfort and eye protection.</p>
+            <p>Premium goggles crafted for clarity and confidence.</p>
         </div>
-        <div class="footer-col">
-            <h4>Quick Links</h4>
+
+        <div>
+            <h5>Quick Links</h5>
             <p><a href="/">Home</a></p>
             <p><a href="/shop/">Shop</a></p>
             <p><a href="/about/">About Us</a></p>
             <p><a href="/contact/">Contact</a></p>
         </div>
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p>Email: twinseyeoptics@gmail.com</p>
-            <p>Phone: +91 8160133978</p>
+
+        <div>
+            <h5>Contact</h5>
+            <p>📧 twinseyeoptics@gmail.com</p>
+            <p>📞 +91 8160133978</p>
             <p>Mon - Sun : 9AM - 8PM</p>
         </div>
-        <!-- <div class="footer-col">
-            <h4>Follow Us</h4>
-            <p><a href="#"><i class="fab fa-instagram"></i> Instagram</a></p>
-            <p><a href="#"><i class="fab fa-facebook"></i> Facebook</a></p>
-            <p><a href="#"><i class="fab fa-twitter"></i> Twitter</a></p>
-        </div> -->
     </div>
-    <div class="footer-brand text-center mt-3">
-        <h2>Optiview</h2>
-        <p>© 2026 Optiview. All rights reserved.</p>
+
+    <div class="footer-bottom">
+        © 2026 Optiview. All rights reserved.
     </div>
 </footer>
 
-<!-- JS -->
-<script src="{% static 'app/js/shop.js' %}"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-
-{% if user.is_authenticated %}
-<script>
-const notifWrapper = document.getElementById("notif-wrapper");
-const btn = document.getElementById("notif-btn");
-const box = document.getElementById("notif-box");
-const countBadge = document.getElementById("notif-count");
-const itemsBox = document.getElementById("notif-items");
-
-// Toggle notification box
-btn.onclick = () => {
-    box.style.display = box.style.display === "none" ? "block" : "none";
-};
-
-// Browser notification helper
-function showBrowserNotification(title, message) {
-    if ("Notification" in window && Notification.permission === "granted") {
-        try {
-            new Notification(title, { body: message });
-        } catch(e) {
-            console.log("Notification failed", e);
-        }
-    }
-}
-
-// Load notifications from backend
-async function loadNotifications() {
-    const res = await fetch("{% url 'get_notifications' %}");
-    const data = await res.json();
-
-    if (!data.notifications || data.notifications.length === 0) {
-        notifWrapper.style.display = "none"; // hide if no notifications
-        return;
-    }
-
-    notifWrapper.style.display = "inline-block"; // show notification icon
-
-    countBadge.style.display = "inline";
-    countBadge.textContent = data.notifications.length;
-
-    itemsBox.innerHTML = "";
-    data.notifications.forEach(n => {
-        const div = document.createElement("div");
-        div.style.padding = "12px";
-        div.style.borderBottom = "1px solid #eee";
-        div.style.cursor = "pointer";
-        div.innerHTML = `
-            <strong style="color:#000">${n.title}</strong>
-            <p style="color:#555;margin:0">${n.message}</p>
-        `;
-
-        div.onclick = async () => {
-            await fetch(`/notifications/read/${n.id}/`);
-            loadNotifications();
-        };
-        itemsBox.appendChild(div);
-        showBrowserNotification(n.title, n.message);
-    });
-}
-
-// Account dropdown toggle
-const accountDropdown = document.querySelector(".account-dropdown");
-const accountMenu = accountDropdown.querySelector(".account-menu");
-accountDropdown.addEventListener("mouseenter", () => { accountMenu.style.display = "block"; });
-accountDropdown.addEventListener("mouseleave", () => { accountMenu.style.display = "none"; });
-
-document.addEventListener("DOMContentLoaded", () => {
-    if ("Notification" in window && Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
-    loadNotifications();
-    setInterval(loadNotifications, 8000);
-});
-</script>
-{% endif %}
-
+<script src="{% static 'app/js/base.js' %}"></script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

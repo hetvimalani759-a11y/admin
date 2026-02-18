@@ -53,6 +53,12 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             e.stopPropagation();
 
+            /* ✅ If already added → go to cart */
+            if (cartBtn.dataset.added === "true") {
+                window.location.href = "/cart/";
+                return;
+            }
+
             if (cartBtn.dataset.loading === "true") return;
             cartBtn.dataset.loading = "true";
 
@@ -71,6 +77,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.success) {
                     updateCartCount();
                     showToast("🛒 Added to cart");
+
+                    /* ✅ Change button to Go to Cart */
+                    cartBtn.textContent = " 🛒 Go to Cart";
+                    cartBtn.classList.remove("btn-primary");
+                    cartBtn.classList.add("btn-success");
+                    cartBtn.dataset.added = "true";
                 } else {
                     showToast(data.error || "Failed", "error");
                 }
@@ -81,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             return;
         }
-
+        
         /* ===== WISHLIST ===== */
         const wishBtn = e.target.closest(".toggle-wishlist-btn");
         if (wishBtn) {

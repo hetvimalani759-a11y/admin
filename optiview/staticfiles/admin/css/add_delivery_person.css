@@ -1,0 +1,116 @@
+/* ==============================
+   DELIVERY PAGE STYLING
+============================== */
+.delivery-page {
+  padding: 24px;
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #7ebaee 0%, #ffffff 100%);
+}
+
+/* ==============================
+   GLASS FORM CARD
+============================== */
+.category-form-card {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  padding: 28px 22px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* ==============================
+   HEADING
+============================== */
+.category-heading {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Optional animated gradient text */
+.ripple-text {
+  background: linear-gradient(90deg, #6366f1, #7ebaee, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ripple 3s linear infinite;
+}
+
+@keyframes ripple {
+  0% { background-position: 0% }
+  100% { background-position: 200% }
+}
+
+/* ==============================
+   FORM FIELDS
+============================== */
+.category-form .form-group {
+  margin-bottom: 16px;
+}
+
+.category-form label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.category-form input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+  color: #0f172a;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.category-form input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+/* ==============================
+   BUTTON
+============================== */
+.btn-primary {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #6366f1;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+@media (max-width: 576px) {
+  .delivery-page {
+    padding: 16px;
+  }
+
+  .category-form-card {
+    padding: 20px;
+  }
+
+  .category-heading {
+    font-size: 18px;
+  }
+}
+

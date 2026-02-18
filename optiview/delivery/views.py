@@ -1,34 +1,67 @@
 from django.db import IntegrityError
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login , logout
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from adminpanel.models import Order
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.conf import settings
+from functools import wraps
+from adminpanel.utils import is_delivery
+
+from adminpanel.models import Order
 from .models import DeliveryPerson
 
 
+# =====================================================
+# 🔐 DELIVERY ACCESS GUARD
+# =====================================================
+def delivery_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect("delivery:delivery_login")
+
+        if request.session.get("panel") != "delivery":
+            logout(request)
+            request.session.flush()
+            return redirect("delivery:delivery_login")
+
+        if not hasattr(request.user, "deliveryperson"):
+            logout(request)
+            request.session.flush()
+            return redirect("delivery:delivery_login")
+
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+# =====================================================
+# 🚪 LOGOUT
+# =====================================================
+@delivery_required
 def delivery_logout(request):
     logout(request)
-    return redirect('delivery_login')
+    request.session.flush()
+    return redirect("delivery:delivery_login")
 
 
+# =====================================================
+# 🔑 FORGOT PASSWORD
+# =====================================================
 def forgot_password(request):
     if request.method == "POST":
-        email = request.POST.get('email')
+        email = request.POST.get("email")
         user = User.objects.filter(email=email).first()
 
         if user:
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             token = default_token_generator.make_token(user)
-
             reset_link = request.build_absolute_uri(
-                f"/reset-password/{uid}/{token}/"
+                f"/delivery/reset-password/{uid}/{token}/"
             )
 
             send_mail(
@@ -39,11 +72,16 @@ def forgot_password(request):
                 fail_silently=False,
             )
 
-        return render(request, "delivery/forgot_password.html",
-                      {"msg": "If email exists, reset link sent"})
+        return render(request, "delivery/forgot_password.html", {
+            "msg": "If the email exists, a reset link has been sent."
+        })
 
     return render(request, "delivery/forgot_password.html")
 
+
+# =====================================================
+# 🔑 RESET PASSWORD
+# =====================================================
 def reset_password(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -51,168 +89,121 @@ def reset_password(request, uidb64, token):
     except:
         user = None
 
-    if user and default_token_generator.check_token(user, token):
-        if request.method == "POST":
-            password = request.POST.get("password")
-            user.set_password(password)
-            user.save()
-            return redirect("login")
+    if not user or not default_token_generator.check_token(user, token):
+        return render(request, "delivery/reset_password.html", {
+            "error": "Invalid or expired reset link."
+        })
 
-        return render(request, "delivery/reset_password.html")
-
-    return render(request, "delivery/reset_password.html",
-                  {"error": "Invalid or expired link"})
-
-def delivery_login(request):
     if request.method == "POST":
-        username = request.POST.get("username", "").strip()
-        password = request.POST.get("password", "").strip()
+        password = request.POST.get("password")
+        user.set_password(password)
+        user.save()
+        messages.success(request, "Password reset successful. Please login.")
+        return redirect("delivery:delivery_login")
 
-        if not username or not password:
-            return render(request, "delivery/login.html", {
-                "error": "Both fields are required"
-            })
+    return render(request, "delivery/reset_password.html")
 
-        user = authenticate(request, username=username, password=password)
 
-        if user is None:
-            return render(request, "delivery/login.html", {
-                "error": "Invalid username or password"
-            })
+# =====================================================
+# 🔐 LOGIN
+# =====================================================
+def delivery_login(request):
+    if request.user.is_authenticated and is_delivery(request.user):
+        return redirect("app:home")
+    request.session.flush()
 
-        if not hasattr(user, "deliveryperson"):
-            return render(request, "delivery/login.html", {
-                "error": "You are not authorized as delivery person"
-            })
+    if request.method == "POST":
+        user = authenticate(
+            request,
+            username=request.POST.get("username"),
+            password=request.POST.get("password"),
+        )
+
+        if not user or not hasattr(user, "deliveryperson"):
+            messages.error(request, "Delivery account required")
+            return redirect("delivery:delivery_login")
+
         login(request, user)
-
-# ✅ LOGIN SUCCESS MESSAGE
-        messages.success(request, f"You have been login successfully")
-
-        return redirect("delivery_dashboard")
+        request.session["panel"] = "delivery"
+        return redirect("delivery:delivery_dashboard")
 
     return render(request, "delivery/login.html")
 
+
+# =====================================================
+# 📊 DASHBOARD
+# =====================================================
+@login_required(login_url="delivery:delivery_login")
+@delivery_required
 def delivery_dashboard(request):
-    try:
-        delivery_person = DeliveryPerson.objects.get(user=request.user)
-    except DeliveryPerson.DoesNotExist:
-        return redirect("login")
-
+    delivery_person = request.user.deliveryperson
     orders = Order.objects.filter(delivery_person=delivery_person)
-    delivery_person = DeliveryPerson.objects.get(user=request.user)
-
-    all_orders = Order.objects.filter(delivery_person=delivery_person)
-
-    active_orders = all_orders.filter(
-        status__in=["Placed", "Out for Delivery"]
-    )
 
     context = {
-        "total_orders": all_orders.count(),
-        "out_for_delivery": all_orders.filter(status="Out for Delivery").count(),
-        "delivered_orders": all_orders.filter(status="Delivered").count(),
-        "pending_orders": all_orders.filter(status="Pending").count(),
-        "active_orders": active_orders,
+        "total_orders": orders.count(),
+        "pending_orders": orders.filter(status="Pending").count(),
+        "out_for_delivery": orders.filter(status="Out for Delivery").count(),
+        "delivered_orders": orders.filter(status="Delivered").count(),
+        "active_orders": orders.filter(status__in=["Placed", "Out for Delivery"]),
     }
 
-    return render(request, "delivery/dashboard.html", context)  
+    return render(request, "delivery/dashboard.html", context)
 
 
-@login_required
+# =====================================================
+# 📦 MY ORDERS
+# =====================================================
+@login_required(login_url="delivery:delivery_login")
+@delivery_required
 def my_orders(request):
-    delivery_person = DeliveryPerson.objects.get(user=request.user)
-    orders = Order.objects.filter(delivery_person=delivery_person)
-
-    return render(request, 'delivery/my_orders.html', {'orders': orders})
+    orders = Order.objects.filter(delivery_person=request.user.deliveryperson)
+    return render(request, "delivery/my_orders.html", {"orders": orders})
 
 
-
-@login_required
-def  delivery_profile(request):
-    delivery_person = DeliveryPerson.objects.get(user=request.user)
-    return render(request, 'delivery/profile.html', {'delivery_person': delivery_person})
-
-
-@login_required
-def edit_profile(request):
-    user = request.user
-    delivery_person = user.deliveryperson  # assuming one-to-one relation
-    redirect_after = False  # initially False
-
-    if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        phone = request.POST.get("phone")
-        address = request.POST.get("address")
-
-        # update user
-        user.username = username
-        user.email = email
-        if password:
-            user.set_password(password)
-        user.save()
-
-        # update delivery person
-        delivery_person.phone = phone
-        delivery_person.address = address
-        delivery_person.save()
-
-        messages.success(request, "Profile updated successfully!")
-        redirect_after = True  # enable redirect
-
-    context = {
-        'user': user,
-        'delivery_person': delivery_person, 
-        'redirect_after': redirect_after
-    }
-    return render(request, 'delivery/edit_profile.html', context)
-
-
-
-
-def delivery_person_list(request):
-    delivery_persons = DeliveryPerson.objects.select_related("user").all()
-    return render(request, 'admin/delivery_person_list.html', {
-        'delivery_persons': delivery_persons
+# =====================================================
+# 👤 PROFILE
+# =====================================================
+@login_required(login_url="delivery:delivery_login")
+@delivery_required
+def delivery_profile(request):
+    return render(request, "delivery/profile.html", {
+        "delivery_person": request.user.deliveryperson
     })
 
 
+# =====================================================
+# ✏️ EDIT PROFILE
+# =====================================================
+@login_required(login_url="delivery:delivery_login")
+@delivery_required
+def edit_profile(request):
+    user = request.user
+    delivery_person = user.deliveryperson
 
-
-def add_delivery_person(request):
     if request.method == "POST":
-        username = request.POST.get("username").strip()
-        email = request.POST.get("email")
+        user.username = request.POST.get("username", "").strip()
+        user.email = request.POST.get("email")
+
         password = request.POST.get("password")
-        phone = request.POST.get("phone")
+        if password:
+            user.set_password(password)
 
-        # ✅ First check (fast)
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists.")
-            return redirect("add_delivery_person")
+        user.save()
 
-        try:
-            # ✅ Second safety layer (database level)
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password
-            )
-            user.is_staff = True   # ✅ THIS LINE
-            user.save()
-        except IntegrityError:
-            messages.error(request, "Username already exists.")
-            return redirect("delivery_person_add")
+        delivery_person.phone = request.POST.get("phone")
+        delivery_person.address = request.POST.get("address")
+        delivery_person.save()
 
-        DeliveryPerson.objects.create(
-            user=user,
-            phone=phone
-        )
+        messages.success(request, "Profile updated successfully.")
+        return redirect("delivery:delivery_profile")
 
-        messages.success(request, "Delivery person added successfully.")
-        return redirect("delivery_person_list")
+    return render(request, "delivery/edit_profile.html", {
+        "user": user,
+        "delivery_person": delivery_person
+    })
 
-    return render(request, "admin/add_delivery_person.html")
 
+# =====================================================
+# ❌ REMOVE ADMIN LOGIC FROM DELIVERY APP
+# (Delivery creation should stay in adminpanel)
+# =====================================================

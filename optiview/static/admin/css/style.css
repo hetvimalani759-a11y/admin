@@ -422,6 +422,29 @@ body.dark-mode table tr:hover {
     font-weight: 600;
 }
 /* =========================
+   DASHBOARD CHART CARDS
+========================= */
+.mini-chart-card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+  height: 280px;
+}
+
+body.dark-mode .mini-chart-card {
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #1e293b;
+}
+
+/* Chart canvas size */
+.mini-chart-card canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* =========================
    DARK MODE TEXT VISIBILITY FIX
 ========================= */
 body.dark-mode h1,
@@ -439,7 +462,8 @@ body.dark-mode title
 /* Dark mode input normal */
 body.dark-mode .form-control,
 body.dark-mode .form-card input,
-body.dark-mode .form-card textarea {
+body.dark-mode .form-card textarea
+body.dark-mode ..mini-chart-card {
   background: #020617;
   color: #e5e7eb;
   border-color: #1e293b;
@@ -478,7 +502,13 @@ table th, table h1, table h2, table h3, table h4, table h5, table h6, table p,
     background-color: #ffffff !important;
     color: black !important; /* optional: text inside card black */
 }
-
+/* .dark-mode.charts-row .mini-chart-card {
+  background-color: #ffffff !important;
+  color: black !important;
+  box-shadow:
+    0 22px 55px rgba(0,0,0,.7),
+    inset 0 0 0 1px rgba(255,255,255,.08);
+} */
 /* Optional: table row colors in dark mode */
 .dark-mode table {
     background-color: #f9f9f9;

@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Dashboard Image</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        form { max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 10px; }
+        input, textarea { padding: 10px; font-size: 14px; border-radius: 5px; border: 1px solid #ccc; width: 100%; }
+        button { padding: 10px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #45a049; }
+        h1 { text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>Add Dashboard Image</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="text" name="title" placeholder="Image Title">
+        <textarea name="description" placeholder="Image Description" rows="3"></textarea>
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">Add Image</button>
+    </form>
+</body>
+</html>

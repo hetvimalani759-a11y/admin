@@ -4,73 +4,337 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'app/css/shop.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+<style>
+/* ================= PRODUCT CARD ================= */
+.product-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    transition: 0.2s ease;
+}
+.product-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+/* ================= IMAGE SLIDER ================= */
+.product-image-slider {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.product-image-slider img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+.color-swatch {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-right: 5px;
+    border: 1px solid #aaa;
+    cursor: pointer;
+}
+.price-row { margin-top: 8px; }
+.discounted-price { font-weight: bold; color: #5b4de0; }
+.original-price { text-decoration: line-through; color: #888; margin-left: 8px; }
+.discount-text { color: #28a745; margin-left: 5px; font-size: 0.85rem; }
+.card-actions { margin-top: 10px; }
+</style>
 {% endblock %}
 
 {% block content %}
-<input type="hidden" id="csrf-token" value="{{ csrf_token }}">
-
 <div class="container py-4">
     <h2 class="text-center mb-4">🛍 Shop Goggles</h2>
 
-    <!-- Category Filter -->
-    <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
-        <a href="{% url 'shop' %}" class="btn btn-outline-dark">All</a>
-        {% for cat in categories %}
-            <a href="?category={{ cat.name }}" class="btn btn-outline-dark">{{ cat.name }}</a>
-        {% endfor %}
-    </div>
+    <div class="row">
 
-    <!-- Products Grid -->
-    <div class="product-grid">
-        {% for product in products %}
-        <div class="product-card">
-            <a href="{% url 'product_detail' product.id %}" class="product-image">
-                <img src="{{ product.image.url|default:'/static/app/images/default.png' }}" alt="{{ product.name }}">
-            </a>
-            <div class="product-body">
-                <div class="product-rating">
-                    <span class="rating">{{ product.rating|default:4.5 }} ★</span>
-                    <span class="reviews">({{ product.review_count|default:100 }})</span>
-                </div>
-                <div class="product-brand">{{ product.brand|default:"Brand Name" }}</div>
-                <h5 class="product-name">{{ product.name }}</h5>
-                <div class="price-row">
-                    {% if product.get_offer %}
-                    <span class="discounted-price">₹{{ product.get_final_price|floatformat:0 }}</span>
-                    <span class="original-price">₹{{ product.price|floatformat:0 }}</span>
-                    {% if product.get_offer.discount_type == "percent" %}
-                        <span class="discount-text" style="color: green;">({{ product.get_offer.discount_value }}% OFF)</span>
-                    {% else %}
-                        <span class="discount-text" style="color: green;">(₹{{ product.get_offer.discount_value }} OFF)</span>
-                    {% endif %}
-                    {% else %}
-                    <span class="discounted-price">₹{{ product.price|floatformat:0 }}</span>
-                {% endif %}
+        <!-- ================= FILTER SIDEBAR ================= -->
+        <div class="col-md-3">
+            <form method="GET" class="filter-sidebar">
 
+                <h5>Category</h5>
+                {% for cat in categories %}
+                <div class="filter-item">
+                    <input type="checkbox"
+                           name="category"
+                           value="{{ cat.id }}"
+                           {% if selected_category == cat.id|stringformat:"s" %}checked{% endif %}>
+                    <label>{{ cat.name }}</label>
+                </div>
+                {% endfor %}
+
+                <hr>
+
+                <h5>Price Range</h5>
+                <input type="number" name="min_price" value="{{ request.GET.min_price }}"
+                       placeholder="Min Price" class="form-control mb-2">
+                <input type="number" name="max_price" value="{{ request.GET.max_price }}"
+                       placeholder="Max Price" class="form-control">
+
+                <hr>
+
+                <h5>Color</h5>
+                {% for color in colors %}
+                <div class="filter-item">
+                    <input type="checkbox"
+                           name="color"
+                           value="{{ color.id }}"
+                           {% if color.id|stringformat:"s" in selected_colors %}checked{% endif %}>
+                    <label>{{ color.name }}</label>
+                </div>
+                {% endfor %}
+
+                <hr>
+
+                <h5>Brand</h5>
+                {% for brand in brands %}
+                <div class="filter-item">
+                    <input type="checkbox"
+                           name="brand"
+                           value="{{ brand.id }}"
+                           {% if brand.id|stringformat:"s" in selected_brands %}checked{% endif %}>
+                    <label>{{ brand.name }}</label>
+                </div>
+                {% endfor %}
+
+                <hr>
+
+                <div class="filter-item">
+                    <input type="checkbox" name="stock" value="1"
+                           {% if request.GET.stock %}checked{% endif %}>
+                    <label>In Stock</label>
                 </div>
 
-                <div class="card-actions d-flex gap-2 mt-2">
-                    {% if product.stock > 0 %}
-                        <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ product.id }}">
-                            🛒 Add to Cart
-                        </button>
-                    {% else %}
-                        <button class="btn btn-secondary btn-sm" disabled>Out of Stock</button>
-                    {% endif %}
-                    <button class="btn btn-sm toggle-wishlist-btn" data-id="{{ product.id }}">
-                        {% if product.id in wishlist_ids %}
-                            <i class="fa-solid fa-heart"></i>
-                        {% else %}
-                            <i class="fa-regular fa-heart"></i>
-                        {% endif %}
-                    </button>
+                <button type="submit" class="btn btn-primary w-100 mt-3">
+                    Apply Filters
+                </button>
+            </form>
+        </div>
+
+        <!-- ================= PRODUCTS GRID ================= -->
+        <div class="col-md-9">
+            <div class="row g-3">
+
+                {% for product in products %}
+                <div class="col-md-4">
+                    <div class="product-card">
+                        
+
+                        <!-- IMAGE -->
+                        <div class="product-image-slider" data-url="{% url 'app:product_detail' product.id %}">
+                            {% if product.variants.first and product.variants.first.images.first %}
+                                <img class="product-main-image" src="{{ product.variants.first.images.first.image.url }}">
+                            {% else %}
+                                <img class="product-main-image" src="{% static 'app/images/default.png' %}">
+                            {% endif %}
+                        </div>
+
+                        <!-- PRODUCT INFO -->
+                        <div class="mt-2">
+                            <div class="text-muted small">{{ product.brand|default:"Brand Name" }}</div>
+                            <h6>{{ product.name }}</h6>
+
+                            <!-- Color Swatches -->
+                            {% if product.variants.exists %}
+                            <div class="mt-1">
+                                {% for variant in product.variants.all %}
+                                {% if variant.images.first %}
+                                <span class="color-swatch"
+                                      style="background-color: {{ variant.color|default:'#ccc' }}"
+                                      data-image="{{ variant.images.first.image.url }}"></span>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <!-- Price -->
+                            <div class="price-row">
+                                {% with offer=product.get_best_offer %}
+                                    {% if offer %}
+                                        <span class="discounted-price">₹{{ product.get_final_price|floatformat:0 }}</span>
+                                        <span class="original-price">₹{{ product.price|floatformat:0 }}</span>
+                                        {% if offer.discount_type == "percent" %}
+                                            <span class="discount-text">({{ offer.discount_value }}% OFF)</span>
+                                        {% else %}
+                                            <span class="discount-text">(₹{{ offer.discount_value }} OFF)</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="discounted-price">₹{{ product.price|floatformat:0 }}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="card-actions d-flex gap-2 mt-2">
+                                {% if product.stock > 0 %}
+                                <button class="btn btn-primary btn-sm add-to-cart-btn"
+                                        data-id="{{ product.id }}">
+                                    🛒 Add to Cart
+                                </button>
+                                {% else %}
+                                <button class="btn btn-secondary btn-sm" disabled>
+                                    Out of Stock
+                                </button>
+                                {% endif %}
+
+                                <button class="btn btn-sm toggle-wishlist-btn"
+                                        data-id="{{ product.id }}">
+                                    {% if product.id in wishlist_ids %}
+                                        <i class="fa-solid fa-heart text-danger"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-heart"></i>
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                {% empty %}
+                <p>No products found.</p>
+                {% endfor %}
+
             </div>
         </div>
-        {% empty %}
-            <p class="text-center">No products found.</p>
-        {% endfor %}
+
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]")?.value
+        || document.getElementById("csrf-token")?.value;
+
+    // ================= CHANGE IMAGE ON COLOR CLICK =================
+    document.querySelectorAll(".color-swatch").forEach(swatch => {
+        swatch.addEventListener("click", () => {
+            const card = swatch.closest(".product-card");
+            const mainImage = card.querySelector(".product-main-image");
+            mainImage.src = swatch.dataset.image;
+
+            const addBtn = card.querySelector(".add-to-cart-btn");
+            if(addBtn) addBtn.dataset.selectedImage = swatch.dataset.image;
+        });
+    });
+
+    // ================= TOAST FUNCTION =================
+    let toastEl = null;
+    function showToast(msg, type="success") {
+        if(!toastEl){
+            toastEl = document.createElement("div");
+            toastEl.style.position = "fixed";
+            toastEl.style.top = "20px";
+            toastEl.style.right = "20px";
+            toastEl.style.zIndex = "9999";
+            document.body.appendChild(toastEl);
+        }
+        toastEl.innerHTML = `<div style="
+            background:${type==="success"?"#5ec8ec":"#dc3545"};
+            color:white;padding:10px 16px;border-radius:6px;
+            box-shadow:0 4px 10px rgba(0,0,0,.15);margin-bottom:8px;">
+            ${msg}</div>`;
+        setTimeout(()=>{ toastEl.innerHTML=""; },2500);
+    }
+    // ================= REDIRECT ON IMAGE CLICK =================
+document.querySelectorAll(".product-image-slider").forEach(slider => {
+    slider.addEventListener("click", e => {
+        // Avoid triggering redirect when clicking color swatches
+        if(e.target.classList.contains("color-swatch")) return;
+
+        const url = slider.dataset.url;
+        if(url) window.location.href = url;
+    });
+});
+
+    // ================= CART & WISHLIST =================
+    document.body.addEventListener("click", async e => {
+
+        // Add to Cart
+        const cartBtn = e.target.closest(".add-to-cart-btn");
+        if(cartBtn){
+            e.preventDefault(); e.stopPropagation();
+             if(cartBtn.disabled) {
+                    showToast("❌ Product is out of stock", "error");
+                    return;
+                }
+
+
+            if(!cartBtn.dataset.selectedImage){
+                showToast("⚠️ Please select a color before adding to cart", "error");
+                return;
+            }
+
+            if(cartBtn.dataset.added==="true"){
+                window.location.href="/cart/";
+                return;
+            }
+            if(cartBtn.dataset.loading==="true") return;
+            cartBtn.dataset.loading="true";
+
+            try{
+                const res = await fetch(`/add-to-cart/${cartBtn.dataset.id}/`, {
+                    method:"POST",
+                    headers:{
+                        "X-CSRFToken": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Content-Type":"application/json"
+                    },
+                    body: JSON.stringify({selected_image: cartBtn.dataset.selectedImage})
+                });
+                const data = await res.json();
+                if(data.success){
+                    showToast("🛒 Added to cart");
+                    cartBtn.textContent="🛒 Go to Cart";
+                    cartBtn.classList.remove("btn-primary");
+                    cartBtn.classList.add("btn-success");
+                    cartBtn.dataset.added="true";
+                }else{
+                    showToast(data.error || "Failed", "error");
+                }
+            }catch(err){
+                showToast("Please login before adding to cart", "error");
+            }finally{ cartBtn.dataset.loading="false"; }
+            return;
+        }
+
+        // Wishlist toggle
+        const wishBtn = e.target.closest(".toggle-wishlist-btn");
+        if(wishBtn){
+            e.preventDefault(); e.stopPropagation();
+            const icon = wishBtn.querySelector("i");
+            try{
+                const res = await fetch(`/wishlist/toggle/${wishBtn.dataset.id}/`, {
+                    method:"POST",
+                    headers:{
+                        "X-CSRFToken": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+                const data = await res.json();
+                if(data.status==="added"){
+                    icon.classList.remove("fa-regular");
+                    icon.classList.add("fa-solid","text-danger");
+                    showToast("💖 Added to wishlist");
+                }else if(data.status==="removed"){
+                    icon.classList.remove("fa-solid","text-danger");
+                    icon.classList.add("fa-regular");
+                    showToast("💔 Removed from wishlist");
+                }
+            }catch(err){
+                showToast("Please login before adding to wishlist", "error");
+            }
+        }
+
+    });
+
+});
+</script>
 {% endblock %}

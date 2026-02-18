@@ -1,4 +1,5 @@
-/* ================================
+
+/* /* ================================
    ROOT THEME VARIABLES
 ================================ */
 :root {
@@ -394,27 +395,66 @@
 }/* ================================
    CHART CARD — MATCH DASH CARDS
 ================================ */
-.chart-card {
-  background: var(--card-bg);
-  border-radius: 22px;
-  padding: 18px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(16px) saturate(160%);
-  box-shadow:
-    0 18px 44px rgba(0,0,0,.28),
-    inset 0 0 0 1px rgba(255,255,255,.35);
-  transition: transform .35s ease, box-shadow .35s ease, filter .35s ease;
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 22px;
 }
 
-.chart-card:hover {
-  transform: translateY(-6px) scale(1.03);
-  box-shadow:
-    0 30px 70px rgba(0,0,0,.45),
-    inset 0 0 0 1px rgba(255,255,255,.45);
-  filter: brightness(1.05) saturate(1.1);
+.mini-chart-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 12px 14px;
+  height: 300px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.25);
 }
+
+.mini-chart-card h4 {
+  font-size: 14px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.mini-chart-box {
+  height: 180px;
+  width: 100%;
+  position: relative;
+}
+
+.mini-chart-box canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.chart-box {
+  height: 260px;
+  transition: .35s ease;
+}
+
+.chart-box:hover {
+  transform: scale(1.06);
+  filter: drop-shadow(0 18px 35px rgba(99,102,241,.45));
+}
+
+body.dark-mode .chart-box:hover {
+  filter: drop-shadow(0 18px 35px rgba(147,197,253,.45));
+}
+
+/* [data-theme="dark"] .charts-row.mini-chart-card {
+  background: #020617;
+  color: #e5e7eb;
+  box-shadow:
+    0 22px 55px rgba(0,0,0,.7),
+    inset 0 0 0 1px rgba(255,255,255,.08); */
+}
+
+/* Dark mode */
+/* [data-theme="dark"] .mini-chart-card {
+  background: rgba(2,6,23,.85);
+  box-shadow:
+    0 22px 55px rgba(0,0,0,.7),
+    inset 0 0 0 1px rgba(255,255,255,.08);
+} */
 
 /* Glow aura
 .chart-card::after {
@@ -452,15 +492,6 @@
   position: relative;
   z-index: 2;
 } */
-
-/* Dark mode */
-[data-theme="dark"] .chart-card {
-  background: rgba(2,6,23,.85);
-  box-shadow:
-    0 22px 55px rgba(0,0,0,.7),
-    inset 0 0 0 1px rgba(255,255,255,.08);
-}
-
 
 /* ================================
    DARK MODE — PRO LEVEL
@@ -605,4 +636,4 @@ body.dark .latest-item span {
     text-shadow:
         0 0 8px rgba(56,189,248,.7),
         0 0 18px rgba(56,189,248,.4);
-}
+} */

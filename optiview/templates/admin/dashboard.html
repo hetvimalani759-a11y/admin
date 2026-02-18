@@ -6,191 +6,279 @@
 {% endblock %}
 
 {% block content %}
+<h2 class="dashboard-title">📊 Admin Dashboard</h2>
 
-<h2 class="dashboard-title">📊 Dashboard</h2>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<!-- DASHBOARD CARDS -->
 <div class="dashboard-grid">
-
-    <a href="{% url 'adminpanel:product_list' %}" class="dash-card blue " data-count="{{ total_products }}">
-        <div class="dash-icon">📦</div>
-        <div>
-            <p>Total Products</p>
-            <h3 class="counter">0</h3>
-            <canvas class="sparkline" height="28"></canvas>
-        </div>
-    </a>
-
-    <a href="{% url 'adminpanel:order_list' %}" class="dash-card purple " data-count="{{ total_orders }}">
-        <div class="dash-icon">🛒</div>
-        <div>
-            <p>Orders</p>
-            <h3 class="counter">0</h3>
-            <canvas class="sparkline" height="28"></canvas>
-        </div>
-    </a>
-
-    <a href="{% url 'adminpanel:revenue_dashboard' %}" class="dash-card green " data-count="{{ total_revenue }}">
-        <div class="dash-icon">💰</div>
-        <div>
-            <p>Revenue</p>
-            <h3 class="counter">₹0</h3>
-            <canvas class="sparkline" height="28"></canvas>
-        </div>
-    </a>
-
-    <a href="{% url 'adminpanel:lens_list' %}" class="dash-card orange " data-count="{{ total_lenses }}">
-        <div class="dash-icon">👓</div>
-        <div>
-            <p>Lenses</p>
-            <h3 class="counter">0</h3>
-            <canvas class="sparkline" height="28"></canvas>
-        </div>
-    </a>
-
-    <a href="{% url 'adminpanel:user_list' %}" class="dash-card teal " data-count="{{ total_users }}">
-        <div class="dash-icon">👤</div>
-        <div>
-            <p>Total Users</p>
-            <h3 class="counter">0</h3>
-            <canvas class="sparkline" height="28"></canvas>
-        </div>
-    </a>
-
-    <a href="{% url 'adminpanel:low_stock_products' %}" class="dash-card red " data-count="{{ low_stock }}">
-        <div class="dash-icon">⚠️</div>
-        <div>
-            <p>Low Stock</p>
-            <h3 class="counter">0</h3>
-            <canvas class="sparkline" height="28"></canvas>
-        </div>
-    </a>
-
-</div>
-
-<!-- Latest Products -->
-<div class="dash-section">
-    <h4>🆕 Latest Products</h4>
-    <div class="latest-products">
-        {% for product in latest_products %}
-            <div class="latest-item">
-                <span>{{ product.name }}</span>
-                <span class="price">₹{{ product.price }}</span>
-            </div>
-        {% empty %}
-            <p class="text-muted">No products found</p>
-        {% endfor %}
+  <a href="{% url 'adminpanel:product_list' %}" class="dash-card blue">
+    <div class="dash-icon">📦</div>
+    <div>
+      <p>Total Products</p>
+      <h3>{{ total_products }}</h3>
     </div>
+  </a>
+
+  <a href="{% url 'adminpanel:order_list' %}" class="dash-card purple">
+    <div class="dash-icon">🛒</div>
+    <div>
+      <p>Total Orders</p>
+      <h3>{{ total_orders }}</h3>
+    </div>
+  </a>
+
+  <a href="{% url 'adminpanel:revenue_dashboard'%}" class="dash-card green">
+    <div class="dash-icon">💰</div>
+    <div>
+      <p>Total Revenue</p>
+      <h3>₹{{ total_revenue }}</h3>
+    </div>
+  </a>
+
+  <a href="{% url 'adminpanel:lens_list' %}" class="dash-card orange">
+    <div class="dash-icon">👓</div>
+    <div>
+      <p>Total Lenses</p>
+      <h3>{{ total_lenses }}</h3>
+    </div>
+  </a>
+
+  <a href="{% url 'adminpanel:user_list' %}" class="dash-card teal">
+    <div class="dash-icon">👤</div>
+    <div>
+      <p>Total Users</p>
+      <h3>{{ total_users }}</h3>
+    </div>
+  </a>
+
+  <a href="{% url 'adminpanel:low_stock_products' %}" class="dash-card red">
+    <div class="dash-icon">⚠️</div>
+    <div>
+      <p>Low Stock</p>
+      <h3>{{ low_stock }}</h3>
+    </div>
+  </a>
 </div>
 
-<div class="chart-card small-chart">
-  <h5 class="chart-title">📦 Order Status</h5>
-  <div class="chart-wrapper">
-    <canvas id="orderPieChart"></canvas>
-    <div class="chart-center">
-      <span class="total">{{ total_orders }}</span>
-      <small>Total</small>
+<!-- CHARTS -->
+<div class="charts-row">
+  <div class="mini-chart-card">
+    <h4>📦 Order Status</h4>
+    <div class="mini-chart-box">
+      <div class="chart-box">
+      <canvas id="orderPieChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="mini-chart-card">
+    <h4>💵 Weekly Revenue</h4>
+    <div class="mini-chart-box">
+      <div class="chart-box">
+      <canvas id="weeklyRevenueChart"></canvas>
+      </div>
     </div>
   </div>
 </div>
 
+
+<!-- LATEST PRODUCTS -->
+<!-- <div class="dash-section">
+  <h4>🆕 Latest Products</h4>
+  <div class="latest-products">
+    {% for product in latest_products %}
+      <div class="latest-item">
+        <span>{{ product.name }}</span>
+        <span class="price">₹{{ product.price }}</span>
+      </div>
+    {% empty %}
+      <p class="muted">No products found</p>
+    {% endfor %}
+  </div>
+</div> -->
+
+<!-- COMPANY CARD -->
+<div class="company-card">
+  {% if company.logo %}
+    <img src="{{ company.logo.url }}" class="company-logo">
+  {% endif %}
+  <div>
+    <h3>{{ company.name }}</h3>
+    <p>📍 {{ company.address }}</p>
+    <p>📞 {{ company.phone }} | 📧 {{ company.email }}</p>
+  </div>
+  
+</div>
+<div class="dashboard-actions">
+    {% if company %}
+    <a href="{% url 'adminpanel:company_update' %}" class="btn-primary">✏️ Edit Company Info</a>
+    {% else %}
+    <a href="{% url 'adminpanel:company_create' %}" class="btn-success">➕ Add Company Info</a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
 <script>
-const isDark = document.documentElement.classList.contains("dark");
+document.addEventListener("DOMContentLoaded", function () {
 
-const textColor = isDark ? "#e5e7eb" : "#0f172a";
-const mutedText = isDark ? "#9ca3af" : "#64748b";
-const gridColor = isDark ? "#334155" : "#e5e7eb";
+  const isDark = () => document.body.classList.contains("dark-mode");
+  const textColor = () => isDark() ? "#e5e7eb" : "#0f172a";
+  const gridColor = () => isDark() ? "#1e293b" : "#e5e7eb";
 
-const ctx = document.getElementById("orderPieChart").getContext("2d");
+  /* =====================
+     CENTER TOTAL PLUGIN
+  ===================== */
+  const centerTextPlugin = {
+    id: "centerText",
+    afterDraw(chart) {
+      const { ctx, chartArea: { width, height } } = chart;
+      const total = chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
 
-const chart = new Chart(ctx, {
-  type: "doughnut",
-  data: {
-    labels: {{ order_labels|safe }},
-    datasets: [{
-      data: {{ order_values|safe }},
-      backgroundColor: isDark
-        ? ["#818cf8", "#4ade80", "#fbbf24", "#f87171", "#22d3ee"]
-        : ["#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#06b6d4"],
-      borderWidth: 2,
-      hoverOffset: 12,
-      cutout: "70%"
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: { duration: 1000 },
-    plugins: {
-      legend: {
-        position: "bottom",
-        labels: {
-          color: textColor,
-          usePointStyle: true,
-          padding: 14,
-          font: { size: 12, weight: "600" }
-        }
-      },
-      tooltip: {
-        backgroundColor: isDark ? "#020617" : "#0f172a",
-        titleColor: "#fff",
-        bodyColor: "#fff",
-        cornerRadius: 10
-      },
-      datalabels: {
-        color: "#fff",
-        font: { weight: "700", size: 11 },
-        formatter: (value, ctx) => {
-          const total = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
-          return ((value / total) * 100).toFixed(0) + "%";
-        }
-      }
-    },
-    onClick: (evt, elements) => {
-      if (elements.length) {
-        const index = elements[0].index;
-        const status = chart.data.labels[index];
-        window.location.href = `/admin/orders/?status=${encodeURIComponent(status)}`;
-      }
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      ctx.font = "700 24px Segoe UI";
+      ctx.fillStyle = textColor();
+      ctx.fillText(total, width/2, height/2 - 6);
+
+      ctx.font = "500 13px Segoe UI";
+      ctx.fillStyle = isDark() ? "#94a3b8" : "#64748b";
+      ctx.fillText("Total Orders", width/2, height/2 + 16);
+
+      ctx.restore();
     }
-  },
-  plugins: [ChartDataLabels]
+  };
+
+  /* =====================
+     ORDER STATUS PIE
+  ===================== */
+  const orderLabels = JSON.parse('{{ order_labels|escapejs }}');
+  const orderData = JSON.parse('{{ order_values|escapejs }}');
+
+  let pieChart;
+
+  function renderPie() {
+    if (pieChart) pieChart.destroy();
+
+    pieChart = new Chart(document.getElementById("orderPieChart"), {
+      type: "doughnut",
+      plugins: [ChartDataLabels, centerTextPlugin],
+      data: {
+        labels: orderLabels,
+        datasets: [{
+          data: orderData,
+          backgroundColor: isDark()
+            ? ["#818cf8","#22c55e","#facc15","#fb7185","#38bdf8"]
+            : ["#6366f1","#16a34a","#f59e0b","#ef4444","#0ea5e9"],
+          borderColor: isDark() ? "#020617" : "#fff",
+          borderWidth: 2,
+          hoverOffset: 16,
+          hoverBorderWidth: 4,
+          cutout: "70%"
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { color: textColor() }
+          },
+          tooltip: {
+            callbacks: {
+              label(ctx) {
+                const value = ctx.raw;
+                const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+                const percent = ((value/total)*100).toFixed(1);
+                return ` ${ctx.label}: ${value} (${percent}%)`;
+              }
+            }
+          },
+          datalabels: {
+            color: "#fff",
+            font: { weight: "700", size: 12 },
+            formatter(value, ctx) {
+              const total = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+              return ((value/total)*100).toFixed(0) + "%";
+            }
+          }
+        }
+      }
+    });
+  }
+
+  renderPie();
+
+  /* =====================
+     WEEKLY REVENUE LINE
+  ===================== */
+  const weeklyLabels = JSON.parse('{{ weekly_labels|escapejs }}');
+  const weeklyData = JSON.parse('{{ weekly_data|escapejs }}');
+
+  let lineChart;
+
+  function renderLine() {
+    if (lineChart) lineChart.destroy();
+
+    lineChart = new Chart(document.getElementById("weeklyRevenueChart"), {
+      type: "line",
+      data: {
+        labels: weeklyLabels,
+        datasets: [{
+          label: "Revenue",
+          data: weeklyData,
+          borderColor: "#2563eb",
+          backgroundColor: "rgba(37,99,235,0.15)",
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: textColor() } }
+        },
+        scales: {
+          x: {
+            ticks: { color: textColor() },
+            grid: { color: gridColor() }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: textColor(),
+              callback: v => "₹" + v
+            },
+            grid: { color: gridColor() }
+          }
+        }
+      }
+    });
+  }
+
+  renderLine();
+
+  /* =====================
+     AUTO UPDATE ON DARK MODE
+  ===================== */
+  new MutationObserver(() => {
+    renderPie();
+    renderLine();
+  }).observe(document.body, {
+    attributes: true,
+    attributeFilter: ["class"]
+  });
+
 });
 </script>
 
 
-
-
-<!-- Company Card -->
-
-<div class="company-card ">
-    {% if company.logo %}
-        <img src="{{ company.logo.url }}" class="company-logo" alt="Logo">
-    {% endif %}
-    <div>
-        <h3>{{ company.name }}</h3>
-        <p>📍 {{ company.address }}</p>
-        <p>📞 {{ company.phone }} | 📧 {{ company.email }}</p>
-        {% if company.gst_number %}
-        <small>GST: {{ company.gst_number }}</small>
-        {% endif %}
-    </div>
-</div>
-
-<div class="dashboard-actions">
-    {% if company %}
-    <a href="{% url 'adminpanel:company_update' %}" class="btn-primary ripple">✏️ Edit Company Info</a>
-    {% else %}
-    <a href="{% url 'adminpanel:company_create' %}" class="btn-success ripple">➕ Add Company Info</a>
-    {% endif %}
-</div>
-
-{% endblock %}
-
-{% block extra_js %}
-<script src="{% static 'admin/js/dashboard.js' %}"></script>
 {% endblock %}

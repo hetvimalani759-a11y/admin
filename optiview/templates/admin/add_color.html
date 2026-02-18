@@ -1,0 +1,18 @@
+<h2>Add Color</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="name" placeholder="Color Name" required>
+    <input type="text" name="code" placeholder="Hex Code (optional)">
+    <button type="submit">Add Color</button>
+</form>
+
+<h3>Existing Colors</h3>
+<ul>
+    {% for color in colors %}
+        <li>{{ color.name }} {% if color.code %} - {{ color.code }}{% endif %}</li>
+    {% empty %}
+        <li>No colors added yet.</li>
+    {% endfor %}
+</ul>
+

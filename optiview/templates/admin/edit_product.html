@@ -1,76 +1,171 @@
-{% extends "admin/base.html" %}
+{% extends 'admin/base.html' %}
 {% load static %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'admin/css/edit_product.css' %}">
+<style>
+/* Variant Box styling */
+.variant-box { 
+    border:1px solid #444; 
+    padding:15px; 
+    margin-bottom:15px; 
+    border-radius:8px; 
+    position:relative; 
+    background-color: var(--card-bg);
+}
+.remove-variant { 
+    position:absolute; 
+    top:5px; 
+    right:5px; 
+    cursor:pointer; 
+    color:#ff6b6b; 
+    font-weight:bold;
+}
+.category-input, .category-input:focus { 
+    background-color: var(--input-bg); 
+    color: var(--text-color); 
+    border:1px solid #555; 
+    border-radius:6px; 
+    padding:8px 12px; 
+    width:100%; 
+    box-sizing:border-box;
+}
+.btn-primary { background-color:#5b4de0; border:none;}
+.btn-cancel { background-color:#555; color:#fff; text-align:center;}
+.preview-img { max-width:100%; height:auto; margin-bottom:10px; }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="product-edit-page">
+<div class="edit-product-page">
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="category-form-card">
         <h4 class="category-heading ripple-text">✏️ Edit Product</h4>
 
-        <form method="POST" enctype="multipart/form-data" class="category-form">
+        <form method="post" enctype="multipart/form-data" id="productForm">
           {% csrf_token %}
 
+          <!-- Category -->
           <div class="form-group">
             <label>Category</label>
-            <select name="category" id="categorySelect" required>
+            <select name="category" id="category" class="category-input" required>
               <option value="">Select Category</option>
               {% for category in categories %}
-                <option value="{{ category.id }}"
-                        {% if product.category.id == category.id %}selected{% endif %}>
+                <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
                   {{ category.name }}
                 </option>
               {% endfor %}
             </select>
           </div>
 
+          <!-- Subcategory -->
           <div class="form-group">
             <label>Subcategory</label>
-            <select name="subcategory" id="subcategorySelect" required>
+            <select name="subcategory" id="subcategory" class="category-input" required>
               <option value="">Select Subcategory</option>
               {% for subcat in subcategories %}
-                <option value="{{ subcat.id }}"
-                        {% if product.subcategory.id == subcat.id %}selected{% endif %}>
+                <option value="{{ subcat.id }}" {% if product.subcategory.id == subcat.id %}selected{% endif %}>
                   {{ subcat.name }}
                 </option>
               {% endfor %}
             </select>
           </div>
 
+          <!-- Product Name -->
           <div class="form-group">
             <label>Product Name</label>
-            <select name="name" required>
-              <option value="eyeglasses" {% if product.name == 'eyeglasses' %}selected{% endif %}>Eyeglasses</option>
-              <option value="lens" {% if product.name == 'lens' %}selected{% endif %}>Lens</option>
-              <option value="frame" {% if product.name == 'frame' %}selected{% endif %}>Frame</option>
+            <input type="text" name="name" class="category-input" value="{{ product.name }}" required>
+          </div>
+
+          <!-- Brand -->
+          <div class="form-group">
+            <label>Brand</label>
+            <select name="brand" class="category-input" required>
+              <option value="">Select Brand</option>
+              {% for brand in brands %}
+                <option value="{{ brand.id }}" {% if product.brand and product.brand.id == brand.id %}selected{% endif %}>
+                  {{ brand.name }}
+                </option>
+              {% endfor %}
             </select>
           </div>
 
+          <!-- Description -->
           <div class="form-group">
-            <label>Brand</label>
-            <input type="text" name="brand" value="{{ product.brand }}">
+            <label>Description</label>
+            <textarea name="description" class="category-input" rows="4" required>{{ product.description }}</textarea>
           </div>
 
+          <!-- Price -->
           <div class="form-group">
             <label>Price</label>
-            <input type="number" name="price" value="{{ product.price }}">
+            <input type="number" name="price" step="0.01" class="category-input" value="{{ product.price }}" required>
           </div>
 
+          <!-- Gender -->
+          <div class="form-group">
+            <label>Gender</label>
+            <select name="gender" class="category-input" required>
+              <option value="Men" {% if product.gender == "Men" %}selected{% endif %}>Men</option>
+              <option value="Women" {% if product.gender == "Women" %}selected{% endif %}>Women</option>
+              <option value="Unisex" {% if product.gender == "Unisex" %}selected{% endif %}>Unisex</option>
+            </select>
+          </div>
+
+          <!-- Frame Type -->
+          <div class="form-group">
+            <label>Frame Type</label>
+            <select name="frame_type" class="category-input" required>
+              <option value="Full Rim" {% if product.frame_type == "Full Rim" %}selected{% endif %}>Full Rim</option>
+              <option value="Half Rim" {% if product.frame_type == "Half Rim" %}selected{% endif %}>Half Rim</option>
+              <option value="Rimless" {% if product.frame_type == "Rimless" %}selected{% endif %}>Rimless</option>
+            </select>
+          </div>
+
+          <!-- Image -->
           <div class="form-group">
             <label>Image</label>
             {% if product.image %}
               <img src="{{ product.image.url }}" class="preview-img"><br>
             {% endif %}
-            <input type="file" name="image">
+            <input type="file" name="image" class="category-input">
           </div>
 
+          <!-- Variants -->
+          <h5 class="mt-4">Variants (Color + Stock + Images)</h5>
+          <div id="variantsContainer">
+            {% for variant in product.variants.all %}
+              <div class="variant-box category-form-card" data-variant="{{ forloop.counter }}">
+                <span class="remove-variant">✖</span>
+                <div class="form-group">
+                  <label>Color</label>
+                  <select name="variants[{{ forloop.counter }}][color]" class="category-input" required>
+                    <option value="">Select Color</option>
+                    {% for color in colors %}
+                      <option value="{{ color.id }}" {% if variant.color.id == color.id %}selected{% endif %}>
+                        {{ color.name }}
+                      </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Stock</label>
+                  <input type="number" name="variants[{{ forloop.counter }}][stock]" class="category-input" value="{{ variant.stock }}" required>
+                </div>
+                <div class="form-group">
+                  <label>Images</label>
+                  <input type="file" name="variants[{{ forloop.counter }}][images][]" multiple class="category-input image-input">
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <button type="button" class="btn-primary ripple-text mb-3" id="addVariantBtn">+ Add Variant</button>
+
+          <!-- Actions -->
           <div class="form-actions">
-            <button type="submit" class="btn-primary w-100">Update Product</button>
-            <a href="{% url 'adminpanel:product_list' %}" class="btn-cancel w-100 mt-2">Back</a>
+            <button type="submit" class="btn-primary w-100 ripple-text">Update Product</button>
+            <a href="{% url 'adminpanel:product_list' %}" class="btn-cancel w-100 mt-2 ripple-text">Back</a>
           </div>
 
         </form>
@@ -81,5 +176,79 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'admin/js/product_form.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const categorySelect = document.getElementById('category');
+    const subcategorySelect = document.getElementById('subcategory');
+
+    // Load subcategories for selected category
+    function loadSubcategories(categoryId, selectedSubId = null) {
+        if (!categoryId) {
+            subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+            return;
+        }
+        fetch(`/admin-panel/subcategories/${categoryId}/`)
+            .then(res => res.json())
+            .then(data => {
+                subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+                data.forEach(sub => {
+                    const selected = String(sub.id) === String(selectedSubId) ? 'selected' : '';
+                    subcategorySelect.innerHTML += `<option value="${sub.id}" ${selected}>${sub.name}</option>`;
+                });
+            })
+            .catch(err => console.error('Error loading subcategories:', err));
+    }
+
+    // Initial load
+    loadSubcategories(categorySelect.value, '{{ product.subcategory.id }}');
+
+    // On category change
+    categorySelect.addEventListener('change', function() {
+        loadSubcategories(this.value);
+    });
+
+
+    // --- Variants dynamic ---
+    const addVariantBtn = document.getElementById('addVariantBtn');
+    const variantsContainer = document.getElementById('variantsContainer');
+    let variantCount = {{ product.variants.count }};
+
+    addVariantBtn.addEventListener('click', function() {
+        variantCount++;
+        const variantHTML = `
+        <div class="variant-box category-form-card" data-variant="${variantCount}">
+            <span class="remove-variant">✖</span>
+            <div class="form-group">
+                <label>Color</label>
+                <select name="variants[${variantCount}][color]" class="category-input" required>
+                    <option value="">Select Color</option>
+                    {% for color in colors %}
+                    <option value="{{ color.id }}">{{ color.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Stock</label>
+                <input type="number" name="variants[${variantCount}][stock]" class="category-input" required>
+            </div>
+            <div class="form-group">
+                <label>Images</label>
+                <input type="file" name="variants[${variantCount}][images][]" multiple class="category-input image-input">
+            </div>
+        </div>
+        `;
+        variantsContainer.insertAdjacentHTML('beforeend', variantHTML);
+
+        variantsContainer.querySelector(`[data-variant="${variantCount}"] .remove-variant`)
+            .addEventListener('click', e => e.target.closest('.variant-box').remove());
+    });
+
+    // Remove existing variants
+    document.querySelectorAll('.remove-variant').forEach(btn => {
+        btn.addEventListener('click', e => e.target.closest('.variant-box').remove());
+    });
+
+});
+</script>
 {% endblock %}

@@ -3,6 +3,47 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'admin/css/add_product.css' %}">
+<style>
+/* Variant Box styling matches Add Category page */
+.variant-box {
+    border: 1px solid #444;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    position: relative;
+    background-color: var(--card-bg); /* supports dark/light mode */
+}
+
+.remove-variant {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.category-input, .category-input:focus {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 8px 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.btn-primary {
+    background-color: #5b4de0;
+    border: none;
+}
+
+.btn-cancel {
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -12,12 +53,13 @@
       <div class="category-form-card">
         <h4 class="category-heading ripple-text">🛒 Add Product</h4>
 
-        <form method="post" enctype="multipart/form-data" class="category-form">
+        <form method="post" enctype="multipart/form-data" id="productForm">
           {% csrf_token %}
 
+          <!-- Category -->
           <div class="form-group">
             <label>Category</label>
-            <select name="category" id="category" required>
+            <select name="category" id="category" class="category-input" required>
               <option value="">Select Category</option>
               {% for category in categories %}
                 <option value="{{ category.id }}">{{ category.name }}</option>
@@ -25,48 +67,75 @@
             </select>
           </div>
 
+          <!-- Subcategory -->
           <div class="form-group">
             <label>Subcategory</label>
-            <select name="subcategory" id="subcategory" required>
+            <select name="subcategory" id="subcategory" class="category-input" required>
               <option value="">Select Subcategory</option>
             </select>
           </div>
 
+          <!-- Product Name -->
           <div class="form-group">
             <label>Product Name</label>
-            <select name="name" required>
-              <option>eyeglasses</option>
-              <option>lens</option>
-              <option>frame</option>
+            <input type="text" name="name" class="category-input" required>
+          </div>
+
+          <!-- Brand -->
+          <div class="form-group">
+            <label>Brand</label>
+            <select name="brand" class="category-input" required>
+              <option value="">Select Brand</option>
+              {% for brand in brands %}
+                <option value="{{ brand.id }}">{{ brand.name }}</option>
+              {% endfor %}
             </select>
           </div>
 
+          <!-- Description -->
           <div class="form-group">
-            <label>Brand</label>
-            <input type="text" name="brand" required>
+            <label>Description</label>
+            <textarea name="description" class="category-input" rows="4" required></textarea>
           </div>
 
+          <!-- Price -->
           <div class="form-group">
             <label>Price</label>
-            <input type="number" name="price" required>
+            <input type="number" name="price" step="0.01" class="category-input" required>
           </div>
 
+          <!-- Gender -->
           <div class="form-group">
-            <label>Stock</label>
-            <input type="number" name="stock" required>
+            <label>Gender</label>
+            <select name="gender" class="category-input" required>
+              <option value="Men">Men</option>
+              <option value="Women">Women</option>
+              <option value="Unisex">Unisex</option>
+            </select>
           </div>
 
+          <!-- Frame Type -->
           <div class="form-group">
-            <label>Image</label>
-            <input type="file" name="image" required>
+            <label>Frame Type</label>
+            <select name="frame_type" class="category-input" required>
+              <option value="Full Rim">Full Rim</option>
+              <option value="Half Rim">Half Rim</option>
+              <option value="Rimless">Rimless</option>
+            </select>
           </div>
 
+          <!-- Variants -->
+          <h5 class="mt-4">Variants (Color + Stock + Images)</h5>
+          <div id="variantsContainer"></div>
+          <button type="button" class="btn-primary ripple-text mb-3" id="addVariantBtn">+ Add Variant</button>
+
+          <!-- Actions -->
           <div class="form-actions">
-            <button type="submit" class="btn-primary w-100">Save Product</button>
-            <a href="{% url 'adminpanel:product_list' %}" class="btn-cancel w-100 mt-2">Back</a>
+            <button type="submit" class="btn-primary w-100 ripple-text">Save Product</button>
+            <a href="{% url 'adminpanel:product_list' %}" class="btn-cancel w-100 mt-2 ripple-text">Back</a>
           </div>
-
         </form>
+
       </div>
     </div>
   </div>
@@ -75,4 +144,57 @@
 
 {% block extra_js %}
 <script src="{% static 'admin/js/add_product.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('category');
+    const subcategorySelect = document.getElementById('subcategory');
+
+    categorySelect.addEventListener('change', function() {
+        fetch(`/admin-panel/subcategories/${this.value}/`)
+            .then(res => res.json())
+            .then(data => {
+                subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+                data.forEach(sub => {
+                    subcategorySelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+                });
+            });
+    });
+
+    const addVariantBtn = document.getElementById('addVariantBtn');
+    const variantsContainer = document.getElementById('variantsContainer');
+    let variantCount = 0;
+
+    addVariantBtn.addEventListener('click', function() {
+        variantCount++;
+        const variantHTML = `
+            <div class="variant-box category-form-card" data-variant="${variantCount}">
+                <span class="remove-variant">✖</span>
+                <div class="form-group">
+                    <label>Color</label>
+                    <select name="variants[${variantCount}][color]" class="category-input" required>
+                        <option value="">Select Color</option>
+                        {% for color in colors %}
+                        <option value="{{ color.id }}">{{ color.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Stock</label>
+                    <input type="number" name="variants[${variantCount}][stock]" class="category-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Images</label>
+                    <input type="file" name="variants[${variantCount}][images][]" multiple class="category-input image-input" required>
+                </div>
+            </div>
+        `;
+        variantsContainer.insertAdjacentHTML('beforeend', variantHTML);
+
+        variantsContainer.querySelector(`[data-variant="${variantCount}"] .remove-variant`)
+            .addEventListener('click', function() {
+                this.parentElement.remove();
+            });
+    });
+});
+</script>
 {% endblock %}

@@ -1,0 +1,37 @@
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Product:</label>
+    <select name="product" required>
+        <option value="">--Select Product--</option>
+        {% for product in products %}
+            <option value="{{ product.id }}">{{ product.name }}</option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <label>Variant (Color):</label>
+    <select name="variant">
+        <option value="">--Select Variant--</option>
+        {% for variant in variants %}
+            <option value="{{ variant.id }}">
+                {{ variant.product.name }} - {{ variant.color.name }}
+            </option>
+        {% endfor %}
+    </select>
+    <br><br>
+
+    <label>Dealer Name:</label>
+    <input type="text" name="dealer_name" required>
+    <br><br>
+
+    <label>Quantity:</label>
+    <input type="number" name="quantity" min="1" required>
+    <br><br>
+
+    <label>Cost Price (optional):</label>
+    <input type="number" name="cost_price" step="0.01">
+    <br><br>
+
+    <button type="submit">Add Purchase</button>
+</form>

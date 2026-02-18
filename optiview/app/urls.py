@@ -1,10 +1,14 @@
 from django.urls import path
 from . import views
-
+app_name = "app" 
 urlpatterns = [
     path("", views.home, name="home"),
     path("shop/", views.shop, name="shop"),
     path("product/<int:id>/", views.product_detail, name="product_detail"),
+    path('categories/', views.categories_view, name='categories'),
+    path('categories/<int:category_id>/', views.category_products, name='category_products'),
+    # path('shop/category/<int:category_id>/', views.shop_by_category, name='shop_by_category'),
+
 
     # Cart
     path("cart/", views.cart_view, name="cart"),
@@ -22,17 +26,21 @@ urlpatterns = [
     # Auth & Pages
     path("register/", views.register_view, name="register"),
     path("login/", views.login_view, name="login"),
-    path("logout/", views.logout_view, name="logout"),
+    path("logout/", views.customer_logout, name="logout"),
     path("about/", views.about, name="about"),
     path("contact/", views.contact, name="contact"),
-
+    path("create-order/", views.create_order, name="create_order"),
+    path("orders/cancel/<int:order_id>/", views.cancel_order, name="cancel_order"),
+    # path('notifications/', views.notifications_api, name='notifications_api'),
+    path("order-invoice/<int:order_id>/", views.order_invoice, name="order_invoice"),
+        
     # Notifications
     path("notifications/", views.get_notifications, name="get_notifications"),
     path("notifications/read/<int:pk>/", views.mark_notification_read, name="mark_notification_read"),
 
     path("checkout/", views.checkout, name="checkout"),
     path("order-success/", views.order_success, name="order_success"),
-    path("place-order/", views.place_order, name="place_order"),
+    # path("place-order/", views.place_order, name="place_order"),
     path('orders/history/', views.order_history, name='order_history'),
     path('orders/<int:order_id>/', views.order_detail, name='order_detail')
 

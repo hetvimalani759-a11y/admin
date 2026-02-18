@@ -15,7 +15,17 @@
     border: 1px solid var(--card-border, #e5e7eb);
     box-shadow: 0 10px 28px rgba(0,0,0,.12);
 }
+.img-col {
+  width: 80px;
+}
 
+.product-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+}
 /* ==============================
    HEADING
 ============================== */

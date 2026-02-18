@@ -7,85 +7,142 @@
 
 {% block content %}
 <div class="cart-page">
-    <h2 class="cart-title">🛒 My Cart</h2>
+    <h2 class="cart-title text-center">🛒 My Cart</h2>
 
     {% if items %}
     <div class="cart-layout">
 
+        <!-- ================= CART ITEMS ================= -->
         <div class="cart-items">
             {% for item in items %}
-            <div class="cart-row" id="cart-item-{{ item.id }}" data-id="{{ item.id }}">
+            <div class="cart-row" data-id="{{ item.id }}">
+
+                <!-- Product Image -->
                 <div class="cart-img">
-                    <img src="{{ item.product.image.url|default:'/static/app/images/default.png' }}">
+                    {% if item.product.image %}
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    {% else %}
+                        <img src="{% static 'app/images/no-image.png' %}" alt="No Image">
+                    {% endif %}
                 </div>
 
+                <!-- Product Info -->
                 <div class="cart-info">
-                    <div class="cart-name">{{ item.product.name }}</div>
-                    <div class="cart-price">
-                        {% with offer=item.product.get_offer %}
+                    <h6 class="cart-name">{{ item.product.name }}</h6>
+
+                    <div class="price-row">
+                        {% with offer=item.product.get_best_offer %}
                             {% if offer %}
-                                <span class="discounted-price">₹{{ item.product.get_final_price|floatformat:0 }}</span>
-                                <span class="original-price">₹{{ item.product.price|floatformat:0 }}</span>
+                                <span class="discounted-price" style="font-weight: bold; color: #5b4de0;">₹{{ item.product.get_final_price|floatformat:0 }}</span>
+                                <span class="original-price" style="text-decoration: line-through; color: #888; margin-left: 8px;">₹{{ item.product.price|floatformat:0 }}</span>
                                 {% if offer.discount_type == "percent" %}
-                                    <span class="discount-text" style="color: green;">({{ offer.discount_value }}% OFF)</span>
+                                    <span class="discount-text" style="color: #28a745; margin-left: 5px; font-size: 0.85rem">({{ offer.discount_value }}% OFF)</span>
                                 {% else %}
-                                    <span class="discount-text" style="color: green;">(₹{{ offer.discount_value }} OFF)</span>
+                                    <span class="discount-text" style="color: #28a745; margin-left: 5px; font-size: 0.85rem">(₹{{ offer.discount_value }} OFF)</span>
                                 {% endif %}
                             {% else %}
-                                <span class="discounted-price">₹{{ item.product.price|floatformat:0 }}</span>
+                                <span class="discounted-price" style="font-weight: bold; color: #5b4de0;">₹{{ item.product.price|floatformat:0 }}</span>
                             {% endif %}
                         {% endwith %}
                     </div>
                 </div>
 
-                <!-- QUANTITY -->
+                <!-- Quantity Controls -->
                 <div class="qty-controls">
                     <button type="button" class="qty-btn minus-btn">−</button>
                     <span class="qty-number">{{ item.quantity }}</span>
-                    <button type="button" class="qty-btn plus-btn">+</button>
+                    <button type="button" 
+                            class="qty-btn plus-btn" 
+                            data-stock="{{ item.product.stock }}">
+                        +
+                    </button>
                 </div>
 
-                <a href="{% url 'remove_from_cart' item.id %}" class="remove-btn">Remove</a>
+                <!-- Remove Button -->
+                <button type="button" class="remove-btn">Remove</button>
+
             </div>
             {% endfor %}
         </div>
 
+        <!-- ================= ORDER SUMMARY ================= -->
         <div class="cart-summary">
-            <h5>Order Summary</h5>
-            <div class="summary-row"><span>Items</span><span>{{ items|length }}</span></div>
-            <div class="summary-row"><span>Original Total</span><span>₹{{ original_total }}</span></div>
-            <div class="summary-row discount-row"><span>Offer Discount</span><span>− ₹{{ discount_total }}</span></div>
-            <div class="summary-row"><span>Delivery</span><span>{% if delivery_charge == 0 %}Free 🎉{% else %}₹{{ delivery_charge }}{% endif %}</span></div>
+            <h5 style="text-align: center;">Order Summary</h5>
 
-            {% if total_saved > 0 %}
-            <div class="saved-banner">🎉 You saved ₹{{ total_saved }}!</div>
-            {% endif %}
 
-            <div class="summary-row summary-total">
-                <span>Total Payable</span>
-                <span>₹{{ grand_total }}</span>
+            <div class="summary-row">
+                <span>Items</span>
+                <span id="summaryItems">{{ items|length }}</span>
             </div>
 
-            <a href="{% url 'checkout' %}" class="checkout-btn btn btn-primary btn-lg w-100">Checkout</a>
-            <div class="summary-actions">
-                <a href="{% url 'shop' %}" class="add-more-link">➕ Add More Items</a>
+            <div class="summary-row">
+                <span>Original Total</span>
+                <span>₹<span id="summaryOriginal">{{ original_total }}</span></span>
+            </div>
+
+            <div class="summary-row">
+                <span>Offer Discount</span>
+                <span class="text-success">
+                    − ₹<span id="summaryDiscount" style="text-align: right;">{{ discount_total }}</span>
+                </span>
+            </div>
+
+            <div class="summary-row">
+                <span>Delivery</span>
+                <span id="summaryDelivery">
+                    {% if delivery_charge == 0 %}
+                        Free 🎉
+                    {% else %}
+                        ₹{{ delivery_charge }}
+                    {% endif %}
+                </span>
+            </div>
+
+           
+
+            <hr>
+            {% if total_saved > 0 %}
+            <div class="saved-banner" id="saved-banner">
+                🎉 You saved ₹{{ total_saved }}!
+            </div>
+            {% endif %}
+            <div class="summary-row summary-total">
+                <span>Total Payable</span>
+                <span>₹<span id="summaryTotal">{{ grand_total }}</span></span>
+            </div>
+
+            <a href="{% url 'app:checkout' %}" 
+               class="checkout-btn btn btn-primary btn-lg w-100 mt-3">
+                Checkout
+            </a>
+
+            <div class="summary-actions text-center mt-2">
+                <a href="{% url 'app:shop' %}" class="add-more-link">
+                    ➕ Add More Items
+                </a>
             </div>
         </div>
 
     </div>
-    {% else %}
-    <div class="cart-empty">
-        <p>Your cart is empty 😔</p>
-        <button class="btn-continue" onclick="window.location.href='{% url 'shop' %}'">Continue Shopping</button>
-    </div>
 
+    {% else %}
+    <!-- ================= EMPTY CART ================= -->
+    <div class="cart-empty text-center">
+        <h3>Your Cart is Empty 😔</h3>
+        <p>Looks like you haven’t added anything yet.</p>
+        <button class="btn-continue btn btn-primary"
+                onclick="window.location.href='{% url 'app:shop' %}'">
+            🛍 Continue Shopping
+        </button>
+    </div>
     {% endif %}
 </div>
 
-<!-- ✅ CUSTOM CONFIRM MODAL -->
+<!-- ================= MODALS ================= -->
+
 <div class="modal-overlay" id="confirm-modal">
     <div class="modal-box">
-        <p id="confirm-text">Are you sure?</p>
+        <p>Are you sure you want to remove this item?</p>
         <div class="modal-actions">
             <button id="confirm-yes" class="modal-confirm">Yes</button>
             <button id="confirm-no" class="modal-cancel">No</button>
@@ -93,7 +150,17 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="stock-modal">
+    <div class="modal-box">
+        <p id="stock-text"></p>
+        <div class="modal-actions">
+            <button id="stock-ok" class="modal-confirm">OK</button>
+        </div>
+    </div>
+</div>
+
 {% block extra_js %}
 <script src="{% static 'app/js/cart.js' %}"></script>
 {% endblock %}
+
 {% endblock %}

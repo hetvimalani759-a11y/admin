@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<form method="POST" action="{% url 'checkout' %}" class="checkout-page" id="checkoutForm">
+<form method="POST" action="{% url 'app:checkout' %}" class="checkout-page" id="checkoutForm">
 {% csrf_token %}
 
 <!-- ===== STEP 1 ===== -->
@@ -61,8 +61,7 @@
       </div>
     </div>
 
-    <button type="button" id="saveAddressBtn">Save Address</button>
-    <button type="button" id="editAddressBtn" class="hidden">Edit Address</button>
+    <div class="address-actions"> <button type="button" id="saveAddressBtn" class="btn btn-primary" {% if has_address %}style="display:none;"{% endif %}> Save Address </button> <button type="button" id="editAddressBtn" class="btn btn-secondary" {% if not has_address %}style="display:none;"{% endif %}> Edit Address </button> </div>
   </div>
   <div class="address-preview hidden" id="addressPreview" data-has-address="{{ has_address|yesno:'1,0' }}"></div>
 
@@ -114,13 +113,14 @@
       <div class="qty-controls">
         <button type="button" class="qty-btn minus-btn">−</button>
         <span class="qty-number">{{ item.quantity }}</span>
-        <button type="button" class="qty-btn plus-btn">+</button>
+        <button type="button" class="qty-btn plus-btn" data-stock="{{ item.product.stock }}">+</button>
+
       </div>
 
 
 
       <!-- ✅ ONLY CHANGE -->
-      <a href="#" class="remove-btn" data-remove-url="{% url 'remove_from_cart' item.id %}">Remove</a>
+      <a href="#" class="remove-btn" data-remove-url="{% url 'app:remove_from_cart' item.id %}">Remove</a>
     </div>
     {% endfor %}
 
@@ -161,7 +161,7 @@
   <br>
   <button type="submit" id="placeOrderBtn" class="place-order-btn" disabled>Place Order</button>
   <div class="summary-actions">
-    <a href="{% url 'shop' %}" class="add-more-link" style="text-align: center;">➕ Add More Items</a>
+    <a href="{% url 'app:shop' %}" class="add-more-link" style="text-align: center;">➕ Add More Items</a>
   </div>
 </div>
 
@@ -177,9 +177,74 @@
     </div>
   </div>
 </div>
+<div class="modal-overlay" id="stock-modal">
+  <div class="modal-box">
+    <p id="stock-text"></p>
+    <div class="modal-actions">
+      <button id="stock-ok" class="modal-confirm">OK</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 {% block extra_js %}
 <script src="{% static 'app/js/checkout.js' %}"></script>
 {% endblock %}
+<script>
+document.getElementById("checkoutForm").addEventListener("submit", function(e) {
+
+    const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+
+    if (selectedPayment === "ONLINE") {
+        e.preventDefault();  // stop normal submit
+
+        const totalAmount = document.getElementById("summaryTotal").innerText;
+
+        fetch("{% url 'app:create_order' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                amount: totalAmount
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            var options = {
+                "key": data.key,
+                "amount": data.amount * 100,
+                "currency": "INR",
+                "name": "Optiview",
+                "description": "Order Payment",
+                "order_id": data.order_id,
+                "handler": function (response) {
+
+                    // Append payment details to form
+                    const form = document.getElementById("checkoutForm");
+
+                    const paymentInput = document.createElement("input");
+                    paymentInput.type = "hidden";
+                    paymentInput.name = "razorpay_payment_id";
+                    paymentInput.value = response.razorpay_payment_id;
+                    form.appendChild(paymentInput);
+
+                    form.submit();  // submit normally after success
+                },
+                "theme": {
+                    "color": "#007bff"
+                }
+            };
+
+            var rzp = new Razorpay(options);
+            rzp.open();
+        });
+    }
+
+});
+</script>
 
 {% endblock %}

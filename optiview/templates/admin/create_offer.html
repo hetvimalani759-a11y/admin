@@ -3,6 +3,8 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'admin/css/create_offer.css' %}">
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 {% endblock %}
 
 {% block content %}
@@ -63,12 +65,12 @@
 
           <div class="form-group">
             <label>Start Date</label>
-            <input type="datetime-local" name="start_date" required>
+            <input type="text" id="start_date" name="start_date" required>
           </div>
 
           <div class="form-group">
             <label>End Date</label>
-            <input type="datetime-local" name="end_date" required>
+            <input type="text" id="end_date" name="end_date" required>
           </div>
 
           <div class="form-group checkbox">
@@ -89,4 +91,41 @@
 
 {% block extra_js %}
 <script src="{% static 'admin/js/create_offer.js' %}"></script>
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  // Initialize flatpickr for Start Date
+  // Initialize End Date first
+const endPicker = flatpickr("#end_date", {
+    dateFormat: "Y-m-d",
+    allowInput: false,  // prevent typing
+});
+
+// Initialize Start Date
+const startPicker = flatpickr("#start_date", {
+    dateFormat: "Y-m-d",
+    minDate: "today",
+    onChange: function(selectedDates) {
+        if (selectedDates.length > 0) {
+            const startDate = selectedDates[0];
+
+            // Set End Date minDate to Start Date + 1 day
+            const nextDay = new Date(startDate);
+            nextDay.setDate(nextDay.getDate() + 1);
+
+            endPicker.set('minDate', nextDay);
+
+            // Optional: if End Date is now before new minDate, update it
+            const endDateVal = endPicker.selectedDates[0];
+            if (!endDateVal || endDateVal <= startDate) {
+                endPicker.clear(); // force user to pick new valid End Date
+            }
+        }
+    }
+});
+
+</script>
+
+
+ 
 {% endblock %}

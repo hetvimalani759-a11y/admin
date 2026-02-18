@@ -126,7 +126,16 @@ USE_I18N = True
 
 TIME_ZONE = 'Asia/Kolkata'
 USE_TZ = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+# For customer panel
+CUSTOMER_SESSION_COOKIE_NAME = 'customer_sessionid'
 
+# For admin panel (Django default)
+# SESSION_COOKIE_NAME = 'sessionid'
+
+RAZORPAY_KEY_ID = "rzp_test_SERWErY8A9nrrB"
+RAZORPAY_KEY_SECRET = "PcAqW8MeVM71yccqhV4h6Tuq"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
@@ -153,11 +162,16 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'harshanavadiya074@gmail.com'
 EMAIL_HOST_PASSWORD = 'qybe darg xxqe yphb'
 
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/login/'
+# LOGIN_URL = '/login/'
+# LOGIN_REDIRECT_URL = '/'
+# LOGOUT_REDIRECT_URL = '/login/'
+# LOGIN_REDIRECT_URL = "/"
+# LOGOUT_REDIRECT_URL = "/"
 
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/login/"
 
+LOGIN_URL = '/admin-panel/login/'  
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
