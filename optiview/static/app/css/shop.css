@@ -1,8 +1,73 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Category Tabs */
+.category-tabs {
+    padding: 15px 25px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+.category-tabs button {
+    margin-right: 8px;
+    padding: 6px 14px;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.category-tabs button.active {
+    background: #1a73e8;
+    color: #fff;
+    border-color: #1a73e8;
+}
+
+/* Layout */
+.shop-container {
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+}
+
+/* Filters */
+.filters {
+    width: 260px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 5px 14px rgba(0,0,0,0.08);
+}
+.filters h3 {
+    margin-bottom: 15px;
+}
+.filter-group {
+    margin-bottom: 18px;
+}
+.filter-group h4 {
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+.filter-group label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+/* Products */
+.products {
+    flex: 1;
+}
+
+/* ======= TARA PRODUCT CSS (UNCHANGED) ======= */
+
 .product-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 22px;
-    justify-content: start;
 }
 
 .product-card {
@@ -68,13 +133,6 @@
     margin-left: 6px;
 }
 
-.card-actions a,
-.card-actions button {
-    font-size: 14px;
-    padding: 7px 12px;
-    border-radius: 8px;
-}
-
 .btn-view-similar {
     display: inline-block;
     width: 100%;
@@ -91,63 +149,4 @@
 .btn-view-similar:hover {
     background: #1a73e8;
     color: #fff;
-}
-.wishlist-btn {
-    display: inline-block;
-    width: 100%;
-    padding: 8px 0;
-    background: #fff;
-    border: none;
-    color: black;
-    border-radius: 8px;
-    font-size: 14px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-.wishlist-heart {
-    display: inline-block;
-    border: 2px solid black;
-    color: black;
-    background: white;
-    padding: 6px 10px;
-    font-size: 18px;
-    text-decoration: none;
-    transition: 0.3s;
-}
-
-.wishlist-heart.active {
-    background: red;
-    color: white;
-    border-color: red;
-}
-
-
-/* --- Toast Notifications --- */
-#toast {
-    visibility: hidden;
-    min-width: 220px;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    border-radius: 8px;
-    padding: 10px 14px;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 9999;
-    opacity: 0;
-    font-size: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: opacity 0.5s, visibility 0.5s;
-}
-
-#toast.show {
-    visibility: visible;
-    opacity: 1;
-}
-.toggle-wishlist-btn i.fa-solid {
-    color: red;
-}
-.toggle-wishlist-btn i.fa-regular {
-    color: #000000;
 }

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'app/css/shop.css' %}">
+<link rel="stylesheet" href="{% static 'app/css/style.css' %}">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 {% endblock %}
 
@@ -12,7 +12,7 @@
 <div class="container py-4">
     <h2 class="text-center mb-4">🛍 Shop Goggles</h2>
 
-    <!-- Category Filter -->
+    <!-- Category Filter (UNCHANGED) -->
     <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
         <a href="{% url 'shop' %}" class="btn btn-outline-dark">All</a>
         {% for cat in categories %}
@@ -20,57 +20,192 @@
         {% endfor %}
     </div>
 
-    <!-- Products Grid -->
-    <div class="product-grid">
-        {% for product in products %}
-        <div class="product-card">
-            <a href="{% url 'product_detail' product.id %}" class="product-image">
-                <img src="{{ product.image.url|default:'/static/app/images/default.png' }}" alt="{{ product.name }}">
-            </a>
-            <div class="product-body">
-                <div class="product-rating">
-                    <span class="rating">{{ product.rating|default:4.5 }} ★</span>
-                    <span class="reviews">({{ product.review_count|default:100 }})</span>
-                </div>
-                <div class="product-brand">{{ product.brand|default:"Brand Name" }}</div>
-                <h5 class="product-name">{{ product.name }}</h5>
-                <div class="price-row">
-                    {% if product.get_offer %}
-                    <span class="discounted-price">₹{{ product.get_final_price|floatformat:0 }}</span>
-                    <span class="original-price">₹{{ product.price|floatformat:0 }}</span>
-                    {% if product.get_offer.discount_type == "percent" %}
-                        <span class="discount-text" style="color: green;">({{ product.get_offer.discount_value }}% OFF)</span>
-                    {% else %}
-                        <span class="discount-text" style="color: green;">(₹{{ product.get_offer.discount_value }} OFF)</span>
-                    {% endif %}
-                    {% else %}
-                    <span class="discounted-price">₹{{ product.price|floatformat:0 }}</span>
-                {% endif %}
+    <!-- MAIN SHOP LAYOUT -->
+    <div class="shop-layout">
 
-                </div>
+        <!-- FILTER SIDEBAR (NEW – UI ONLY) -->
+        <aside class="filter-sidebar">
 
-                <div class="card-actions d-flex gap-2 mt-2">
-                    {% if product.stock > 0 %}
-                        <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ product.id }}">
-                            🛒 Add to Cart
-                        </button>
-                    {% else %}
-                        <button class="btn btn-secondary btn-sm" disabled>Out of Stock</button>
-                    {% endif %}
-                    <button class="btn btn-sm toggle-wishlist-btn" data-id="{{ product.id }}">
-                        {% if product.id in wishlist_ids %}
-                            <i class="fa-solid fa-heart"></i>
-                        {% else %}
-                            <i class="fa-regular fa-heart"></i>
-                        {% endif %}
-                    </button>
-                </div>
-            </div>
-        </div>
-        {% empty %}
-            <p class="text-center">No products found.</p>
-        {% endfor %}
-    </div>
+<form method="GET" action="{% url 'shop' %}">
+
+  <!-- SHAPE FILTER -->
+  <div class="filter-group">
+    <h5>Shape</h5>
+
+    <label>
+  <input type="checkbox" name="shape" value="Round"
+    {% if "Round" in selected_shapes %}checked{% endif %}>
+  Round
+</label>
+
+<label>
+  <input type="checkbox" name="shape" value="Aviator"
+    {% if "Aviator" in selected_shapes %}checked{% endif %}>
+  Aviator
+</label>
+
+<label>
+  <input type="checkbox" name="shape" value="Square"
+    {% if "Square" in selected_shapes %}checked{% endif %}>
+  Square
+</label>
+
+<label>
+  <input type="checkbox" name="shape" value="Rectangle"
+    {% if "Rectangle" in selected_shapes %}checked{% endif %}>
+  Rectangle
+</label>
+
+  </div>
+
+  <!-- COLOR FILTER -->
+  <!-- COLOR FILTER -->
+<div class="filter-group">
+  <h5>Color</h5>
+
+  <label>
+    <input type="checkbox" name="color" value="Black"
+      {% if "Black" in selected_colors %}checked{% endif %}>
+    Black
+  </label>
+
+  <label>
+    <input type="checkbox" name="color" value="Blue"
+      {% if "Blue" in selected_colors %}checked{% endif %}>
+    Blue
+  </label>
+
+  <label>
+    <input type="checkbox" name="color" value="Gold"
+      {% if "Gold" in selected_colors %}checked{% endif %}>
+    Gold
+  </label>
 </div>
 
+
+  <!-- SIZE FILTER -->
+  <!-- SIZE FILTER -->
+<div class="filter-group">
+  <h5>Size</h5>
+
+  <label>
+    <input type="checkbox" name="size" value="Small"
+      {% if "Small" in selected_sizes %}checked{% endif %}>
+    Small
+  </label>
+
+  <label>
+    <input type="checkbox" name="size" value="Medium"
+      {% if "Medium" in selected_sizes %}checked{% endif %}>
+    Medium
+  </label>
+
+  <label>
+    <input type="checkbox" name="size" value="Large"
+      {% if "Large" in selected_sizes %}checked{% endif %}>
+    Large
+  </label>
+</div>
+
+  <!-- PRICE FILTER -->
+  <div class="filter-group">
+    <h5>Price</h5>
+
+    <label>
+  <input type="radio" name="price" value="under_1000"
+    {% if selected_price == "under_1000" %}checked{% endif %}>
+  Under ₹1000
+</label>
+
+<label>
+  <input type="radio" name="price" value="1000_2000"
+    {% if selected_price == "1000_2000" %}checked{% endif %}>
+  ₹1000 – ₹2000
+</label>
+
+<label>
+  <input type="radio" name="price" value="above_2000"
+    {% if selected_price == "above_2000" %}checked{% endif %}>
+  Above ₹2000
+</label>
+
+  </div>
+
+  <button type="submit" class="btn btn-dark w-100 mt-3">
+    Apply Filters
+  </button>
+
+  <a href="{% url 'shop' %}" class="btn btn-outline-secondary w-100 mt-2">
+    Clear Filters
+  </a>
+
+</form>
+
+</aside>
+
+
+
+
+        <!-- PRODUCTS (TARO CODE – UNCHANGED) -->
+        <div class="products-area">
+            <div class="product-grid">
+                {% for product in products %}
+                <div class="product-card">
+                    <a href="{% url 'product_detail' product.id %}" class="product-image">
+                        <img src="{{ product.image.url|default:'/static/app/images/default.png' }}" alt="{{ product.name }}">
+                    </a>
+
+                    <div class="product-body">
+                        <div class="product-rating">
+                            <span class="rating">{{ product.rating|default:4.5 }} ★</span>
+                            <span class="reviews">({{ product.review_count|default:100 }})</span>
+                        </div>
+
+                        <div class="product-brand">{{ product.brand|default:"Brand Name" }}</div>
+                        <h5 class="product-name">{{ product.name }}</h5>
+
+                        <div class="price-row">
+                            {% if product.get_offer %}
+                                <span class="discounted-price">₹{{ product.get_final_price|floatformat:0 }}</span>
+                                <span class="original-price">₹{{ product.price|floatformat:0 }}</span>
+                                <span class="discount-text" style="color:green;">
+                                    {% if product.get_offer.discount_type == "percent" %}
+                                        ({{ product.get_offer.discount_value }}% OFF)
+                                    {% else %}
+                                        (₹{{ product.get_offer.discount_value }} OFF)
+                                    {% endif %}
+                                </span>
+                            {% else %}
+                                <span class="discounted-price">₹{{ product.price|floatformat:0 }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-actions d-flex gap-2 mt-2">
+                            {% if product.stock > 0 %}
+                                <button class="btn btn-primary btn-sm add-to-cart-btn" data-id="{{ product.id }}">
+                                    🛒 Add to Cart
+                                </button>
+                            {% else %}
+                                <button class="btn btn-secondary btn-sm" disabled>Out of Stock</button>
+                            {% endif %}
+
+                            <button class="btn btn-sm toggle-wishlist-btn" data-id="{{ product.id }}">
+                                {% if product.id in wishlist_ids %}
+                                    <i class="fa-solid fa-heart"></i>
+                                {% else %}
+                                    <i class="fa-regular fa-heart"></i>
+                                {% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                    <p>No products found.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+   <script src="{% static 'app/js/shop.js' %}"></script>
 {% endblock %}

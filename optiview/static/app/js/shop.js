@@ -1,9 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]")?.value
-        || document.getElementById("csrf-token")?.value;
+    const csrfToken =
+        document.querySelector("[name=csrfmiddlewaretoken]")?.value ||
+        document.getElementById("csrf-token")?.value;
 
-    /* ---------- TOAST ---------- */
+    /* ================= TOAST ================= */
     let toastEl = null;
     let hideTimer = null;
 
@@ -34,21 +35,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 2500);
     }
 
-    /* ---------- CART COUNT ---------- */
+    /* ================= CART COUNT ================= */
     async function updateCartCount() {
         try {
-            const res = await fetch("/cart/count/");
+            const res = await fetch("/cart/count/", {
+                credentials: "same-origin"
+            });
+
+            if (!res.ok) return;
+
             const data = await res.json();
             const badge = document.getElementById("cart-count");
+
             if (badge) badge.textContent = data.count;
-        } catch (e) {}
+
+        } catch (err) {
+            console.error(err);
+        }
     }
 
-    /* ---------- CLICK HANDLER ---------- */
+    /* ================= CLICK EVENTS ================= */
     document.body.addEventListener("click", async (e) => {
 
         /* ===== ADD TO CART ===== */
         const cartBtn = e.target.closest(".add-to-cart-btn");
+
         if (cartBtn) {
             e.preventDefault();
             e.stopPropagation();
@@ -61,29 +72,41 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const res = await fetch(`/add-to-cart/${productId}/`, {
                     method: "POST",
+                    credentials: "same-origin",
                     headers: {
                         "X-CSRFToken": csrfToken,
                         "X-Requested-With": "XMLHttpRequest"
                     }
                 });
+
+                if (res.redirected) {
+                    window.location.href = res.url;
+                    return;
+                }
+
+                if (!res.ok) throw new Error("Request failed");
+
                 const data = await res.json();
 
                 if (data.success) {
                     updateCartCount();
                     showToast("🛒 Added to cart");
                 } else {
-                    showToast(data.error || "Failed", "error");
+                    showToast("Failed to add", "error");
                 }
+
             } catch (err) {
-                showToast("Please register or login before adding to cart", "error");
+                showToast("Please login first", "error");
             } finally {
                 cartBtn.dataset.loading = "false";
             }
+
             return;
         }
 
         /* ===== WISHLIST ===== */
         const wishBtn = e.target.closest(".toggle-wishlist-btn");
+
         if (wishBtn) {
             e.preventDefault();
             e.stopPropagation();
@@ -97,8 +120,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     headers: {
                         "X-CSRFToken": csrfToken,
                         "X-Requested-With": "XMLHttpRequest"
-                    }
+                    },
+                    credentials: "same-origin"
                 });
+
+                if (res.redirected) {
+                    window.location.href = res.url;
+                    return;
+                }
+
+                if (!res.ok) throw new Error("Request failed");
+
                 const data = await res.json();
 
                 if (data.status === "added") {
@@ -110,8 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     icon.classList.add("fa-regular");
                     showToast("💔 Removed from wishlist");
                 }
+
             } catch (err) {
-                showToast("Please register or login before adding to wishlist", "error");
+                showToast("Please login first", "error");
             }
         }
 

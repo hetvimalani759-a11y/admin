@@ -74,32 +74,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const csrfToken = document.getElementById("csrf-token").value;
 
+    // ✅ ADD TO CART
+    document.querySelectorAll(".add-to-cart-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const productId = btn.dataset.id;
+
+            try {
+                const res = await fetch(`/add-to-cart/${productId}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                    }
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    alert("Added to cart ✅");
+                }
+
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    });
+
+
+    // ✅ TOGGLE WISHLIST
     document.querySelectorAll(".toggle-wishlist-btn").forEach(btn => {
         btn.addEventListener("click", async () => {
             const productId = btn.dataset.id;
             const icon = btn.querySelector("i");
 
             try {
-                const res = await fetch("/wishlist/toggle/", {
+                const res = await fetch(`/wishlist/toggle/${productId}/`, {
                     method: "POST",
                     headers: {
                         "X-CSRFToken": csrfToken,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ product_id: productId })
+                    }
                 });
 
                 const data = await res.json();
 
-                if (data.in_wishlist) {
+                if (data.status === "added") {
                     icon.classList.remove("fa-regular");
                     icon.classList.add("fa-solid");
                     icon.style.color = "red";
-                } else {
+                } else if (data.status === "removed") {
                     icon.classList.remove("fa-solid");
                     icon.classList.add("fa-regular");
                     icon.style.color = "";
                 }
+
             } catch (err) {
                 console.error(err);
             }
@@ -108,5 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 </script>
+
 
 {% endblock %}

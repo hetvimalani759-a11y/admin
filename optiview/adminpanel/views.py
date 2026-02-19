@@ -388,7 +388,6 @@ def revenue_dashboard(request):
         'revenue_values': revenue_values,
     })
 
-<<<<<<< HEAD
 
 
 def assign_order(request):
@@ -435,8 +434,6 @@ def delivery_person_list(request):
     return render(request, 'admin/delivery_person_list.html', {
         'delivery_persons': delivery_persons
     })
-=======
->>>>>>> 7ced781489db27d9c3e456467918a5ac88685510
 # ---------------- CREATE ----------------
 def create_offer(request):
     products = Product.objects.all()
@@ -530,8 +527,6 @@ def delete_offer(request, pk):
     offer.delete()
     messages.success(request, "Offer deleted successfully!")
     return redirect('adminpanel:offer_list')
-<<<<<<< HEAD
-=======
 def assign_order(request):
     orders = Order.objects.filter(status='Pending')
     delivery_persons = DeliveryPerson.objects.all()
@@ -616,4 +611,3 @@ def add_delivery_person(request):
         return redirect("delivery_person_list")
 
     return render(request, "delivery/add_delivery_person.html")
->>>>>>> 7ced781489db27d9c3e456467918a5ac88685510
