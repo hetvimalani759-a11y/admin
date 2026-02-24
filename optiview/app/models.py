@@ -4,6 +4,13 @@ from adminpanel.models import Product
 
 
 
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=15, blank=True, null=True)
+    profile_image = models.ImageField(upload_to="profile_images/", blank=True, null=True)
+
+    def __str__(self):
+        return self.user.username
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

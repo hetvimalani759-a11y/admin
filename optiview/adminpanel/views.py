@@ -1,22 +1,30 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User,Group
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Sum, Q
 from django.db.models.functions import TruncMonth
-from django.contrib.auth.models import User
-from .models import Order, DeliveryPerson
-from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.tokens import default_token_generator
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from orders.models import Order
+from delivery.models import DeliveryPerson
+
 
 from .models import (
-    Product, Category, SubCategory,Offer,
-    Order,OrderItem, Lens, Notification, CompanyInfo
+    Product, Category, SubCategory, Offer, Lens, CompanyInfo,
+    Order, OrderItem, DeliveryPerson, Notification
 )
 
 LOW_STOCK_THRESHOLD = 50
 
-# --------------------------- AUTH VIEWS ---------------------------
+
+# ================= AUTH =================
 
 def login_view(request):
     if request.method == "POST":
@@ -25,22 +33,21 @@ def login_view(request):
             username=request.POST.get("username"),
             password=request.POST.get("password")
         )
-        if user:
+        if user and user.is_staff:
             login(request, user)
             messages.success(request, "Welcome Admin")
             return redirect("adminpanel:dashboard")
-        messages.error(request, "Invalid username or password")
+        messages.error(request, "Invalid credentials")
     return render(request, "admin/login.html")
 
 
 @login_required(login_url="adminpanel:login")
 def logout_view(request):
     logout(request)
-    messages.success(request, "Logged out successfully")
     return redirect("adminpanel:login")
 
 
-# --------------------------- DASHBOARD ---------------------------
+# ================= DASHBOARD =================
 
 @login_required(login_url="adminpanel:login")
 def dashboard(request):
@@ -48,72 +55,48 @@ def dashboard(request):
     total_orders = Order.objects.count()
     total_lenses = Lens.objects.count()
     total_users = User.objects.count()
-    total_revenue = Order.objects.aggregate(total=Sum("total_amount"))["total"] or 0
-    latest_products = Product.objects.order_by("-created_at")[:1]
-    company = CompanyInfo.objects.first()
+
+    total_revenue = Order.objects.aggregate(
+        total=Sum("total_amount")
+    )["total"] or 0
+
     monthly_revenue = (
         Order.objects.annotate(month=TruncMonth("created_at"))
         .values("month")
         .annotate(total=Sum("total_amount"))
         .order_by("month")
     )
-    notifications = Notification.objects.filter(user=request.user, is_read=False)
-    low_stock = Product.objects.filter(stock__lte=LOW_STOCK_THRESHOLD).count()
+
+    notifications = Notification.objects.filter(
+        user=request.user,
+        is_read=False
+    )
 
     context = {
         "total_products": total_products,
         "total_orders": total_orders,
         "total_lenses": total_lenses,
-        "total_revenue": total_revenue,
-        "latest_products": latest_products,
-        "company": company,
         "total_users": total_users,
+        "total_revenue": total_revenue,
+        "latest_products": Product.objects.order_by("-created_at")[:5],
+        "company": CompanyInfo.objects.first(),
         "monthly_revenue": monthly_revenue,
         "revenue_months": [r["month"].strftime("%b %Y") for r in monthly_revenue],
         "revenue_values": [r["total"] for r in monthly_revenue],
         "notifications": notifications,
-        "notification_count": notifications.count(),
-        "low_stock": low_stock,
+        "low_stock": Product.objects.filter(stock__lte=LOW_STOCK_THRESHOLD).count(),
     }
+
     return render(request, "admin/dashboard.html", context)
 
 
-# --------------------------- NOTIFICATIONS ---------------------------
-def apply_discount(products, discount_percent):
-    for product in products:
-        product.discount_percent = discount_percent
-        product.save()
+# ================= CATEGORY =================
 
 @login_required
-def notifications(request):
-    notifications = Notification.objects.all().order_by("-id")
-    return render(request, "admin/notifications.html", {"notifications": notifications})
-
-
-@login_required
-def mark_notifications_read(request):
-    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
-    return JsonResponse({"status": "ok"})
-
-
-@login_required
-def add_notification(request):
-    if request.method == "POST":
-        title = request.POST.get("title")
-        message = request.POST.get("message")
-        for user in User.objects.all():
-            Notification.objects.create(user=user, title=title, message=message)
-        return redirect("adminpanel:notifications")
-    return render(request, "admin/add_notification.html")
-
-
-# --------------------------- CATEGORY VIEWS ---------------------------
-
-@login_required(login_url="adminpanel:login")
 def add_category(request):
     categories = Category.objects.all().order_by("-id")
     if request.method == "POST":
-        name = request.POST.get("name").strip()
+        name = request.POST.get("name", "").strip()
         if name:
             Category.objects.get_or_create(name=name)
             messages.success(request, "Category added successfully")
@@ -121,186 +104,340 @@ def add_category(request):
     return render(request, "admin/add_category.html", {"categories": categories})
 
 
-@login_required(login_url="adminpanel:login")
-def edit_category(request, id):
-    category = get_object_or_404(Category, id=id)
-    if request.method == "POST":
-        name = request.POST.get("name").strip()
-        if name:
-            category.name = name
-            category.save()
-            messages.success(request, "Category updated successfully")
-        return redirect("adminpanel:add_category")
-    return render(request, "admin/edit_category.html", {"category": category})
-
-
-@login_required(login_url="adminpanel:login")
-def delete_category(request, id):
-    category = get_object_or_404(Category, id=id)
-    category.delete()
-    messages.success(request, "Category deleted successfully")
-    return redirect("adminpanel:add_category")
-
-
-# --------------------------- SUBCATEGORY VIEWS ---------------------------
+# ================= PRODUCT =================
 
 @login_required
-def add_subcategory(request):
-    categories = Category.objects.all()
-    subcategories = SubCategory.objects.select_related("category").all()
-    if request.method == "POST":
-        SubCategory.objects.create(
-            category_id=request.POST.get("category"),
-            name=request.POST.get("name")
-        )
-        return redirect("adminpanel:add_subcategory")
-    return render(request, "admin/add_subcategory.html", {
-        "categories": categories,
-        "subcategories": subcategories
-    })
-
-
-@login_required(login_url="adminpanel:login")
-def edit_subcategory(request, id):
-    subcategory = get_object_or_404(SubCategory, id=id)
-    categories = Category.objects.all()
-    if request.method == "POST":
-        name = request.POST.get("name").strip()
-        category_id = request.POST.get("category")
-        if name and category_id:
-            subcategory.name = name
-            subcategory.category_id = category_id
-            subcategory.save()
-            messages.success(request, "Subcategory updated successfully")
-        return redirect("adminpanel:add_subcategory")
-    return render(request, "admin/edit_subcategory.html", {
-        "subcategory": subcategory,
-        "categories": categories
-    })
-
-
-@login_required(login_url="adminpanel:login")
-def delete_subcategory(request, id):
-    subcategory = get_object_or_404(SubCategory, id=id)
-    subcategory.delete()
-    messages.success(request, "Subcategory deleted successfully")
-    return redirect("adminpanel:add_subcategory")
-
-
-@login_required
-def get_subcategories(request, category_id):
-    subcats = SubCategory.objects.filter(category_id=category_id)
-    return JsonResponse([{"id": s.id, "name": s.name} for s in subcats], safe=False)
-
-
-# --------------------------- PRODUCT VIEWS ---------------------------
-
-@login_required(login_url="adminpanel:login")
 def product_list(request):
     search = request.GET.get("search", "")
     products = Product.objects.all()
     if search:
         products = products.filter(
             Q(name__icontains=search) |
-            Q(brand__icontains=search) |
-            Q(price__icontains=search)
+            Q(brand__icontains=search)
         )
-    return render(request, "admin/product_list.html", {"products": products, "search": search})
+    return render(request, "admin/product_list.html", {
+        "products": products,
+        "search": search
+    })
 
 
-@login_required(login_url="adminpanel:login")
-def add_product(request):
-    categories = Category.objects.all()
+# ================= ORDERS =================
+
+# @login_required
+# def order_list(request):
+#     orders = Order.objects.all().order_by("-created_at")
+#     return render(request, "admin/order_list.html", {"orders": orders})
+
+
+@staff_member_required
+def order_list(request):
+    orders = Order.objects.all().order_by('-id')
+    delivery_persons = DeliveryPerson.objects.all()
+
+    return render(request, 'admin/order_list.html', {
+        'orders': orders,
+        'delivery_persons': delivery_persons
+    })
+
+
+def assign_order_ajax(request):
     if request.method == "POST":
-        Product.objects.create(
-            name=request.POST["name"],
-            brand=request.POST["brand"],
-            price=request.POST["price"],
-            stock=request.POST["stock"],
-            category_id=request.POST["category"],
-            subcategory_id=request.POST["subcategory"],
-            image=request.FILES.get("image")
-        )
-        # Notify users
-        for user in User.objects.filter(is_staff=False):
-            Notification.objects.create(user=user, message="New product added!")
-        messages.success(request, "Product added successfully")
-        return redirect("adminpanel:product_list")
-    return render(request, "admin/add_product.html", {"categories": categories})
+        order_id = request.POST.get("order_id")
+        delivery_id = request.POST.get("delivery_id")
+
+        try:
+            order = Order.objects.get(id=order_id)
+            delivery = DeliveryPerson.objects.get(id=delivery_id)
+
+            order.delivery_person = delivery
+            order.status = "assigned"
+            order.save()
+
+            return JsonResponse({"success": True})
+
+        except:
+            return JsonResponse({"success": False})
+
+    return JsonResponse({"success": False})
+
+
+# @login_required
+# def accept_order(request, order_id):
+#     order = get_object_or_404(Order, id=order_id)
+
+#     order.status = "Out for Delivery"
+#     order.save()
+
+#     Notification.objects.create(
+#         sender=request.user,
+#         receiver=order.user,
+#         order=order,
+#         title="Order Accepted",
+#         message=f"Order #{order.id} is out for delivery."
+#     )
+
+#     return redirect("adminpanel:order_list")
+
+
+# @login_required
+# def reject_order(request, order_id):
+#     order = get_object_or_404(Order, id=order_id)
+
+#     order.status = "Rejected"
+#     order.save()
+
+#     Notification.objects.create(
+#         sender=request.user,
+#         receiver=order.user,
+#         order=order,
+#         title="Order Rejected",
+#         message=f"Order #{order.id} has been rejected."
+#     )
+
+#     return redirect("adminpanel:order_list")
+
+
+# ================= NOTIFICATIONS =================
+
+@login_required
+def notifications_view(request):
+    notes = Notification.objects.filter(
+        receiver=request.user
+    ).order_by("-id")
+
+    return render(request, "admin/notifications.html", {
+        "notifications": notes
+    })
 
 
 @login_required
+def mark_notification_read(request, notification_id):
+    note = get_object_or_404(
+        Notification,
+        id=notification_id,
+        receiver=request.user
+    )
+    note.is_read = True
+    note.save()
+    return redirect("adminpanel:notifications")
+
+
+# ================= LENS & OFFER =================
+
+@login_required
+def lens_list(request):
+    return render(request, "admin/lens_list.html", {
+        "lenses": Lens.objects.all()
+    })
+
+
+@login_required
+def offer_list(request):
+    return render(request, "admin/offer_list.html", {
+        "offers": Offer.objects.all()
+    })
+
+
+@login_required
+def create_offer(request):
+    return render(request, "admin/create_offer.html")
+
+
+def edit_category(request, id):
+    category = get_object_or_404(Category, id=id)
+
+    if request.method == "POST":
+        category.name = request.POST.get("name")
+        category.save()
+        messages.success(request, "Category updated successfully!")
+        return redirect("adminpanel:category_list")  # tamara list page nu name mukjo
+
+    return render(request, "adminpanel/edit_category.html", {"category": category})
+
+
+def delete_category(request, id):
+    category = get_object_or_404(Category, id=id)
+    category.delete()
+    messages.success(request, "Category deleted successfully!")
+    return redirect("adminpanel:category_list")  # tamara list page nu name mukjo
+
+def add_subcategory(request):
+    categories = Category.objects.all()
+
+    if request.method == "POST":
+        name = request.POST.get("name")
+        category_id = request.POST.get("category")
+
+        category = Category.objects.get(id=category_id)
+
+        SubCategory.objects.create(
+            name=name,
+            category=category
+        )
+
+        messages.success(request, "SubCategory added successfully!")
+        return redirect("adminpanel:subcategory_list")  # tamaru list page name mukjo
+
+    return render(request, "adminpanel/add_subcategory.html", {
+        "categories": categories
+    })
+
+def edit_subcategory(request, id):
+    subcategory = get_object_or_404(SubCategory, id=id)
+    categories = Category.objects.all()
+
+    if request.method == "POST":
+        subcategory.name = request.POST.get("name")
+        category_id = request.POST.get("category")
+        subcategory.category = Category.objects.get(id=category_id)
+        subcategory.save()
+
+        messages.success(request, "SubCategory updated successfully!")
+        return redirect("adminpanel:subcategory_list")  # tamaru list page name
+
+    return render(request, "adminpanel/edit_subcategory.html", {
+        "subcategory": subcategory,
+        "categories": categories
+    })
+
+def delete_subcategory(request, id):
+    subcategory = get_object_or_404(SubCategory, id=id)
+    subcategory.delete()
+
+    messages.success(request, "SubCategory deleted successfully!")
+    return redirect("adminpanel:subcategory_list")  # tamaru list page name mukjo
+
+def get_subcategories(request, category_id):
+    subcategories = SubCategory.objects.filter(category_id=category_id)
+
+    data = list(subcategories.values("id", "name"))
+
+    return JsonResponse(data, safe=False)
+
+def add_product(request):
+    categories = Category.objects.all()
+    subcategories = SubCategory.objects.all()
+
+    if request.method == "POST":
+        name = request.POST.get("name")
+        price = request.POST.get("price")
+        category_id = request.POST.get("category")
+        subcategory_id = request.POST.get("subcategory")
+
+        category = Category.objects.get(id=category_id)
+        subcategory = SubCategory.objects.get(id=subcategory_id)
+
+        Product.objects.create(
+            name=name,
+            price=price,
+            category=category,
+            subcategory=subcategory
+        )
+
+        messages.success(request, "Product added successfully!")
+        return redirect("adminpanel:product_list")  # tamaru list page name
+
+    return render(request, "adminpanel/add_product.html", {
+        "categories": categories,
+        "subcategories": subcategories
+    })
+
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     categories = Category.objects.all()
-    subcategories = SubCategory.objects.filter(category=product.category)
+    subcategories = SubCategory.objects.all()
 
     if request.method == "POST":
-        product.category_id = request.POST.get('category')
-        product.subcategory_id = request.POST.get('subcategory')
         product.name = request.POST.get("name")
-        product.brand = request.POST.get("brand")
         product.price = request.POST.get("price")
-        product.stock = request.POST.get("stock")
-        if request.FILES.get("image"):
-            product.image = request.FILES.get("image")
-        product.save()
-        messages.success(request, "Product updated")
-        return redirect("adminpanel:product_list")
 
-    return render(request, "admin/edit_product.html", {
+        category_id = request.POST.get("category")
+        subcategory_id = request.POST.get("subcategory")
+
+        product.category = Category.objects.get(id=category_id)
+        product.subcategory = SubCategory.objects.get(id=subcategory_id)
+
+        product.save()
+
+        messages.success(request, "Product updated successfully!")
+        return redirect("adminpanel:product_list")  # tamaru list page name
+
+    return render(request, "adminpanel/edit_product.html", {
         "product": product,
         "categories": categories,
         "subcategories": subcategories
     })
 
-
-@login_required
 def delete_product(request, id):
-    Product.objects.filter(id=id).delete()
-    messages.error(request, "Product deleted")
-    return redirect("adminpanel:product_list")
+    product = get_object_or_404(Product, id=id)
+    product.delete()
+
+    messages.success(request, "Product deleted successfully!")
+    return redirect("adminpanel:product_list")  # tamaru list page name mukjo
 
 
-# --------------------------- ORDER VIEWS ---------------------------
-
-
-
-@login_required
-def order_list(request):
-    orders = Order.objects.all().order_by("-created_at")
-    orderitems = OrderItem.objects.select_related("order", "product")
-
-    return render(request, "admin/order_list.html", {
-        "orders": orders,
-        "orderitems": orderitems
+def delivery_person_list(request):
+    delivery_persons = DeliveryPerson.objects.all()
+    
+    return render(request, "admin/delivery_person_list.html", {
+             "delivery_persons": delivery_persons
     })
 
+def add_delivery_person(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        phone = request.POST.get("phone")
+        address = request.POST.get("address")
 
-@login_required
-def update_order_status(request, order_id):
-    if request.method == 'POST':
-        order = get_object_or_404(Order, id=order_id)
-        new_status = request.POST.get('status')
-        order.status = new_status
-        order.save()
-    return redirect('adminpanel:order_list')
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Username already exists!")
+            return redirect("adminpanel:add_delivery_person")
+
+        # Create User
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+
+        # Add to Delivery group
+        delivery_group, created = Group.objects.get_or_create(name="Delivery")
+        user.groups.add(delivery_group)
+
+        # 🔥 IMPORTANT — Create DeliveryPerson record
+        DeliveryPerson.objects.create(
+            user=user,
+            phone=phone,
+            address=address
+        )
+
+        messages.success(request, "Delivery person added successfully!")
+        return redirect("adminpanel:delivery_person_list")
+
+    return render(request, "admin/add_delivery_person.html")
 
 
-# --------------------------- LENS VIEWS ---------------------------
-
-@login_required
-def lens_list(request):
-    lenses = Lens.objects.all()
-    return render(request, "admin/lens_list.html", {"lenses": lenses})
+def revenue_dashboard(request):
+    return render(request, "admin/revenue_dashboard.html")
 
 
-# --------------------------- COMPANY INFO ---------------------------
 
-@login_required
-def company_create(request):
+def user_list(request):
+    users = User.objects.all()
+    return render(request, "admin/user_list.html", {"users": users})
+
+
+def low_stock_products(request):
+    products = Product.objects.filter(stock__lte=5)  # 5 thi ochho stock
+    return render(request, "admin/low_stock.html", {"products": products})
+
+def company_create(
+        request):
     if CompanyInfo.objects.exists():
         return redirect("adminpanel:company_update")
+
     if request.method == "POST":
         CompanyInfo.objects.create(
             name=request.POST.get("name"),
@@ -310,197 +447,100 @@ def company_create(request):
             gst_number=request.POST.get("gst_number"),
             logo=request.FILES.get("logo"),
         )
-        messages.success(request, "Company info added")
+        messages.success(request, "Company Info Added Successfully!")
         return redirect("adminpanel:dashboard")
-    return render(request, "admin/company_add.html")
+
+    return render(request, "admin/company_form.html")
 
 
-@login_required
-def company_update(request):
-    company = get_object_or_404(CompanyInfo)
-    if request.method == "POST":
-        company.name = request.POST.get("name")
-        company.email = request.POST.get("email")
-        company.phone = request.POST.get("phone")
-        company.address = request.POST.get("address")
-        company.gst_number = request.POST.get("gst_number")
-        if request.FILES.get("logo"):
-            company.logo = request.FILES.get("logo")
-        company.save()
-        messages.success(request, "Company info updated")
-        return redirect("adminpanel:dashboard")
-    return render(request, "admin/company_edit.html", {"company": company})
-# ----------------------------user-------------------------------
-@login_required(login_url="adminpanel:login")
-def user_list(request):
-    users = User.objects.all().order_by("-id")
-    return render(request, "admin/user_list.html", {"users": users})
-def low_stock_products(request):
-    products = Product.objects.filter(stock__lt=LOW_STOCK_THRESHOLD)
-    labels = [p.name for p in products]
-    data = [p.stock for p in products]
-
-    return render(request, "admin/low_stock_products.html", {
-        "products": products,
-        "labels": labels,
-        "data": data
+def notifications(request):
+    all_notifications = Notification.objects.all().order_by("-created_at")
+    return render(request, "admin/notifications.html", {
+        "notifications": all_notifications
     })
 
-def revenue_dashboard(request):
-    monthly_revenue = (
-        Order.objects
-        .annotate(month=TruncMonth("created_at"))
-        .values("month")
-        .annotate(total=Sum("total_amount"))
-        .order_by("month")
-    )
-
-    data = {
-        "months": [r["month"].strftime("%b %Y") for r in monthly_revenue],
-        "revenues": [r["total"] for r in monthly_revenue],
-    }
-
-    return render(request, 'admin/revenue_dashboard.html', data)   
-
-
-
-<<<<<<< HEAD
-def assign_order(request):
-    orders = Order.objects.filter(status='Pending')
-    delivery_persons = DeliveryPerson.objects.all()
-
+def add_notification(request):
     if request.method == "POST":
-        order_id = request.POST.get("order")
-        dp_id = request.POST.get("delivery_person")
+        title = request.POST.get("title")
+        message = request.POST.get("message")
+        receiver_id = request.POST.get("receiver")
 
-        order = Order.objects.get(id=order_id)
-        dp = DeliveryPerson.objects.get(id=dp_id)
+        receiver = User.objects.get(id=receiver_id)
 
-        order.assigned_to = dp
-        order.status = 'Assigned'
-        order.save()
-
-        return redirect('assign_order')
-
-    return render(request, 'assign_order.html', {
-        'orders': orders,
-        'delivery_persons': delivery_persons
-    })
-
-
-
-@login_required
-def update_order_status(request, order_id):
-    if request.method == "POST":
-        order = get_object_or_404(Order, id=order_id)
-        new_status = request.POST.get("status")
-
-        if new_status:
-            order.status = new_status
-            order.save()
-
-    return redirect("adminpanel:order_list")
-
-
-@staff_member_required
-def delivery_person_list(request):
-    delivery_persons = DeliveryPerson.objects.select_related('user')
-
-    return render(request, 'admin/delivery_person_list.html', {
-        'delivery_persons': delivery_persons
-    })
-=======
-# ---------------- CREATE ----------------
-def create_offer(request):
-    products = Product.objects.all()
-    categories = Category.objects.all()
-
-    if request.method == "POST":
-        name = request.POST.get('name')
-        discount_type = request.POST.get('discount_type')
-        discount_value = request.POST.get('discount_value')
-        product_id = request.POST.get('product')
-        category_id = request.POST.get('category')
-        start_date = request.POST.get('start_date')
-        end_date = request.POST.get('end_date')
-        is_active = request.POST.get('is_active') == 'on'
-
-        if product_id and category_id:
-            messages.error(request, "Select either Product OR Category.")
-            return redirect('create_offer')
-
-        if not product_id and not category_id:
-            messages.error(request, "Select at least Product or Category.")
-            return redirect('create_offer')
-
-        Offer.objects.create(
-            name=name,
-            discount_type=discount_type,
-            discount_value=discount_value,
-            product_id=product_id or None,
-            category_id=category_id or None,
-            start_date=start_date,
-            end_date=end_date,
-            is_active=is_active,
+        Notification.objects.create(
+            sender=request.user,
+            receiver=receiver,
+            title=title,
+            message=message
         )
 
-        messages.success(request, "Offer created successfully!")
-        return redirect('adminpanel:offer_list')
+        messages.success(request, "Notification sent successfully!")
+        return redirect("adminpanel:notifications")
 
-    return render(request, 'admin/create_offer.html', {
-        'products': products,
-        'categories': categories
+    users = User.objects.all()
+    return render(request, "admin/add_notification.html", {
+        "users": users
     })
 
-
-# ---------------- LIST ----------------
-def offer_list(request):
-    offers = Offer.objects.all().order_by('-id')
-    return render(request, 'admin/offer_list.html', {'offers': offers})
-
-
-# ---------------- EDIT ----------------
-def edit_offer(request, pk):
-    offer = get_object_or_404(Offer, pk=pk)
-    products = Product.objects.all()
-    categories = Category.objects.all()
-
+def forgot_password(request):
     if request.method == "POST":
-        offer.name = request.POST.get('name')
-        offer.discount_type = request.POST.get('discount_type')
-        offer.discount_value = request.POST.get('discount_value')
-        product_id = request.POST.get('product')
-        category_id = request.POST.get('category')
-        offer.start_date = request.POST.get('start_date')
-        offer.end_date = request.POST.get('end_date')
-        offer.is_active = request.POST.get('is_active') == 'on'
+        email = request.POST.get("email")
+        try:
+            user = User.objects.get(email=email)
 
-        if product_id and category_id:
-            messages.error(request, "Select either Product OR Category.")
-            return redirect('edit_offer', pk=pk)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
 
-        if not product_id and not category_id:
-            messages.error(request, "Select at least Product or Category.")
-            return redirect('edit_offer', pk=pk)
+            reset_link = request.build_absolute_uri(
+                f"/admin-panel/reset-password/{uid}/{token}/"
+            )
 
-        offer.product_id = product_id or None
-        offer.category_id = category_id or None
-        offer.save()
+            send_mail(
+                "Password Reset",
+                f"Click the link to reset your password:\n{reset_link}",
+                settings.EMAIL_HOST_USER,
+                [email],
+                fail_silently=False,
+            )
 
-        messages.success(request, "Offer updated successfully!")
-        return redirect('adminpanel:offer_list')
+            messages.success(request, "Password reset link sent to your email!")
+            return redirect("adminpanel:forgot_password")
+        except User.DoesNotExist:
+            messages.error(request, "Email not found!")
 
-    return render(request, 'admin/edit_offer.html', {
-        'offer': offer,
-        'products': products,
-        'categories': categories
+    return render(request, "admin/forgot_password.html")
+
+def reset_password(request, uidb64, token):
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == "POST":
+            password1 = request.POST.get("password1")
+            password2 = request.POST.get("password2")
+
+            if password1 and password1 == password2:
+                user.set_password(password1)
+                user.save()
+                messages.success(request, "Password reset successfully!")
+                return redirect("adminpanel:login")
+            else:
+                messages.error(request, "Passwords do not match!")
+
+        return render(request, "admin/reset_password.html", {"validlink": True})
+    else:
+        messages.error(request, "Invalid or expired link.")
+        return render(request, "adminreset_password.html", {"validlink": False})
+    
+def admin_orders(request):
+    orders = Order.objects.all()
+    delivery_persons = DeliveryPerson.objects.all()
+
+    return render(request, "adminpanel/orders.html", {
+        "orders": orders,
+        "delivery_persons": delivery_persons
     })
 
-
-# ---------------- DELETE ----------------
-def delete_offer(request, pk):
-    offer = get_object_or_404(Offer, pk=pk)
-    offer.delete()
-    messages.success(request, "Offer deleted successfully!")
-    return redirect('adminpanel:offer_list')
->>>>>>> 7d674ccc50a9472b9e26c1754b4d21ef8493d40e

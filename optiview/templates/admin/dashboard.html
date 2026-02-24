@@ -184,5 +184,18 @@ if (revenueCtx) {
     {% endif %}
 
 </div>
+<div class="notification-box">
+    <h4>Notifications ({{ notifications.count }})</h4>
+
+    {% for note in notifications %}
+    <div class="notification-card {% if not note.is_read %}unread{% endif %}">
+        <p>{{ note.message }}</p>
+        <small>{{ note.created_at|timesince }} ago</small>
+    </div>
+    {% empty %}
+    <p>No notifications</p>
+    {% endfor %}
+</div>
+
 
 {% endblock %}

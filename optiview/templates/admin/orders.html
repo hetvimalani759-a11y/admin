@@ -1,0 +1,11 @@
+<form method="POST" action="{% url 'assign_delivery' order.id %}">
+    {% csrf_token %}
+    <select name="delivery_person">
+        {% for delivery in delivery_persons %}
+            <option value="{{ delivery.id }}">
+                {{ delivery.user.username }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit">Assign</button>
+</form>

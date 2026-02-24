@@ -1,49 +1,122 @@
-{% extends 'admin/base.html' %}
+{% extends "admin/base.html" %}
+
 {% block content %}
 
-<h2>Orders</h2>
+    <h2 class="mb-4">📦 Manage Orders</h2>
 
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>User</th>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Status</th>
-            <th>Created At</th>
-        </tr>
-    </thead>
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Delivery Person</th>
+                <th width="200">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr id="row-{{ order.id }}">
+                <td>#{{ order.id }}</td>
 
-    {% for order in orders %}
-        {% for item in order.items.all %}
-        <tr>
-            <td>{{ order.id }}</td>
-            <td>{{ order.user.username }}</td>
-            <td>{{ item.product.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>₹{{ item.product.get_final_price }}</td>
+                <td>{{ order.customer_name }}</td>
 
-            {% if forloop.first %}
-            <td rowspan="{{ order.items.count }}">
-                <form method="POST" action="{% url 'adminpanel:update_order_status' order.id %}">
-                    {% csrf_token %}
-                    <select name="status" onchange="this.form.submit()">
-                        {% for value,label in order.STATUS_CHOICES %}
-                        <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>
-                            {{ label }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </form>
-            </td>
-            <td rowspan="{{ order.items.count }}">{{ order.created_at|date:"Y-m-d H:i" }}</td>
-            {% endif %}
-        </tr>
-        {% endfor %}
-    {% endfor %}
+                <!-- STATUS -->
+                <td>
+                    <span id="status-{{ order.id }}"
+                          class="badge 
+                          {% if order.status == 'Placed' %} bg-warning
+                          {% elif order.status == 'Assigned' %} bg-info
+                          {% elif order.status == 'Delivered' %} bg-success
+                          {% else %} bg-secondary
+                          {% endif %}">
+                        {{ order.status }}
+                    </span>
+                </td>
 
-</table>
+                <!-- DELIVERY COLUMN -->
+                <td id="delivery-cell-{{ order.id }}">
+                    {% if order.delivery_person %}
+                        {{ order.delivery_person.user.username }}
+                    {% else %}
+                        {% if order.status == "Placed" %}
+                            <select id="delivery-{{ order.id }}" 
+                                    class="form-select form-select-sm">
+                                <option value="">Select Delivery</option>
+                                {% for dp in delivery_persons %}
+                                    <option value="{{ dp.id }}">
+                                        {{ dp.user.username }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            -
+                        {% endif %}
+                    {% endif %}
+                </td>
+
+                <!-- ACTION -->
+                <td>
+                    {% if order.status == "Placed" %}
+                        <button class="btn btn-primary btn-sm"
+                                onclick="assignOrder({{ order.id }})">
+                            Assign
+                        </button>
+                    {% else %}
+                        <span class="text-muted">No Action</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">
+                    No orders found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<!-- AJAX SCRIPT -->
+<script>
+function assignOrder(orderId) {
+
+    let select = document.getElementById("delivery-" + orderId);
+
+    if (!select || !select.value) {
+        alert("Please select delivery person");
+        return;
+    }
+
+    fetch("{% url 'adminpanel:assign_order_ajax' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": "{{ csrf_token }}"
+        },
+        body: "order_id=" + orderId + "&delivery_id=" + select.value
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+
+            // Update UI without reload
+            document.getElementById("status-" + orderId).innerText = "Assigned";
+            document.getElementById("status-" + orderId).className = "badge bg-info";
+
+            document.getElementById("delivery-cell-" + orderId).innerHTML =
+                select.options[select.selectedIndex].text;
+
+            document.querySelector("#row-" + orderId + " button").remove();
+
+        } else {
+            alert("Error assigning order");
+        }
+    });
+
+}
+</script>
 
 {% endblock %}

@@ -1,24 +1,35 @@
 {% extends "admin/base.html" %}
 {% block content %}
+{% load static %}
 
-<h2>➕ Add Delivery Person</h2>
 
+
+<h2>Add Delivery Person</h2>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 <form method="post" class="card p-4 shadow-sm" style="max-width:500px;">
     {% csrf_token %}
 
     <label>Username</label>
-    <input type="text" name="username" class="form-control" required>
+    <input type="text" name="username" required>
 
-    <label class="mt-2">Email</label>
-    <input type="email" name="email" class="form-control" required>
+    <label>Email</label>
+    <input type="email" name="email">
 
-    <label class="mt-2">Password</label>
-    <input type="password" name="password" class="form-control" required>
+    <label>Password</label>
+    <input type="password" name="password" required>
 
-    <label class="mt-2">Phone</label>
-    <input type="text" name="phone" class="form-control" required>
+    <label>Phone</label>
+    <input type="text" name="phone" required>
 
-    <button type="submit" class="btn btn-success mt-3">Add</button>
+    <label>Address</label>
+    <textarea name="address" rows="3"></textarea>
+
+    <label>Joining Date</label>
+    <input type="date" name="joining_date" required>
+
+    <button type="submit" class="btn btn-primary mt-3">
+        Add Delivery Person
+    </button>
 </form>
 
 {% endblock %}

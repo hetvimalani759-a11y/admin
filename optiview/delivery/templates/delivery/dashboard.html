@@ -4,11 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Delivery Dashboard</title>
-    
+
     <link rel="stylesheet" href="{% static 'delivery/css/dashboard.css' %}">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -16,82 +14,87 @@
 <!-- TOP NAVBAR -->
 <header class="navbar">
     <h2>🚚 Delivery Dashboard</h2>
-</header>
+</header>   
+<div class="sidebar">
 
-<div class="container">
+    <a href="{% url 'delivery:delivery_dashboard' %}" class="nav-link">
+        🏠 Dashboard
+    </a>
 
-    <!-- SIDEBAR -->
-    <div class="sidebar">
-       
-             <a href="{% url 'delivery_dashboard' %}" class="nav-link">
-            <i class= Dashboard></i> 🏠Dashboard</a>
-             <a href="{% url 'my_orders' %}" class="nav-link">
-                 <i class= MyOrders></i> 📦My Orders </a>
+    <a href="{% url 'delivery:my_orders' %}" class="nav-link">
+        📦 My Orders
+    </a>
 
-                  <a><i class=UpdateStatus></i>🔄Update Status</a>
-                  <a href="{% url 'delivery_profile' %}" class="nav-link">
-                   <i class= Profile></i> 👤Profile</a> 
-                   <a href="javascript:void(0);" class="nav-link" onclick="confirmLogout()">
-                   <i class="fa fa-sign-out-alt"> </i> Logout
-                    </a>
+    <a href="#" class="nav-link">
+        🔄 Update Status
+    </a>
 
+    <a href="{% url 'delivery:delivery_profile' %}" class="nav-link">
+        👤 Profile
+    </a>
 
-    </div>
+    <!-- ✅ NEW EDIT PROFILE BUTTON -->
+    
 
-{% if messages %}
-<div id="django-messages"
-     data-messages='[
-        {% for message in messages %}
-            {"tag":"{{ message.tags }}","text":"{{ message|escapejs }}"}{% if not forloop.last %},{% endif %}
-        {% endfor %}
-     ]'>
+    <a href="javascript:void(0);" class="nav-link" onclick="confirmLogout()">
+        <i class="fa fa-sign-out-alt"></i> Logout
+    </a>
+
 </div>
-{% endif %}
+
+
+    <!-- MAIN CONTENT -->
     <main class="content">
 
-        <!-- DASHBOARD CARDS -->
         <div class="cards">
-            <div class="card">
-                📦
-                <h3>{{ total_orders }}</h3>
-                <p>Total Orders</p>
-            </div>
 
-            <div class="card">
-                🚚
-                <h3>{{ out_for_delivery }}</h3>
-                <p>Out for Delivery</p>
-            </div>
+    <div class="card">
+        <p>📋</p>
+        <h3> {{ total_orders }}</h3>
+        <p>Total Orders</p>
+    </div>
 
-            <div class="card">
-                ✅
-                <h3>{{ delivered_orders }}</h3>
-                <p>Delivered</p>
-            </div>
+    <div class="card">
+           <p>🚚</p>
+        <h3> {{ out_for_delivery }}</h3>
+        <p>Out for Delivery</p>
+    </div>
 
-            <div class="card">
-                ⏳
-                <h3>{{ pending_orders }}</h3>
-                <p>Pending</p>
-            </div>
-        </div>
+    <div class="card">
+         <p>✅</p>
+        <h3> {{ delivered_orders }}</h3>
+        <p>Delivered</p>
+    </div>
+
+    <div class="card">
+          <p>⏳</p>
+        <h3> {{ pending_orders }}</h3>
+        <p>Pending</p>
+    </div>
+
+</div>
+
+
 
         <!-- ACTIVE ORDERS -->
         <h2 class="section-title">Active Orders</h2>
 
         <table class="orders-table">
-            <tr>
-                <th>Order ID</th>
-                <th>Customer</th>
-                <th>Address</th>
-                <th>Status</th>
-            </tr>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Address</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
 
+            <tbody>
             {% if active_orders %}
                 {% for order in active_orders %}
                 <tr>
                     <td>#{{ order.id }}</td>
-                    <td>{{ order.customer_name }}</td>
+                    <td>{{ order.user.get_full_name }}</td>
                     <td>{{ order.address }}</td>
                     <td>
                         <span class="status {{ order.status|lower|cut:' ' }}">
@@ -107,55 +110,54 @@
                     </td>
                 </tr>
             {% endif %}
+            </tbody>
         </table>
 
     </main>
 </div>
 
 <!-- LOGOUT CONFIRM -->
+ {% if messages %}
+    {% for message in messages %}
+        {% if "login" in message.tags %}
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '{{ message }}',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
 <script>
 function confirmLogout() {
     Swal.fire({
         title: 'Are you sure?',
+        text: 'You will be logged out',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
-        cancelButtonColor: '#2563eb',
-        confirmButtonText: 'Yes, logout'
+        confirmButtonText: 'Yes, Logout'
     }).then((result) => {
         if (result.isConfirmed) {
-
-            Swal.fire({
-                icon: 'success',
-                text: 'You have been logged out successfully.',
-                timer: 1500,
-                showConfirmButton: false
-            }).then(() => {
-                window.location.href = "{% url 'delivery_logout' %}";
-            });
-
+            window.location.href = "{% url 'delivery:delivery_logout' %}";
         }
     });
 }
 </script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const msgDiv = document.getElementById("django-messages");
-    if (!msgDiv) return;
+{% for note in notifications %}
+<div class="notification-card">
+    <p>{{ note.message }}</p>
 
-    const messages = JSON.parse(msgDiv.dataset.messages);
-
-    messages.forEach(msg => {
-        Swal.fire({
-            icon: msg.tag === "success" ? "success" : "error",
-            title: msg.text,
-            timer: 2000,
-            showConfirmButton: false
-        });
-    });
-});
-</script>
-
+    {% if note.order.status == "Assigned" %}
+    <a href="{% url 'delivery_action' note.order.id 'accept' %}">Accept</a>
+    <a href="{% url 'delivery_action' note.order.id 'reject' %}">Reject</a>
+    {% endif %}
+</div>
+{% endfor %}
 
 </body>
 </html>

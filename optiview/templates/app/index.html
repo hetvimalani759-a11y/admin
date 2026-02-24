@@ -3,7 +3,8 @@
 
 {% block content %} 
 
-<!-- HERO IMAGE WITH TEXT -->
+
+
 <section class="home-hero">
     <div class="hero-content">
         <h1>Premium Goggles Collection</h1>
@@ -16,10 +17,6 @@
     </div>
 </section>
 
-{% if user.is_authenticated %}
-<h2>Welcome, {{ user.username }}</h2>
-<a href="{% url 'logout' %}">Logout</a>
-{% endif %}
 
 <!-- WHY OPTIVIEW -->
 <section class="home-info">

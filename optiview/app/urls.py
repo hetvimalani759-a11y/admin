@@ -1,10 +1,13 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     path("", views.home, name="home"),
     path("shop/", views.shop, name="shop"),
     path("product/<int:id>/", views.product_detail, name="product_detail"),
+   
+
 
     # Cart
     path("cart/", views.cart_view, name="cart"),
@@ -32,9 +35,15 @@ urlpatterns = [
 
     path("checkout/", views.checkout, name="checkout"),
     path("order-success/", views.order_success, name="order_success"),
-    path("place-order/", views.place_order, name="place_order"),
+    # path("place-order/", views.place_order, name="place_order"),
     path('orders/history/', views.order_history, name='order_history'),
-    path('orders/<int:order_id>/', views.order_detail, name='order_detail')
+    path('orders/<int:order_id>/', views.order_detail, name='order_detail'),
+    path('virtual-try/', views.virtual_try, name='virtual_try'),
+    path("edit-profile/", views.edit_profile, name="edit_profile"),
+    path("profile/", views.profile, name="profile"),
+    path("change-password/", views.change_password, name="change_password"),
+    path('forgot-password/', views.forgot_password, name='forgot_password'),
+  
 
 
 ]

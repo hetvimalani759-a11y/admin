@@ -5,9 +5,47 @@
 
 <link rel="stylesheet" href="{% static 'delivery/style.css' %}">
 
+<!-- SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- ✅ MESSAGE BLOCK ADD KARO -->
+{% if messages %}
+    {% for message in messages %}
+        {% if "profile" in message.tags %}
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '{{ message }}',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
 
 <!-- Profile Card -->
 <div class="card">
+    
+    <div class="profile-image-wrapper">
+    
+        <div class="profile-ring">
+            {% if delivery_person.profile_image %}
+                <img src="{{ delivery_person.profile_image.url }}"
+                     class="profile-img"
+                     alt="Profile">
+            {% else %}
+                <img src="{% static 'delivery/default.png' %}"
+                     class="profile-img"
+                     alt="Profile">
+            {% endif %}
+             
+            <span class="status-dot"></span>
+        </div>
+
+    </div>
+
     <div class="profile-row">
         <span>Username:</span>
         <p>{{ request.user.username }}</p>
@@ -32,6 +70,7 @@
         <span>Joined:</span>
         <p>{{ delivery_person.joining_date }}</p>
     </div>
+
 </div>
 
 {% endblock %}

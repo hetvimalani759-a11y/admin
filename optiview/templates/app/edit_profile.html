@@ -1,0 +1,77 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-container">
+    <div class="profile-card">
+
+        <h3 class="text-center mb-4">Edit Profile</h3>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Image -->
+            <div class="profile-image">
+                {% if profile.profile_image %}
+                    <img src="{{ profile.profile_image.url }}">
+                {% else %}
+                    <img src="{% static 'images/default-user.png' %}">
+                {% endif %}
+
+                <input type="file" name="profile_image" class="form-control mt-3">
+            </div>
+
+            <div class="form-section">
+
+                <label>First Name</label>
+                <input type="text" name="first_name"
+                       value="{{ user.first_name }}"
+                       class="form-control custom-input">
+
+                <label>Last Name</label>
+                <input type="text" name="last_name"
+                       value="{{ user.last_name }}"
+                       class="form-control custom-input">
+                
+                <label>User Name</label>
+                <input type="text" name="user_name"
+                       value="{{ user.user_name }}"
+                       class="form-control custom-input">
+
+
+                <label>Email</label>
+                <input type="email" name="email"
+                       value="{{ user.email }}"
+                       class="form-control custom-input">
+
+                <label>Phone</label>
+                <input type="text"
+                       name="phone"
+                       value="{{ profile.phone }}"
+                       maxlength="10"
+                       class="form-control custom-input">
+
+            </div>
+
+            <div class="profile-buttons mt-4">
+                
+                <a href="{% url 'profile' %}" class="btn-light-custom">
+                    Save Changes
+                </a>
+
+                <a href="{% url 'profile' %}" class="btn-light-custom">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
