@@ -1,50 +1,66 @@
- 
 {% load static %}
+
 <!DOCTYPE html>
+
 <html>
 <head>
     <title>Delivery Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <link rel="stylesheet" href="{% static 'delivery/css/dashboard.css' %}">
+
+<!-- Sweet Alert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="{% static 'delivery/css/dashboard.css' %}">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
 </head>
+
 <body>
+
+<!-- ================= NAVBAR ================= -->
 
 <header class="navbar">
-    
-     <div class="nav-left">
+    <div class="nav-left">
         <h2>🚚 Delivery Dashboard</h2>
-
-     </div>
+    </div>
 </header>
 
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Delivery Dashboard</title>
-    <link rel="stylesheet" href="dashboard.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body>
+<div class="container">
 
 
- 
-<div class="container"></div>
-     
-    <div class="sidebar">
-        <h3></h3>
-        <a class="active"><i class="fa fa-home"></i> Dashboard</a>
-        <a href="{% url 'delivery:my_orders' %}" class="nav-link">  
-         <i class="fa fa-box"></i> My Orders
-         </a>
-        <a><i class="fa fa-sync"></i> Update Status</a>
-        <a><i class="fa fa-user"></i> Profile</a>
-        <a href="{% url 'delivery:delivery_logout' %}" onclick="return confirmLogout();">
-    <i class="fa fa-sign-out-alt"></i> Logout
-</a> 
- <script>
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+
+    <a class="active">
+        <i class="fa fa-home"></i> Dashboard
+    </a>
+
+    <a href="{% url 'delivery:my_orders' %}">
+        <i class="fa fa-box"></i> My Orders
+    </a>
+
+    <a href="{% url 'delivery:update_status' %}">
+        <i class="fa fa-edit"></i> Order Status
+    </a>
+
+    <a href="{% url 'delivery:delivery_profile' %}">
+        <i class="fa fa-user"></i> Profile
+    </a>
+
+    <a href="{% url 'delivery:delivery_logout' %}"
+       onclick="return confirmLogout();">
+        <i class="fa fa-sign-out-alt"></i> Logout
+    </a>
+
+</div>
+
+
+<!-- ================= LOGOUT ALERT ================= -->
+
+<script>
 function confirmLogout() {
     Swal.fire({
         title: 'Are you sure?',
@@ -60,51 +76,16 @@ function confirmLogout() {
             window.location.href = "{% url 'delivery:delivery_logout' %}";
         }
     });
-
-    return false; // 🔥 THIS LINE STOPS DIRECT LOGOUT
+    return false;
 }
 </script>
-     
-    </div>
 
-     
-     <div class="main">
-        <h2>Welcome, {{ user.first_name }} 👋</h2>
-       
- 
-     
-         <div class="cards">
-            <div class="card">
-                <h4>Assigned</h4>
-                <span>0</span>
-            </div>
-            <div class="card green">
-                <h4>Delivered</h4>
-                <span>0</span>
-            </div>
-            <div class="card orange">
-                <h4>Pending</h4>
-                <span>0</span>
-            </div>
-        </div> 
 
-        <!-- TABLE -->
-         <h3>Assigned Orders</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="2" class="empty">🚫 No orders assigned yet</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<!-- ================= CHART JS ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{% static 'delivery/js/dashboard.js' %}"></script>
 
 </body>
-</html> 
+</html>

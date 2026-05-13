@@ -1,14 +1,14 @@
-{% extends 'admin/base.html' %}
+*{% extends "admin/base.html" %}
 {% load static %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'admin/css/add_delivery_person.css' %}">
+<!-- Reuse categories CSS -->
+<link rel="stylesheet" href="{% static 'admin/css/categories.css' %}">
 {% endblock %}
 
 {% block content %}
 
-
-
-<div class="delivery-page">
+<div class="categories-page delivery-page">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="category-form-card">
@@ -37,6 +37,11 @@
                         <input id="phone" type="text" name="phone" required>
                     </div>
 
+                    <div class="form-group">
+                        <label for="joining_date">Joining Date</label>
+                        <input id="joining_date" type="date" name="joining_date" required min="{{ today_date }}">
+                    </div>
+
                     <div class="form-actions">
                         <button type="submit" class="btn-primary w-100">Add</button>
                     </div>
@@ -46,7 +51,4 @@
     </div>
 </div>
 
-<!-- Optional: JS -->
-<script src="{% static 'admin/js/add_delivery_persons.js' %}"></script>
-
-{% endblock %}
+{% endblock %}*

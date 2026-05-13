@@ -1,0 +1,74 @@
+/* Page Layout */
+.cart-page{
+    max-width:700px;
+    margin:50px auto;
+    padding:20px;
+}
+
+/* Title */
+.cart-title{
+    font-size:26px;
+    font-weight:700;
+    margin-bottom:30px;
+    color:#333;
+}
+
+/* Card Layout */
+.cart-layout{
+    display:flex;
+    justify-content:center;
+}
+
+.cart-items{
+    width:100%;
+    background:#ffffff;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* Form Layout */
+.feedback-form{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* Labels */
+.feedback-form label{
+    font-weight:600;
+    color:#444;
+}
+
+/* Inputs */
+.feedback-form input,
+.feedback-form textarea{
+    padding:12px;
+    border:1px solid #ddd;
+    border-radius:8px;
+    font-size:14px;
+    transition:0.3s;
+    outline:none;
+}
+
+/* Focus Effect */
+.feedback-form input:focus,
+.feedback-form textarea:focus{
+    border-color:#198754;
+    box-shadow:0 0 5px rgba(25,135,84,0.3);
+}
+
+/* Button */
+.feedback-form button{
+    padding:12px;
+    font-size:16px;
+    font-weight:600;
+    border-radius:8px;
+    transition:0.3s;
+}
+
+/* Button Hover */
+.feedback-form button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 4px 10px rgba(0,0,0,0.15);
+}

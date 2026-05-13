@@ -81,50 +81,71 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ================= QUANTITY INCREASE =================
-  document.querySelectorAll(".plus-btn").forEach(btn => {
-    btn.addEventListener("click", async function () {
-      const row = this.closest(".cart-row");
-      const itemId = row.dataset.id;
-      const stock = parseInt(this.dataset.stock);
-      const qtyEl = row.querySelector(".qty-number");
-      const currentQty = parseInt(qtyEl.innerText);
+  // ================= QUANTITY INCREASE =================
+document.querySelectorAll(".plus-btn").forEach(btn => {
+  btn.addEventListener("click", async function () {
+    const row = this.closest(".cart-row");
+    const itemId = row.dataset.id;
+    const MAX_QTY = 5;
+    const qtyEl = row.querySelector(".qty-number");
+    const currentQty = parseInt(qtyEl.innerText);
 
-      if (currentQty >= stock) {
-        openStock(`⚠ Only ${stock} items available in stock.`);
-        return;
-      }
+    if (currentQty >= MAX_QTY) {
+      openStock(`⚠ Only ${MAX_QTY} items you can add.`);
+      return;
+    }
 
-      const data = await post(`/cart/increase/${itemId}/`);
-      if (!data?.success) {
-        openStock(data?.message || "Cannot increase quantity.");
-        return;
-      }
+    const data = await post(`/cart/increase/${itemId}/`);
+    if (!data?.success) {
+      openStock(data?.message || "Cannot increase quantity.");
+      return;
+    }
 
-      qtyEl.innerText = data.quantity;
-      updateSummary(data.summary);
-    });
+    qtyEl.innerText = data.quantity;
+    updateSummary(data.summary);
   });
+});
 
+// ================= QUANTITY DECREASE =================
+document.querySelectorAll(".minus-btn").forEach(btn => {
+  btn.addEventListener("click", async function () {
+    const row = this.closest(".cart-row");
+    const itemId = row.dataset.id;
+    const qtyEl = row.querySelector(".qty-number");
+    const currentQty = parseInt(qtyEl.innerText);
+
+    if (currentQty === 1) {
+      openConfirm(itemId);
+      return;
+    }
+
+    const data = await post(`/cart/decrease/${itemId}/`);
+    if (!data?.success) return;
+
+    qtyEl.innerText = data.quantity;
+    updateSummary(data.summary);
+  });
+});
   // ================= QUANTITY DECREASE =================
-  document.querySelectorAll(".minus-btn").forEach(btn => {
-    btn.addEventListener("click", async function () {
-      const row = this.closest(".cart-row");
-      const itemId = row.dataset.id;
-      const qtyEl = row.querySelector(".qty-number");
-      const currentQty = parseInt(qtyEl.innerText);
+  // document.querySelectorAll(".minus-btn").forEach(btn => {
+  //   btn.addEventListener("click", async function () {
+  //     const row = this.closest(".cart-row");
+  //     const itemId = row.dataset.id;
+  //     const qtyEl = row.querySelector(".qty-number");
+  //     const currentQty = parseInt(qtyEl.innerText);
 
-      if (currentQty === 1) {
-        openConfirm(itemId);
-        return;
-      }
+  //     if (currentQty === 1) {
+  //       openConfirm(itemId);
+  //       return;
+  //     }
 
-      const data = await post(`/cart/decrease/${itemId}/`);
-      if (!data?.success) return;
+  //     const data = await post(`/cart/decrease/${itemId}/`);
+  //     if (!data?.success) return;
 
-      qtyEl.innerText = data.quantity;
-      updateSummary(data.summary);
-    });
-  });
+  //     qtyEl.innerText = data.quantity;
+  //     updateSummary(data.summary);
+  //   });
+  // });
 
   // ================= REMOVE BUTTON =================
   document.querySelectorAll(".remove-btn").forEach(btn => {

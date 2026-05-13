@@ -9,79 +9,119 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Bootstrap Icons -->
+    <!-- Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
-    <!-- Chart.js -->
+    <!-- Chart -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Custom CSS -->
+    <!-- Custom -->
     <link rel="stylesheet" href="{% static 'admin/css/style.css' %}">
 
-    <style>
-        body {
-            overflow-x: hidden;
-        }
-
-        /* ===== Sidebar default (light mode) ===== */
-.sidebar {
-    background-color: #ffffff; /* light sidebar */
-    color: #333;
-    transition: background-color 0.3s, color 0.3s;
+<style>
+/* ===== GLOBAL ===== */
+body {
+    overflow-x: hidden;
 }
 
-/* Sidebar links */
+/* ===== NAVBAR ===== */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    z-index: 1000;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+    width: 250px;
+    height: calc(100vh - 60px);
+    position: fixed;
+    top: 60px;
+    left: 0;
+    overflow-y: auto;
+    background: #fff;
+    transition: 0.3s;
+}
+
+/* Dark Mode Sidebar */
+body.dark-mode .sidebar {
+    background: #000829;
+    color: #f1f1f1;
+}
+
+/* Sidebar Links */
 .sidebar .nav-link {
     color: #333;
-}
-
-.sidebar .nav-link:hover {
-    background-color: #f0f0f0;
-}
-
-/* ===== Dark mode sidebar ===== */
-body.dark-mode .sidebar {
-    background-color:#000829; /* dark sidebar */
-    color: #f1f1f1;
 }
 
 body.dark-mode .sidebar .nav-link {
     color: #f1f1f1;
 }
 
-body.dark-mode .sidebar .nav-link:hover {
-    background-color: #2a2a3c;
+.sidebar .nav-link:hover {
+    background: #f0f0f0;
 }
 
-/* ===== Adjust main content so sidebar doesn’t cover navbar ===== */
+body.dark-mode .sidebar .nav-link:hover {
+    background: #2a2a3c;
+}
 
+/* Submenu */
+.sidebar .submenu .nav-link {
+    font-size: 14px;
+    padding-left: 35px;
+    color: #cbd5e1 !important;
+}
 
-        .sidebar .submenu .nav-link {
-            font-size: 14px;
-            padding-left: 35px;
-        }
+.sidebar .submenu .nav-link:hover {
+    background: #2d3b4f;
+    color: #fff !important;
+}
 
-        .content-area {
-            min-height: 100vh;
-        }
+.sidebar .submenu .nav-link.active {
+    background: #fff;
+    color: #1f2a38 !important;
+    font-weight: 600;
+}
 
-        .navbar-brand {
-            font-size: 20px;
-            letter-spacing: 1px;
-        }
+/* ===== CONTENT ===== */
+.content-area {
+    margin-top: 60px;
+    margin-left: 250px;
+    min-height: 100vh;
+    transition: 0.3s;
+}
 
-        .badge-notify {
-            font-size: 10px;
-        }
-    </style>
+/* Sidebar Hidden */
+.sidebar.hide {
+    margin-left: -250px;
+}
 
-    {% block extra_css %}{% endblock %}
+.content-area.full {
+    margin-left: 0;
+}
+
+/* ===== SMALL FIX ===== */
+.badge-notify {
+    font-size: 10px;
+}
+
+.navbar-brand {
+    font-size: 20px;
+}
+</style>
+
+{% block extra_css %}{% endblock %}
 </head>
 
 <body>
 
 <!-- ================= NAVBAR ================= -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm px-4">
+<nav class="navbar navbar-dark bg-dark shadow-sm px-4">
+
     <div class="d-flex align-items-center">
         <button class="btn btn-outline-light me-3" id="sidebarToggle">
             <i class="bi bi-list"></i>
@@ -94,35 +134,50 @@ body.dark-mode .sidebar .nav-link:hover {
 
     <div class="ms-auto d-flex align-items-center gap-3">
 
-        <!-- Notification -->
-        <a href="{% url 'adminpanel:notifications' %}" 
-           class="btn btn-outline-light position-relative">
-            <i class="bi bi-bell"></i>
-            {% if unread_count > 0 %}
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger badge-notify">
-                {{ unread_count }}
-            </span>
-            {% endif %}
-        </a>
+        <!-- Notifications -->
+        <div class="dropdown">
+            <button class="btn btn-outline-light position-relative" data-bs-toggle="dropdown">
+                <i class="bi bi-bell"></i>
 
-        <!-- Dark Mode -->
+                {% if unread_count > 0 %}
+                <span class="position-absolute top-0 start-100 translate-middle badge bg-danger badge-notify">
+                    {{ unread_count }}
+                </span>
+                {% endif %}
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+                <li>
+                    <a class="dropdown-item" href="{% url 'adminpanel:add_notification' %}">
+                        Add Notification
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'adminpanel:notifications' %}">
+                        View All
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Theme -->
         <button id="themeToggle" class="btn btn-outline-light">
-    <i id="moonIcon" class="bi bi-moon"></i>
-    <i id="sunIcon" class="bi bi-sun"></i>
-</button>
-
+            <i id="moonIcon" class="bi bi-moon"></i>
+            <i id="sunIcon" class="bi bi-sun"></i>
+        </button>
 
         <!-- Profile -->
         <div class="dropdown">
             <button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
                 <i class="bi bi-person-circle"></i> {{ user.username }}
             </button>
+
             <ul class="dropdown-menu dropdown-menu-end shadow">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'adminpanel:admin_profile' %}">Profile</a></li>
+                <li><hr></li>
                 <li>
                     <a class="dropdown-item text-danger" href="{% url 'adminpanel:logout' %}">
-                        <i class="bi bi-box-arrow-right"></i> Logout
+                        Logout
                     </a>
                 </li>
             </ul>
@@ -131,96 +186,172 @@ body.dark-mode .sidebar .nav-link:hover {
     </div>
 </nav>
 
-<!-- ================= LAYOUT ================= -->
-<div class="d-flex">
+<!-- ================= SIDEBAR ================= -->
+<aside class="sidebar shadow-sm p-3" id="sidebar">
+<ul class="nav flex-column">
 
-    <!-- ================= SIDEBAR ================= -->
-    <aside class="sidebar bg shadow-sm p-3" id="sidebar">
+<!-- (ALL YOUR MENU ITEMS SAME — NO CHANGE) -->
 
-        <ul class="nav flex-column">
-
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'adminpanel:dashboard' %}">
-                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#productMenu">
-                    <i class="bi bi-box-seam me-2"></i> Products
-                </a>
-                <div class="collapse submenu" id="productMenu">
-                    <a class="nav-link" href="{% url 'adminpanel:product_list' %}">All Products</a>
-                    <a class="nav-link" href="{% url 'adminpanel:add_product' %}">Add Product</a>
-                    <a class="nav-link" href="{% url 'adminpanel:add_category' %}">Categories</a>
-                    <a class="nav-link" href="{% url 'adminpanel:add_subcategory' %}">Subcategories</a>
-                </div>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'adminpanel:lens_list' %}">
-                    <i class="bi bi-circle-square me-2"></i> Lenses
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'adminpanel:order_list' %}">
-                    <i class="bi bi-bag-check me-2"></i> Orders
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#offerMenu">
-                    <i class="bi bi-tags me-2"></i> Offers
-                </a>
-                <div class="collapse submenu" id="offerMenu">
-                    <a class="nav-link" href="{% url 'adminpanel:offer_list' %}">All Offers</a>
-                    <a class="nav-link" href="{% url 'adminpanel:create_offer' %}">Create Offer</a>
-                </div>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'adminpanel:delivery_person_list' %}">
-                    <i class="bi bi-truck me-2"></i> Delivery Persons
-                </a>
-            </li>
-
-            <hr>
-
-            <li class="nav-item">
-                <a class="nav-link text-danger" href="{% url 'adminpanel:logout' %}">
-                    <i class="bi bi-box-arrow-right me-2"></i> Logout
-                </a>
-            </li>
-
-        </ul>
-    </aside>
-
-    <!-- ================= CONTENT ================= -->
-    <main class="flex-fill p-4 bg- content-area">
-        {% block content %}{% endblock %}
-    </main>
-
-</div>
-
-<!-- ================= MESSAGE MODAL ================= -->
-{% if messages %}
-<div class="modal fade" id="notificationModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content shadow">
-      <div class="modal-header">
-        <h5 class="modal-title">System Message</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
+<li class="nav-item">
+    <a class="nav-link" data-bs-toggle="collapse" href="#dashboardMenu">
+        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+    </a>
+    <div class="collapse submenu" id="dashboardMenu">
+        <a class="nav-link" href="{% url 'adminpanel:dashboard' %}">Dashboard Home</a>
+        <a class="nav-link" href="{% url 'adminpanel:add_dashboard_image' %}">Add Dashboard Image</a>
     </div>
-  </div>
+</li>
+<li class="nav-item">
+    <a class="nav-link" data-bs-toggle="collapse" href="#productMenu">
+        <i class="bi bi-box-seam me-2"></i> Products
+    </a>
+    <div class="collapse submenu" id="productMenu">
+        <a class="nav-link" href="{% url 'adminpanel:product_list' %}">All Products</a>
+        <a class="nav-link" href="{% url 'adminpanel:add_product' %}">Add Product</a>
+        <a class="nav-link" href="{% url 'adminpanel:add_category' %}">Categories</a>
+        <a class="nav-link" href="{% url 'adminpanel:add_subcategory' %}">Subcategories</a>
+        <a class="nav-link" href="{% url 'adminpanel:frame_type_list' %}">Frame Types</a>
+        <a class="nav-link" href="{% url 'adminpanel:add_frame_type' %}">Add Frame Type</a>
+        <a class="nav-link" href="{% url 'adminpanel:frame_shape_list' %}">Frame Shapes</a>
+        <a class="nav-link" href="{% url 'adminpanel:add_frame_shape' %}">Add Frame Shape</a>
+         <a class="nav-link" href="{% url 'adminpanel:add_material' %}">Add Material</a>
+          
+
+    </div>
+</li>
+       <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="collapse" href="#productSettingsMenu">
+        <i class="bi bi-palette me-2"></i> Product Settings
+    </a>
+    <div class="collapse submenu" id="productSettingsMenu">
+        <a class="nav-link" href="{% url 'adminpanel:add_brand' %}">Brands</a>
+        <a class="nav-link" href="{% url 'adminpanel:add_color_page' %}">Colors</a>
+    </div>
+</li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'adminpanel:lens_list' %}">
+                <i class="bi bi-circle-square me-2"></i> Lenses
+            </a>
+        </li>
+        <li class="nav-item">
+    <a class="nav-link" href="{% url 'adminpanel:reports' %}">
+        <i class="bi bi-file-earmark-bar-graph me-2"></i> Reports
+    </a>
+</li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'adminpanel:orders_list' %}">
+                <i class="bi bi-bag-check me-2"></i> Orders
+            </a>
+        </li>
+        
+
+        <!-- Offers Menu -->
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="collapse" href="#offerMenu">
+                <i class="bi bi-tags me-2"></i> Offers
+            </a>
+            <div class="collapse submenu" id="offerMenu">
+                <a class="nav-link" href="{% url 'adminpanel:offer_list' %}">All Offers</a>
+                <a class="nav-link" href="{% url 'adminpanel:create_offer' %}">Create Offer</a>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'adminpanel:review_list' %}">
+                <i class="bi bi-chat-dots me-2"></i> Reviews
+            </a>  
+        </li>
+
+        <!-- Delivery Persons -->
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'adminpanel:delivery_person_list' %}">
+                <i class="bi bi-truck me-2"></i> Delivery Persons
+            </a>
+            <div class="collapse submenu">
+                <a class="nav-link" href="{% url 'adminpanel:delivery_person_add' %}">Add Delivery Person</a>
+            </div>
+        </li>
+
+        <li class="nav-item">
+    <a class="nav-link" data-bs-toggle="collapse" href="#purchaseMenu">
+        <i class="bi bi-cart-plus me-2"></i> Purchases
+    </a>
+
+    <div class="collapse submenu" id="purchaseMenu">
+        <a class="nav-link" href="{% url 'adminpanel:purchase_list' %}">
+            All Purchases
+        </a>
+
+        <a class="nav-link" href="{% url 'adminpanel:add_purchase' %}">
+            Add Purchase
+        </a>
+
+        <a class="nav-link" href="{% url 'adminpanel:stock_report' %}">
+            Stock Report
+        </a>
+
+        <a class="nav-link" href="{% url 'adminpanel:profit_report' %}">
+            Profit Report
+        </a>
+        <a class="nav-link" href="{% url 'adminpanel:dealer_list' %}">
+            Dealers </a>
+        <a class="nav-link" href="{% url 'adminpanel:add_dealer' %}">
+            Add Dealer</a>
+        <a class="nav-link" href="{% url 'adminpanel:purchase_return_list' %}">
+            Purchase Returns</a>   
+        <a class="nav-link" href="{% url 'adminpanel:add_purchase_return' %}">
+            Add Purchase Return</a>
+        <a class="nav-link" href="{% url 'adminpanel:low_stock_products' %}">
+            Low Stock Items
+        </a>
+    </div>
+</li>
+
+        <!-- Complaints -->
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'adminpanel:complaints_list' %}">
+               <i class="bi bi-exclamation-triangle me-2"></i> Complaints
+            </a>
+        </li>
+       
+
+        
+           
+        <hr>
+        <!-- Logout -->
+        <li class="nav-item">
+            <a class="nav-link text-danger" href="{% url 'adminpanel:logout' %}">
+                <i class="bi bi-box-arrow-right me-2"></i> Logout
+            </a>
+        </li>
+
+
+</ul>
+</aside>
+
+<!-- ================= CONTENT ================= -->
+<main class="content-area p-4" id="contentArea">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ================= MODAL ================= -->
+{% if messages %}
+<div class="modal fade" id="notificationModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow">
+            <div class="modal-header">
+                <h5>System Message</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -235,7 +366,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
 document.getElementById("sidebarToggle").addEventListener("click", function() {
-    document.getElementById("sidebar").classList.toggle("d-none");
+    document.getElementById("sidebar").classList.toggle("hide");
+    document.getElementById("contentArea").classList.toggle("full");
 });
 </script>
 

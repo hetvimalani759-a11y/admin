@@ -10,7 +10,25 @@
   padding: 22px;
   box-shadow: var(--card-shadow);
 }
+.images-container div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
 
+.preview-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+input[type="file"] {
+    border: none;
+    background: transparent;
+}
 .category-heading {
   font-size: 18px;
   font-weight: 600;

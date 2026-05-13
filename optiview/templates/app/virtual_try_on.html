@@ -1,0 +1,282 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+.virtual-try-on {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    margin: 40px auto;
+    max-width: 500px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.toggle-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.toggle-buttons button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #4f46e5;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.toggle-buttons button:hover {
+    background-color: #3730a3;
+}
+
+#video, #capturedCanvas {
+    width: 100%;
+    max-width: 350px;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+form button[type="submit"], #retakeBtn {
+    margin-top: 15px;
+    padding: 12px 25px;
+    border: none;
+    background-color: #10b981;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+form button[type="submit"]:hover, #retakeBtn:hover {
+    background-color: #059669;
+}
+
+#gallerySection input[type="file"] {
+    padding: 10px;
+    border-radius: 6px;
+    border: 2px dashed #ccc;
+    cursor: pointer;
+    width: 100%;
+    max-width: 300px;
+}
+
+#capturedCanvas {
+    display: block;
+    margin-top: 15px;
+}
+
+.images-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.image-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.image-box img {
+    max-width: 300px;
+    border-radius: 12px;
+    border: 2px solid #ccc;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.image-box span {
+    margin-top: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    color: #333;
+}
+
+.image-box button {
+    margin-top: 8px;
+    padding: 8px 18px;
+    border: none;
+    background-color: #4f46e5;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.image-box button:hover {
+    background-color: #3730a3;
+}
+
+@media (max-width: 400px) {
+    .toggle-buttons {
+        flex-direction: column;
+    }
+
+    #video, #capturedCanvas, .image-box img {
+        max-width: 90%;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="virtual-try-on">
+    <h2>👓 Virtual Try-On</h2>
+
+    <div class="toggle-buttons">
+        <button type="button" id="useCameraBtn">Use Camera</button>
+        <button type="button" id="useGalleryBtn">Upload from Gallery</button>
+    </div>
+
+    <form id="tryOnForm" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Camera Section -->
+        <div id="cameraSection" style="display:none;">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="capturedCanvas" style="display:none;"></canvas>
+            <button type="button" id="snap">Capture Photo</button>
+        </div>
+
+        <!-- Gallery Section -->
+        <div id="gallerySection" style="display:none;">
+            <input type="file" id="fileInput" name="user_image" accept="image/*">
+        </div>
+
+        <button type="submit" id="tryOnBtn" style="margin-top:20px;">Try On Glasses</button>
+        <button type="button" id="retakeBtn" style="margin-top:10px; display:none;">Retake</button>
+    </form>
+
+    {% if result_image %}
+    <div class="images-container">
+        <div class="image-box">
+            <img class="result-image" src="{{ result_image }}" alt="Result Image">
+            <span>With Glasses</span>
+            <a href="{{ result_image }}" download>
+                <button>Download Result</button>
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    <div class="product-list">
+  {% for product in products %}
+    <div class="product-item" onclick="selectProduct('{{ product.id }}')">
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" width="150">
+        <p>{{ product.name }}</p>
+    </div>
+  {% endfor %}
+</div>
+
+<script>
+function selectProduct(productId) {
+    // Store selected product ID to use in try-on
+    console.log("Selected product ID:", productId);
+}
+</script>
+</div>
+
+<script>
+const useCameraBtn = document.getElementById('useCameraBtn');
+const useGalleryBtn = document.getElementById('useGalleryBtn');
+const cameraSection = document.getElementById('cameraSection');
+const gallerySection = document.getElementById('gallerySection');
+const video = document.getElementById('video');
+const capturedCanvas = document.getElementById('capturedCanvas');
+const snapBtn = document.getElementById('snap');
+const fileInput = document.getElementById('fileInput');
+const tryOnBtn = document.getElementById('tryOnBtn');
+const retakeBtn = document.getElementById('retakeBtn');
+
+let stream;
+
+// Toggle camera/gallery
+useCameraBtn.addEventListener('click', () => {
+    cameraSection.style.display = 'block';
+    gallerySection.style.display = 'none';
+    tryOnBtn.style.display = 'block';
+    retakeBtn.style.display = 'none';
+    startCamera();
+});
+
+useGalleryBtn.addEventListener('click', () => {
+    cameraSection.style.display = 'none';
+    gallerySection.style.display = 'block';
+    tryOnBtn.style.display = 'block';
+    retakeBtn.style.display = 'none';
+    stopCamera();
+});
+
+// Start camera
+function startCamera() {
+    if (!stream) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(s => {
+            stream = s;
+            video.srcObject = stream;
+            video.style.display = 'block';
+            capturedCanvas.style.display = 'none';
+            snapBtn.style.display = 'block';
+        })
+        .catch(err => console.warn("Camera not available.", err));
+    }
+}
+
+// Stop camera
+function stopCamera() {
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+}
+
+// Capture photo
+snapBtn.addEventListener('click', () => {
+    capturedCanvas.width = video.videoWidth;
+    capturedCanvas.height = video.videoHeight;
+    const ctx = capturedCanvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, capturedCanvas.width, capturedCanvas.height);
+
+    // Convert to file for form
+    capturedCanvas.toBlob(blob => {
+        const file = new File([blob], "capture.png", { type: "image/png" });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+    }, 'image/png');
+
+    stopCamera();
+
+    // Hide video and capture button, show captured canvas
+    video.style.display = 'none';
+    snapBtn.style.display = 'none';
+    capturedCanvas.style.display = 'block';
+
+    // Show Try On and Retake buttons
+    tryOnBtn.style.display = 'block';
+    retakeBtn.style.display = 'inline-block';
+});
+
+// Hide Try On button when clicked
+tryOnBtn.addEventListener('click', () => {
+    tryOnBtn.style.display = 'none';
+});
+
+// Retake photo
+retakeBtn.addEventListener('click', () => {
+    capturedCanvas.style.display = 'none';
+    retakeBtn.style.display = 'none';
+    tryOnBtn.style.display = 'block';
+    startCamera();
+});
+</script>
+{% endblock %}

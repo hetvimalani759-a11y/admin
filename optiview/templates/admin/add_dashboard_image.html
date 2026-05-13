@@ -1,26 +1,258 @@
+{% extends "admin/base.html" %}
 {% load static %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Dashboard Image</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        form { max-width: 500px; margin: auto; display: flex; flex-direction: column; gap: 10px; }
-        input, textarea { padding: 10px; font-size: 14px; border-radius: 5px; border: 1px solid #ccc; width: 100%; }
-        button { padding: 10px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background-color: #45a049; }
-        h1 { text-align: center; }
-    </style>
-</head>
-<body>
-    <h1>Add Dashboard Image</h1>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="text" name="title" placeholder="Image Title">
-        <textarea name="description" placeholder="Image Description" rows="3"></textarea>
-        <input type="file" name="image" accept="image/*" required>
-        <button type="submit">Add Image</button>
-    </form>
-</body>
-</html>
+{% block extra_css %}
+<style>
+
+/* Page */
+.dashboard-page {
+  padding: 24px;
+}
+
+/* Cards */
+.dashboard-form-card,
+.dashboard-table-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+}
+
+.dashboard-table-card {
+  margin-top: 20px;
+}
+
+/* Heading */
+.dashboard-heading {
+  color: var(--text-main);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* Form */
+.dashboard-form .form-group {
+  margin-bottom: 14px;
+}
+
+.dashboard-form label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* Inputs */
+.dashboard-form input,
+.dashboard-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+/* Fix textarea white issue */
+.dashboard-form textarea {
+  background: var(--bg-main) !important;
+  color: var(--text-main) !important;
+  min-height: 80px;
+}
+
+/* Focus */
+.dashboard-form input:focus,
+.dashboard-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+}
+
+/* Button */
+.btn-primary {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  opacity: .9;
+}
+
+/* Table */
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--card-border);
+  color: var(--text-main);
+}
+
+.dashboard-table thead {
+  background: var(--table-head);
+}
+
+.dashboard-table tbody tr:hover {
+  background: rgba(99, 102, 241, .06);
+}
+
+/* Scroll */
+.table-wrapper {
+  overflow-x: auto;
+}
+
+/* Image */
+.dashboard-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons */
+.btn-edit {
+  background: #eef4ff;
+  color: #2563eb;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-edit:hover {
+  background: #2563eb;
+  color: #fff;
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* Empty */
+.no-data {
+  text-align: center;
+  padding: 18px;
+  color: var(--text-muted);
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- FORM -->
+    <div class="dashboard-form-card">
+        <h4 class="dashboard-heading">Add Dashboard Image</h4>
+
+        <form method="POST" enctype="multipart/form-data" class="dashboard-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label>Image Title</label>
+                <input type="text" name="title" placeholder="Enter title" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" placeholder="Enter description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Upload Image</label>
+                <input type="file" name="image" accept="image/*" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Add Image</button>
+        </form>
+    </div>
+
+    <!-- TABLE -->
+    <div class="dashboard-table-card">
+        <h4 class="dashboard-heading">Dashboard Images</h4>
+
+        <div class="table-wrapper">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Sr No</th>
+                        <th>Image</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for img in images %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+
+                        <td>
+                            {% if img.image %}
+                                <img src="{{ img.image.url }}" class="dashboard-img">
+                            {% endif %}
+                        </td>
+
+                        <td>{{ img.title }}</td>
+
+                        <td title="{{ img.description }}">
+                            {{ img.description|truncatechars:40 }}
+                        </td>
+
+                        <td>
+                            <div class="actions">
+                                <a href="{% url 'adminpanel:edit_dashboard_image' img.id %}" class="btn-edit">Edit</a>
+
+                                <form method="POST" action="{% url 'adminpanel:delete_dashboard_image' img.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn-delete"
+                                        onclick="return confirm('Delete this image?')">
+                                        Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="no-data">No images found</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

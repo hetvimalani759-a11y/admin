@@ -1,0 +1,325 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<style>
+
+/* ===== PAGE ===== */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #e9edf2;
+}
+
+/* ===== TITLE ===== */
+h2 {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 36px;
+    font-weight: 600;
+    color: #3c4454;
+}
+
+/* ===== CONTROL SECTION ===== */
+.controls {
+    text-align: center;
+    margin: 40px 0;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.upload-btn {
+    background: #ffffff;
+    color: #2f6bdc;
+    padding: 14px 28px;
+    border-radius: 10px;
+    border: 1px solid #d6dbe5;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 15px;
+    transition: 0.3s;
+}
+
+.upload-btn:hover {
+    background: #f3f6fb;
+}
+
+.primary-btn {
+    background: linear-gradient(90deg, #2f6bdc, #1c4ed8);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.primary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* ===== RESULTS ===== */
+#results {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 40px;
+    padding: 20px 40px 60px;
+}
+
+.product-card {
+    background: #ffffff;
+    width: 380px;
+    border-radius: 18px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: 0.3s;
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+.product-card canvas {
+    width: 100%;
+    border-radius: 12px;
+}
+
+.product-card p {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 18px 0 10px;
+    color: #3c4454;
+}
+
+.download-btn {
+    background: linear-gradient(90deg, #2c3440, #111827);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+video {
+    display: block;
+    margin: 20px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.capture-btn {
+    margin-top: 15px;
+    background: #22c55e;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+</style>
+
+<h2>{{ product.name }} - Virtual Try-On</h2>
+
+<div class="controls">
+
+    <label for="faceUpload" class="upload-btn">Upload Image</label>
+    <input type="file" id="faceUpload" accept="image/*">
+
+    <button class="primary-btn" onclick="startCamera()">Take Photo</button>
+
+    <br><br>
+
+    <video id="video" width="300" autoplay style="display:none;"></video>
+    <br>
+
+    <button id="captureBtn" class="capture-btn"
+            onclick="capturePhoto()" style="display:none;">
+        Capture
+    </button>
+</div>
+
+<div id="results"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+
+<script>
+
+const resultsDiv = document.getElementById("results");
+const video = document.getElementById("video");
+const captureBtn = document.getElementById("captureBtn");
+
+let faceImage = new Image();
+
+const FIXED_WIDTH = 400;
+const FIXED_HEIGHT = 500;
+
+/* ===== VARIANT IMAGES PASSED FROM VIEW ===== */
+const productImages = [
+    {% for item in variant_images %}
+    {
+        name: "{{ item.name|escapejs }}",
+        image: "{{ item.image }}"
+    },
+    {% endfor %}
+];
+
+/* ===== UPLOAD ===== */
+document.getElementById("faceUpload").addEventListener("change", function(e){
+    const reader = new FileReader();
+
+    reader.onload = function(event){
+        resultsDiv.innerHTML = "<p style='font-size:18px;'>Processing image... ⏳</p>";
+
+        faceImage.onload = detectFace;
+        faceImage.src = event.target.result;
+    };
+
+    reader.readAsDataURL(e.target.files[0]);
+});
+
+/* ===== CAMERA ===== */
+async function startCamera() {
+    video.style.display = "block";
+    captureBtn.style.display = "inline-block";
+
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+}
+
+function capturePhoto() {
+
+    const tempCanvas = document.createElement("canvas");
+    tempCanvas.width = video.videoWidth;
+    tempCanvas.height = video.videoHeight;
+
+    tempCanvas.getContext("2d").drawImage(video, 0, 0);
+
+    resultsDiv.innerHTML = "<p style='font-size:18px;'>Processing image... ⏳</p>";
+
+    faceImage.onload = detectFace;
+    faceImage.src = tempCanvas.toDataURL("image/png");
+
+    video.srcObject.getTracks().forEach(track => track.stop());
+    video.style.display = "none";
+    captureBtn.style.display = "none";
+}
+/* ===== FACE DETECTION ===== */
+function detectFace() {
+
+    const faceMesh = new FaceMesh({
+        locateFile: file =>
+            `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+    });
+
+    faceMesh.setOptions({
+        maxNumFaces: 1,
+        refineLandmarks: true,
+        minDetectionConfidence: 0.8
+    });
+
+    faceMesh.onResults(results => {
+
+    if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+        resultsDiv.innerHTML = `
+            <p style="color:red; font-size:18px;">
+                ❌ Face not detected properly.<br>
+                👉 Please upload a clear front-facing image.
+            </p>
+        `;
+        return;
+    }
+
+    generateImages(results.multiFaceLandmarks[0]);
+});
+
+    faceMesh.send({ image: faceImage });
+}
+
+/* ===== GENERATE TRY-ON IMAGES ===== */
+function generateImages(landmarks) {
+
+    resultsDiv.innerHTML = "";
+
+    const leftEye = landmarks[33];
+    const rightEye = landmarks[263];
+
+    productImages.forEach(product => {
+
+        const canvas = document.createElement("canvas");
+        canvas.width = FIXED_WIDTH;
+        canvas.height = FIXED_HEIGHT;
+        const ctx = canvas.getContext("2d");
+
+        ctx.drawImage(faceImage, 0, 0, FIXED_WIDTH, FIXED_HEIGHT);
+
+        const glasses = new Image();
+        glasses.crossOrigin = "anonymous";
+
+        glasses.onload = function() {
+
+            const x1 = leftEye.x * FIXED_WIDTH;
+            const y1 = leftEye.y * FIXED_HEIGHT;
+            const x2 = rightEye.x * FIXED_WIDTH;
+            const y2 = rightEye.y * FIXED_HEIGHT;
+
+            const centerX = (x1 + x2) / 2;
+            const centerY = (y1 + y2) / 2;
+            const eyeDistance = Math.hypot(x2 - x1, y2 - y1);
+
+            const glassesWidth = eyeDistance * 2.2;
+            const glassesHeight = glassesWidth * (glasses.height / glasses.width);
+            const angle = Math.atan2(y2 - y1, x2 - x1);
+
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.rotate(angle);
+
+            ctx.drawImage(
+                glasses,
+                -glassesWidth/2,
+                -glassesHeight/2,
+                glassesWidth,
+                glassesHeight
+            );
+
+            ctx.restore();
+        };
+
+        glasses.src = product.image;
+
+        const container = document.createElement("div");
+        container.className = "product-card";
+
+        const title = document.createElement("p");
+        title.innerText = product.name;
+
+        const downloadBtn = document.createElement("button");
+        downloadBtn.className = "download-btn";
+        downloadBtn.innerText = "Download Image";
+        downloadBtn.onclick = () => {
+            const link = document.createElement("a");
+            link.download = product.name + ".png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+        };
+
+        container.appendChild(canvas);
+        container.appendChild(title);
+        container.appendChild(downloadBtn);
+        resultsDiv.appendChild(container);
+    });
+}
+
+</script>
+
+{% endblock %}

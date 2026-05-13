@@ -1,36 +1,177 @@
-{% extends 'app/base.html' %}
+{% extends "app/base.html" %}
 {% load static %}
 
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'admin/css/order_detail.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Order #{{ order.id }}</h2>
 
-<h3>Items:</h3>
-<table class="table table-bordered table-hover">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in items %}
-        <tr>
-            <td>{{ order.id }}</td>
-            <td>{{ order.created_at|date:"M d, Y H:i" }}</td>
-            <td>{{ order.status }}</td>
-            <td>{{ item.product.name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>₹{{ item.price }}</td>
-            <td>₹{{ item.total_price }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="custom-order-container">
 
-<a href="{% url 'app:order_history' %} " class="btn ">Back to Order History</a>
+
+<!-- ================= ORDER HEADER ================= -->
+<div class="custom-card header-card">
+    <div class="header-left">
+        <h2>📦 Order #{{ order.id }}</h2>
+        <p><strong>Date:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+        <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+    </div>
+
+    <!-- ORDER STATUS -->
+    <div class="status-badge">
+        {% if order.status == "delivered" %}
+            <span class="badge bg-success">Delivered</span>
+
+        {% elif order.status == "cancelled" %}
+            <span class="badge bg-danger">Cancelled</span>
+
+        {% elif order.status == "partially_delivered" %}
+            <span class="badge bg-info">Partially Delivered</span>
+
+        {% elif order.status == "out_for_delivery" %}
+            <span class="badge bg-warning">Out For Delivery</span>
+
+        {% elif order.status == "accepted" or order.status == "assigned" or item.status == "rejected" %}
+            <span class="badge bg-secondary">Processing</span>
+
+        {% else %}
+            <span class="badge bg-secondary">
+                {{ order.get_status_display }}
+            </span>
+        {% endif %}
+    </div>
+</div>
+
+
+<!-- ================= CUSTOMER INFO ================= -->
+<div class="custom-card">
+    <div class="section-title">👤 Customer Information</div>
+
+    <div class="section-content">
+        <p><strong>Name:</strong> {{ order.full_name|default:order.user.username }}</p>
+        <p><strong>Username:</strong> {{ order.user.username }}</p>
+        <p><strong>Phone:</strong> {{ order.phone }}</p>
+    </div>
+</div>
+
+
+<!-- ================= DELIVERY ADDRESS ================= -->
+<div class="custom-card">
+    <div class="section-title">🚚 Delivery Address</div>
+
+    <div class="section-content">
+        <p>{{ order.address }}</p>
+        <p>{{ order.city }}, {{ order.state }}</p>
+        <p><strong>Pincode:</strong> {{ order.pincode }}</p>
+    </div>
+</div>
+
+
+<!-- ================= ORDER ITEMS ================= -->
+<div class="custom-card">
+    <div class="section-title">🛒 Order Items</div>
+
+    <div class="table-wrapper">
+        <table class="custom-table">
+
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+
+                    <!-- PRODUCT INFO -->
+                    <td>
+                        <strong>{{ item.product.name }}</strong>
+
+                        {% if item.variant %}
+                            <br><small>Color: {{ item.variant.color.name }}</small>
+                        {% endif %}
+
+                        {% if item.lens %}
+                            <br><small>Lens: {{ item.lens.name }}</small>
+                        {% endif %}
+
+                        {% if item.left_eye_power or item.right_eye_power %}
+                            <br>
+                            <small>
+                                Power:
+                                L {{ item.left_eye_power|default:"-" }} |
+                                R {{ item.right_eye_power|default:"-" }}
+                            </small>
+                        {% endif %}
+                    </td>
+
+                    <!-- QUANTITY -->
+                    <td>{{ item.quantity }}</td>
+
+                    <!-- UNIT PRICE -->
+                    <td>₹{{ item.price|floatformat:0 }}</td>
+
+                    <!-- ITEM STATUS -->
+                    <td>
+
+                        {% if item.status == "delivered" %}
+                            <span class="badge bg-success">Delivered</span>
+
+                        {% elif item.status == "cancelled" %}
+                            <span class="badge bg-danger">Cancelled</span>
+
+                        {% elif item.status == "out_for_delivery" %}
+                            <span class="badge bg-warning">Out For Delivery</span>
+
+                        {% elif item.status == "accepted" or item.status == "assigned" or item.status == "rejected" %}
+                            <span class="badge bg-secondary">Processing</span>
+
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                {{ item.get_status_display }}
+                            </span>
+                        {% endif %}
+
+                    </td>
+
+                    <!-- TOTAL -->
+                    <td class="total-col">
+                        ₹{{ item.total_price|floatformat:0 }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty">
+                        No items found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+<!-- ================= GRAND TOTAL ================= -->
+<div class="grand-total-box">
+    💰 Grand Total: ₹{{ order.get_total_amount|floatformat:0 }}
+</div>
+<!-- BACK BUTTON -->
+    <div class="back-btn-wrapper">
+        <a href="{% url 'app:order_history' %}" class="back-btn">
+            ← Back to Orders
+        </a>
+    </div>
+</div>
+</div>
 {% endblock %}

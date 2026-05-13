@@ -18,7 +18,7 @@
     </div>
   </a>
 
-  <a href="{% url 'adminpanel:order_list' %}" class="dash-card purple">
+  <a href="{% url 'adminpanel:orders_list' %}" class="dash-card purple">
     <div class="dash-icon">🛒</div>
     <div>
       <p>Total Orders</p>
@@ -30,7 +30,7 @@
     <div class="dash-icon">💰</div>
     <div>
       <p>Total Revenue</p>
-      <h3>₹{{ total_revenue }}</h3>
+      <h3>₹{{ total_revenue |floatformat:0}}</h3>
     </div>
   </a>
 

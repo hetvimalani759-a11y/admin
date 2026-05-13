@@ -44,7 +44,7 @@
     <h2>Top Categories</h2>
     <div class="three-col-grid">
         {% for category in categories %}
-    <div class="col-box" onclick='redirectToCategory("{{ category.name }}")'>
+        <div class="col-box" onclick="redirectToCategory({{ category.id }})">
         <img src="{{ category.image.url }}" alt="{{ category.name }}">
         <h3>{{ category.name }}</h3>
         <p>Click to view products</p>
@@ -52,10 +52,8 @@
 {% endfor %}
 
 <script>
-function redirectToCategory(categoryName) {
-    // Encode in case name has spaces or special chars
-    const encodedName = encodeURIComponent(categoryName);
-    window.location.href = `/shop/?category=${encodedName}`;
+function redirectToCategory(categoryId) {
+    window.location.href = `/shop/?category=${categoryId}`;
 }
 </script>
 

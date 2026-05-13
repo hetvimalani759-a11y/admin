@@ -1,0 +1,109 @@
+/* PAGE BACKGROUND */
+body {
+    background-color: #eef1f5 !important;
+}
+
+/* MAIN CONTAINER */
+.custom-order-container {
+    max-width: 1100px;
+    margin: 40px auto;
+}
+
+/* CARD STYLE */
+.custom-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* HEADER */
+.header-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* STATUS BADGE */
+.status-badge {
+    background: #3b82f6;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* SECTION TITLE */
+.section-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+/* TABLE */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.custom-table thead {
+    background: #f3f4f6;
+}
+
+.custom-table th,
+.custom-table td {
+    padding: 12px;
+    text-align: left;
+}
+
+.custom-table tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+.total-col {
+    font-weight: 600;
+}
+
+.empty {
+    text-align: center;
+    color: #999;
+}
+
+/* GRAND TOTAL */
+.grand-total-box {
+    background: white;
+    padding: 18px 25px;
+    border-radius: 12px;
+    text-align: right;
+    font-size: 20px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* BACK BUTTON */
+.back-btn-wrapper {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.back-btn {
+    background: #1f2937;
+    color: white;
+    padding: 10px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.back-btn:hover {
+    background: #111827;
+    color: white;
+}

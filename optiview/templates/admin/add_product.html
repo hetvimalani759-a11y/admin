@@ -4,16 +4,14 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'admin/css/add_product.css' %}">
 <style>
-/* Variant Box styling matches Add Category page */
 .variant-box {
     border: 1px solid #444;
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 8px;
     position: relative;
-    background-color: var(--card-bg); /* supports dark/light mode */
+    background-color: var(--card-bg);
 }
-
 .remove-variant {
     position: absolute;
     top: 5px;
@@ -22,7 +20,6 @@
     color: #ff6b6b;
     font-weight: bold;
 }
-
 .category-input, .category-input:focus {
     background-color: var(--input-bg);
     color: var(--text-color);
@@ -32,17 +29,8 @@
     width: 100%;
     box-sizing: border-box;
 }
-
-.btn-primary {
-    background-color: #5b4de0;
-    border: none;
-}
-
-.btn-cancel {
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-}
+.btn-primary { background-color: #5b4de0; border: none; }
+.btn-cancel { background-color: #555; color: #fff; text-align: center; }
 </style>
 {% endblock %}
 
@@ -78,7 +66,8 @@
           <!-- Product Name -->
           <div class="form-group">
             <label>Product Name</label>
-            <input type="text" name="name" class="category-input" required>
+            <input type="text" name="name" id="productName" class="category-input" required>
+            <small id="nameError" style="color:#ff6b6b; display:none;">Product name already exists.</small>
           </div>
 
           <!-- Brand -->
@@ -105,22 +94,38 @@
           </div>
 
           <!-- Gender -->
-          <div class="form-group">
-            <label>Gender</label>
-            <select name="gender" class="category-input" required>
-              <option value="Men">Men</option>
-              <option value="Women">Women</option>
-              <option value="Unisex">Unisex</option>
-            </select>
-          </div>
+          
 
           <!-- Frame Type -->
           <div class="form-group">
             <label>Frame Type</label>
             <select name="frame_type" class="category-input" required>
-              <option value="Full Rim">Full Rim</option>
-              <option value="Half Rim">Half Rim</option>
-              <option value="Rimless">Rimless</option>
+                <option value="">Select Frame Type</option>
+                {% for frame in frame_types %}
+                    <option value="{{ frame.id }}">{{ frame.name }}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <!-- Shape -->
+          <div class="form-group">
+            <label>Shape</label>
+            <select name="frame_shape" class="category-input" required>
+                <option value="">Select Shape</option>
+                {% for shape in frame_shapes %}
+                    <option value="{{ shape.id }}">{{ shape.name }}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <!-- Material -->
+          <div class="form-group">
+            <label>Material</label>
+            <select name="material" class="category-input" required>
+                <option value="">Select Material</option>
+                {% for mat in materials %}
+                    <option value="{{ mat.id }}">{{ mat.name }}</option>
+                {% endfor %}
             </select>
           </div>
 
@@ -135,7 +140,6 @@
             <a href="{% url 'adminpanel:product_list' %}" class="btn-cancel w-100 mt-2 ripple-text">Back</a>
           </div>
         </form>
-
       </div>
     </div>
   </div>
@@ -143,58 +147,159 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'admin/js/add_product.js' %}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+    // ===== Colors array for JS =====
+    const COLORS = [
+        {% for color in colors %}
+        { id: {{ color.id }}, name: "{{ color.name }}" }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    // ===== Category → Subcategory dynamic =====
     const categorySelect = document.getElementById('category');
     const subcategorySelect = document.getElementById('subcategory');
 
-    categorySelect.addEventListener('change', function() {
-        fetch(`/admin-panel/subcategories/${this.value}/`)
+    categorySelect.addEventListener('change', () => {
+        const categoryId = categorySelect.value;
+        subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+        if (!categoryId) return;
+
+        fetch(`/admin-panel/subcategories/${categoryId}/`)
             .then(res => res.json())
             .then(data => {
-                subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
                 data.forEach(sub => {
-                    subcategorySelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
+                    const opt = document.createElement('option');
+                    opt.value = sub.id;
+                    opt.textContent = sub.name;
+                    subcategorySelect.appendChild(opt);
                 });
-            });
+            })
+            .catch(err => console.error('Error loading subcategories:', err));
     });
 
+    // ===== Variant Add/Remove =====
     const addVariantBtn = document.getElementById('addVariantBtn');
     const variantsContainer = document.getElementById('variantsContainer');
     let variantCount = 0;
 
-    addVariantBtn.addEventListener('click', function() {
-        variantCount++;
-        const variantHTML = `
-            <div class="variant-box category-form-card" data-variant="${variantCount}">
-                <span class="remove-variant">✖</span>
-                <div class="form-group">
-                    <label>Color</label>
-                    <select name="variants[${variantCount}][color]" class="category-input" required>
-                        <option value="">Select Color</option>
-                        {% for color in colors %}
-                        <option value="{{ color.id }}">{{ color.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Stock</label>
-                    <input type="number" name="variants[${variantCount}][stock]" class="category-input" required>
-                </div>
-                <div class="form-group">
-                    <label>Images</label>
-                    <input type="file" name="variants[${variantCount}][images][]" multiple class="category-input image-input" required>
-                </div>
-            </div>
-        `;
-        variantsContainer.insertAdjacentHTML('beforeend', variantHTML);
+    // Inside addVariantBtn click listener
+addVariantBtn.addEventListener('click', () => {
+    variantCount++;
+    const variantBox = document.createElement('div');
+    variantBox.classList.add('variant-box');
+    variantBox.dataset.variant = variantCount;
 
-        variantsContainer.querySelector(`[data-variant="${variantCount}"] .remove-variant`)
-            .addEventListener('click', function() {
-                this.parentElement.remove();
-            });
+    let colorOptions = '<option value="">Select Color</option>';
+    COLORS.forEach(c => colorOptions += `<option value="${c.id}">${c.name}</option>`);
+
+    variantBox.innerHTML = `
+        <span class="remove-variant">✖</span>
+        <div class="form-group">
+            <label>Color</label>
+            <select name="variants[${variantCount}][color]" class="category-input" required>
+                ${colorOptions}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Stock</label>
+            <input type="number" name="variants[${variantCount}][stock]" class="category-input" required>
+        </div>
+        <span class="remove-variant">✖</span>
+        <div class="form-group">
+            <label>Images</label>
+            <div class="images-container"></div>
+            <button type="button" class="btn-add-image btn-primary">+ Add Image</button>
+        </div>
+    `;
+
+    // Remove variant
+    variantBox.querySelector('.remove-variant').addEventListener('click', () => variantBox.remove());
+
+    // Add image button logic
+    const addImageBtn = variantBox.querySelector('.btn-add-image');
+    const imagesContainer = variantBox.querySelector('.images-container');
+
+    addImageBtn.addEventListener('click', () => {
+
+    const imageBox = document.createElement('div');
+    imageBox.style.display = "flex";
+    imageBox.style.alignItems = "center";
+    imageBox.style.gap = "8px";
+    imageBox.style.marginTop = "5px";
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.name = `variants[${variantCount}][images][]`;
+    input.classList.add('category-input');
+
+    const cancelBtn = document.createElement('span');
+    cancelBtn.innerHTML = "✖";
+    cancelBtn.style.cursor = "pointer";
+    cancelBtn.style.color = "#ff6b6b";
+    cancelBtn.style.fontWeight = "bold";
+
+    cancelBtn.addEventListener('click', () => {
+        imageBox.remove();
     });
+
+    imageBox.appendChild(input);
+    imageBox.appendChild(cancelBtn);
+
+    imagesContainer.appendChild(imageBox);
+});
+
+    variantsContainer.appendChild(variantBox);
+});
+    // ===== Product Name Validation =====
+    const form = document.getElementById('productForm');
+    const productNameInput = document.getElementById('productName');
+    const nameError = document.getElementById('nameError');
+    let typingTimer;
+    const typingDelay = 500;
+
+    productNameInput.addEventListener('input', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(checkProductName, typingDelay);
+    });
+    productNameInput.addEventListener('keydown', () => clearTimeout(typingTimer));
+
+    async function checkProductName() {
+        const name = productNameInput.value.trim();
+        nameError.style.display = 'none';
+        if (!name) return;
+
+        try {
+            const res = await fetch(`/admin-panel/check-product-name/?name=${encodeURIComponent(name)}`);
+            const data = await res.json();
+            if (data.exists) nameError.style.display = 'block';
+        } catch (err) {
+            console.error('Error checking product name:', err);
+        }
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = productNameInput.value.trim();
+        nameError.style.display = 'none';
+        if (!name) return;
+
+        try {
+            const res = await fetch(`/admin-panel/check-product-name/?name=${encodeURIComponent(name)}`);
+            const data = await res.json();
+            if (data.exists) {
+                nameError.style.display = 'block';
+                productNameInput.focus();
+                return;
+            }
+            form.submit();
+        } catch (err) {
+            console.error('Error checking product name:', err);
+            form.submit();
+        }
+    });
+
 });
 </script>
 {% endblock %}

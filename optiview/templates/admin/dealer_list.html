@@ -1,0 +1,247 @@
+{% extends "admin/base.html" %}
+
+{% block extra_css %}
+<style>
+.dealers-container {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.dealers-card {
+    width: 100%;
+    max-width: 800px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.dealers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.dealers-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.btn-add-dealer {
+    background: var(--primary);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.btn-add-dealer:hover {
+    opacity: .9;
+}
+
+.dealers-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.dealers-table th,
+.dealers-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--card-border);
+    text-align: left;
+    color: var(--text-main);
+}
+
+.dealers-table th {
+    background: var(--table-head);
+}
+
+.dealers-table tbody tr:hover {
+    background: rgba(99,102,241,.06);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit {
+    background: #eef4ff;
+    color: #2563eb;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.btn-edit:hover {
+    background: #2563eb;
+    color: #fff;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+.no-data {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+}
+
+/* ===== MODAL ===== */
+.custom-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.custom-modal.show {
+    display: flex;
+}
+
+.custom-modal-content {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+}
+
+.btn-confirm-delete {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.btn-cancel {
+    background: #e5e7eb;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dealers-container">
+    <div class="dealers-card">
+
+        <div class="dealers-header">
+            <h2>Dealers</h2>
+            <a href="{% url 'adminpanel:add_dealer' %}" class="btn-add-dealer">
+                + Add Dealer
+            </a>
+        </div>
+
+        <table class="dealers-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th style="width:150px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dealer in dealers %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ dealer.name }}</td>
+                    <td>{{ dealer.email }}</td>
+                    <td>{{ dealer.phone }}</td>
+                    <td>{{ dealer.address }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'adminpanel:edit_dealer' dealer.id %}" class="btn-edit">
+                                Edit
+                            </a>
+
+                            <button class="btn-delete"
+                                    onclick="openDeleteModal('{% url 'adminpanel:delete_dealer' dealer.id %}', '{{ dealer.name }}')">
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="no-data">
+                        No Dealers Found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <h3>Delete Dealer</h3>
+        <p id="deleteMessage"></p>
+
+        <form method="POST" id="deleteForm">
+            {% csrf_token %}
+            <button type="submit" class="btn-confirm-delete">
+                Yes, Delete
+            </button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">
+                Cancel
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openDeleteModal(url, name) {
+    document.getElementById("deleteForm").action = url;
+    document.getElementById("deleteMessage").innerText =
+        "Are you sure you want to delete '" + name + "'?";
+    document.getElementById("deleteModal").classList.add("show");
+}
+
+function closeDeleteModal() {
+    document.getElementById("deleteModal").classList.remove("show");
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById("deleteModal");
+    if (event.target === modal) {
+        closeDeleteModal();
+    }
+};
+</script>
+{% endblock %}

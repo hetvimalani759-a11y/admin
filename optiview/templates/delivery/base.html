@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Delivery Dashboard{% endblock %}</title>
+
+    <!-- ✅ Main CSS -->
+    <link rel="stylesheet" href="{% static 'delivery/css/style.css' %}">
+
+    <!-- ✅ Page Specific CSS -->
+    {% block extra_css %}{% endblock %}
+
+    <!-- ✅ Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- ✅ SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+<!-- ================= PAGE CONTENT ================= -->
+<div class="page-content">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- ================= LOGOUT SCRIPT ================= -->
+<script>
+function confirmLogout() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You will be logged out!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#2563eb',
+        confirmButtonText: 'Yes, Logout',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{% url 'delivery:delivery_logout' %}";
+        }
+    });
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,164 @@
+/* ===== PAGE ===== */
+
+.orders-page {
+    padding: 30px;
+    background: #f4f6fb;
+    min-height: 100vh;
+}
+
+.page-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #022551;
+    text-align: center;
+}
+    
+/* ===== TABLE CARD STYLE ===== */
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+}
+
+.orders-table thead {
+    background: linear-gradient(90deg, #0a1966);
+    color: white;
+}
+
+.orders-table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.orders-table td {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    color: #444;
+}
+
+.orders-table tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ===== STATUS STYLE ===== */
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.assigned {
+    background: #fff4e5;
+    color: #d9822b;
+}
+
+.accepted {
+    background: #e6f4ff;
+    color: #1677ff;
+}
+
+.out_for_delivery {
+    background: #f0e6ff;
+    color: #722ed1;
+}
+
+.delivered {
+    background: #e6ffed;
+    color: #1a7f37;
+}
+
+.rejected {
+    background: #ffe6e6;
+    color: #d93025;
+}
+
+/* ===== BUTTON STYLE ===== */
+
+form {
+    margin-top: 8px;
+}
+
+button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: 0.2s ease;
+}
+
+/* Accept */
+button[value="accept"] {
+    background: #1677ff;
+    color: white;
+}
+
+button[value="accept"]:hover {
+    background: #0f5fd8;
+}
+
+/* Reject */
+button[value="reject"] {
+    background: #ff4d4f;
+    color: white;
+}
+
+button[value="reject"]:hover {
+    background: #d9363e;
+}
+
+/* Out for Delivery */
+button[value="out_for_delivery"] {
+    background:#2e6786;
+    color: white;
+}
+
+button[value="out_for_delivery"]:hover {
+    background:#2e6786;
+}
+
+/* Deliver */
+button[value="deliver"] {
+    background: #1a7f37;
+    color: white;
+}
+
+button[value="deliver"]:hover {
+    background: #14662c;
+}
+
+/* ===== NO ORDERS ===== */
+
+.no-orders {
+    text-align: center;
+    padding: 30px;
+    color: #999;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 900px) {
+    .orders-table th,
+    .orders-table td {
+        padding: 10px;
+        font-size: 12px;
+    }
+
+    button {
+        margin-top: 5px;
+        display: block;
+    }
+}

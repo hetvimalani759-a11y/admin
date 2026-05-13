@@ -1,18 +1,129 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/style.css' %}">
 
-<div class="about-center">
-    <h1>Elevate Your Look with our Fashion Forward Eyewear</h1>
+<style>
+/* ===== HERO ===== */
+.about-hero {
+    text-align: center;
+    padding: 80px 20px 40px;
+}
+
+.about-hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #111;
+}
+
+.about-hero p {
+    margin-top: 10px;
+    color: #666;
+}
+
+/* ===== SECTION ===== */
+.about-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    padding: 60px 10%;
+}
+
+.about-section.reverse {
+    flex-direction: row-reverse;
+}
+
+.about-img img {
+    width: 100%;
+    max-width: 450px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.about-content h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.about-content p {
+    color: #555;
+    line-height: 1.7;
+}
+
+/* ===== FEATURES ===== */
+.features {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding: 60px 10%;
+    background: #f8f9fb;
+    flex-wrap: wrap;
+}
+
+.feature-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    text-align: center;
+    width: 250px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card h3 {
+    margin-bottom: 10px;
+}
+
+/* ===== CTA ===== */
+.about-cta {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.about-cta a {
+    padding: 12px 30px;
+    background: #111;
+    color: #fff;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.about-cta a:hover {
+    background: #333;
+}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width: 768px) {
+    .about-section {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO ===== -->
+<div class="about-hero">
+    <h1>Elevate Your Look with Fashion-Forward Eyewear</h1>
+    <p>Designed for style, comfort, and everyday confidence</p>
 </div>
 
-<section class="about-main">
-    <div class="about-left">
-        <img src="{% static 'app/images/product1.jpg' %}">
+<!-- ===== SECTION 1 ===== -->
+<section class="about-section">
+    <div class="about-img">
+        <img src="{% static 'app/images/product1.jpg' %}" alt="Eyewear">
     </div>
 
-
-    <div class="about-right">
+    <div class="about-content">
         <h2>Explore the Latest Eyewear Trends</h2>
         <p>
             Our minimalist eyewear blends simplicity with elegance.
@@ -22,35 +133,44 @@
     </div>
 </section>
 
-<section class="about-main reverse">
-    <div class="about-left">
-        <img src="{% static 'app/images/product2.jpg' %}">
+<!-- ===== SECTION 2 ===== -->
+<section class="about-section reverse">
+    <div class="about-img">
+        <img src="{% static 'app/images/product2.jpg' %}" alt="Eyewear">
     </div>
 
-    <div class="about-right">
+    <div class="about-content">
         <h2>Find the Perfect Pair</h2>
         <p>
-            From bold fashion statements to lightweight sports eyewear,
-            Optiview delivers quality frames designed for every lifestyle.
+            From bold fashion statements to lightweight everyday frames,
+            Optiview delivers quality eyewear designed for every lifestyle.
         </p>
     </div>
 </section>
 
-<section class="feature-section">
-    <div class="feature">
+<!-- ===== FEATURES ===== -->
+<section class="features">
+    <div class="feature-card">
         <h3>Premium Quality</h3>
-        <p>Durable lenses with crystal clarity.</p>
+        <p>Durable frames with crystal clear lenses.</p>
     </div>
 
-    <div class="feature">
+    <div class="feature-card">
         <h3>Modern Design</h3>
-        <p>Trendy frames for every age.</p>
+        <p>Trendy styles crafted for all ages.</p>
     </div>
 
-    <div class="feature">
+    <div class="feature-card">
         <h3>Trusted Brand</h3>
-        <p>Loved by thousands of customers.</p>
+        <p>Loved by thousands of happy customers.</p>
     </div>
 </section>
+
+<!-- ===== CTA ===== -->
+<div class="about-cta">
+    <h2>Discover Your Style Today</h2>
+    <br>
+    <a href="{% url 'app:shop' %}">Shop Now</a>
+</div>
 
 {% endblock %}

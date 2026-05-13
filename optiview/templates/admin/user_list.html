@@ -3,53 +3,203 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'admin/css/users.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}
 
 {% block content %}
 <div class="users-page">
 
   <div class="page-header">
-    <h2 class="ripple-text">👤 Users</h2>
+    <h2>👤 Users Management</h2>
   </div>
 
-  <div class="table-card-wrapper">
-    <div class="table-card">
-      <table class="users-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Staff</th>
-            <th>Active</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for user in users %}
-          <tr>
-            <td>{{ user.id }}</td>
-            <td class="name">{{ user.username }}</td>
-            <td>{{ user.email }}</td>
-            <td>
-              <span class="badge {% if user.is_staff %}yes{% else %}no{% endif %}">
-                {{ user.is_staff|yesno:"Yes,No" }}
-              </span>
-            </td>
-            <td>
-              <span class="badge {% if user.is_active %}yes{% else %}no{% endif %}">
-                {{ user.is_active|yesno:"Yes,No" }}
-              </span>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="5" class="no-data">No users found</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  <!-- 🔍 SEARCH -->
+<div class="search-container">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search users...">
+    <span class="search-icon">🔍</span>
+</div>
+
+
+  <div class="table-card">
+    <table class="users-table" id="usersTable">
+
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">ID ⬍</th>
+          <th onclick="sortTable(1)">User ⬍</th>
+          <th>Email</th>
+          <th>Staff</th>
+          <th>Status</th>
+          <th>Joined</th>
+          <th>Last Login</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for user in users %}
+        <tr>
+
+          <td>{{ user.id }}</td>
+
+          <td>
+            <div class="user-info">
+              <div class="avatar">
+                <!-- {{ user.username|first|upper }} -->
+              </div>
+              {{ user.username }}
+            </div>
+          </td>
+
+          <td>{{ user.email }}</td>
+
+          <td>
+            <span class="badge {% if user.is_staff %}yes{% else %}no{% endif %}">
+              {{ user.is_staff|yesno:"Yes,No" }}
+            </span>
+          </td>
+
+          <td>
+            <span class="badge status" id="status-{{ user.id }}">
+              {{ user.is_active|yesno:"Active,Inactive" }}
+            </span>
+          </td>
+
+          <td>{{ user.date_joined|date:"d M Y" }}</td>
+
+          <td>
+            {% if user.last_login %}
+              {{ user.last_login|date:"d M Y H:i" }}
+            {% else %}
+              Never
+            {% endif %}
+          </td>
+
+          <td>
+            <button class="btn toggle-btn" data-id="{{ user.id }}">
+              Toggle
+            </button>
+
+            <button class="btn delete-btn" data-id="{{ user.id }}">
+              Delete
+            </button>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+
+    </table>
   </div>
 
 </div>
+
+<!-- ✅ ALL JS INSIDE BLOCK -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+  // ✅ GET CSRF TOKEN SAFELY
+  function getCSRFToken() {
+    return document.cookie.split('; ')
+      .find(row => row.startsWith('csrftoken'))
+      ?.split('=')[1];
+  }
+
+  // 🔁 TOGGLE USER
+  document.querySelectorAll(".toggle-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+
+      let userId = this.dataset.id;
+
+      fetch(`/admin-panel/toggle-user/${userId}/`, {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": getCSRFToken()
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById(`status-${userId}`).innerText = data.status;
+      });
+
+    });
+  });
+
+  // ❌ DELETE USER
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", function() {
+
+      let userId = this.dataset.id;
+
+      Swal.fire({
+  title: "Deactivate user?",
+  text: "User will be disabled (not deleted)",
+  icon: "warning",
+  showCancelButton: true,
+  confirmButtonColor: "#e67e22",
+}).then((result) => {
+  if (result.isConfirmed) {
+
+    fetch(`/admin-panel/toggle-user/${userId}/`, {
+      method: "POST",
+      headers: {
+        "X-CSRFToken": getCSRFToken()
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById(`status-${userId}`).innerText = data.status;
+    });
+
+  }
+});
+
+    });
+  });
+
+  // 🔍 LIVE SEARCH
+  document.getElementById("searchInput").addEventListener("keyup", function() {
+    let value = this.value.toLowerCase();
+    let rows = document.querySelectorAll("#usersTable tbody tr");
+
+    rows.forEach(row => {
+      row.style.display = row.innerText.toLowerCase().includes(value) ? "" : "none";
+    });
+  });
+
+});
+
+// 📊 SORTING
+function sortTable(n) {
+  let table = document.getElementById("usersTable");
+  let rows = Array.from(table.rows).slice(1);
+  let asc = table.classList.toggle("asc");
+
+  rows.sort((a, b) => {
+
+    let x = a.cells[n].innerText.trim();
+    let y = b.cells[n].innerText.trim();
+
+    // ✅ If sorting ID column (index 0) → NUMBER SORT
+    if (n === 0) {
+      return asc ? Number(x) - Number(y) : Number(y) - Number(x);
+    }
+
+    // ✅ If sorting USERNAME column (index 1) → ALPHABET SORT
+    if (n === 1) {
+      return asc 
+        ? x.localeCompare(y) 
+        : y.localeCompare(x);
+    }
+
+    // 🔁 Default (for other columns)
+    return asc 
+      ? x.localeCompare(y) 
+      : y.localeCompare(x);
+  });
+
+  rows.forEach(row => table.appendChild(row));
+}
+</script>
+
 {% endblock %}

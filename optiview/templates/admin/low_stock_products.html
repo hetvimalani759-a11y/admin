@@ -13,40 +13,69 @@
 {% block content %}
 <div class="low-stock-page">
   <div class="low-stock-card">
-    <h2 class="page-title ripple-text">📉 Low Stock Products</h2>
+    <h2 class="page-title ripple-text">
+      📉 Low Stock Variants (Threshold: {{ low_stock_threshold }})
+    </h2>
 
     <div class="content-grid" style="display:flex; gap:2rem; flex-wrap:wrap;">
-      <!-- Table -->
+
+      <!-- TABLE -->
       <div class="table-card" style="flex:1 1 300px;">
         <table class="stock-table" border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse: collapse;">
           <thead>
             <tr>
               <th>#</th>
               <th>Product</th>
+              <th>Color</th>
               <th>Stock</th>
             </tr>
           </thead>
           <tbody>
-{% for p in low_stock_products %}
-<tr>
-  <td>{{ forloop.counter }}</td>
-  <td>{{ p.name }}</td>
-  <td class="{% if p.stock <= low_stock_threshold %}stock-low{% endif %}">{{ p.stock }}</td>
-</tr>
-{% empty %}
-<tr>
-  <td colspan="3">No low stock products!</td>
-</tr>
-{% endfor %}
-</tbody>
 
+          {% for v in low_stock_variants %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+
+            <td>{{ v.product.name }}</td>
+
+            <td>
+              {% if v.color.code %}
+                <span style="
+                  display:inline-block;
+                  width:12px;
+                  height:12px;
+                  border-radius:50%;
+                  background:{{ v.color.code }};
+                  margin-right:5px;">
+                </span>
+              {% endif %}
+              {{ v.color.name }}
+            </td>
+
+            <td class="{% if v.stock <= low_stock_threshold %}stock-low{% endif %}" >
+              {% if v.stock == 0 %}
+                Out of Stock
+              {% else %}
+                {{ v.stock }}
+              {% endif %}
+            </td>
+          </tr>
+
+          {% empty %}
+          <tr>
+            <td colspan="4">No low stock variants!</td>
+          </tr>
+          {% endfor %}
+
+          </tbody>
         </table>
       </div>
 
-      <!-- Chart -->
+      <!-- CHART -->
       <div class="chart-card" style="flex:1 1 300px;">
         <canvas id="lowStockChart"></canvas>
       </div>
+
     </div>
   </div>
 </div>
@@ -60,7 +89,11 @@ const labels = JSON.parse(document.getElementById('lowStockLabels').textContent)
 const values = JSON.parse(document.getElementById('lowStockData').textContent);
 const lowStockThreshold = {{ low_stock_threshold }};
 
-const backgroundColors = values.map(v => v <= lowStockThreshold ? 'rgba(220,53,69,0.7)' : 'rgba(0,123,255,0.7)');
+const backgroundColors = values.map(v => {
+  if (v === 0) return 'rgba(0,0,0,0.7)';
+  if (v <= lowStockThreshold) return 'rgba(220,53,69,0.7)';
+  return 'rgba(0,123,255,0.7)';
+});
 
 new Chart(document.getElementById('lowStockChart'), {
   type: 'bar',

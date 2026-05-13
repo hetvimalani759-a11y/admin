@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* ===== PAGE ===== */
+.profit-page {
+    padding: 24px;
+}
+
+/* ===== CARD ===== */
+.profit-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: var(--card-shadow);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* ===== HEADINGS ===== */
+.profit-page h2 {
+    color: var(--text-main);
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* ===== TOTALS ===== */
+.profit-item {
+    font-size: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-main);
+}
+
+.profit-item span.amount {
+    font-weight: 600;
+}
+
+/* ===== PROFIT HIGHLIGHT ===== */
+.profit-item.profit span.amount {
+    color: #16a34a; /* green */
+    font-size: 18px;
+}
+
+.profit-item.loss span.amount {
+    color: #dc2626; /* red */
+    font-size: 18px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profit-page">
+    <div class="profit-card">
+        <h2>Profit Report</h2>
+
+        <div class="profit-item">
+            <span>Total Purchase Cost:</span>
+            <span class="amount">₹{{ total_purchase }}</span>
+        </div>
+
+        <div class="profit-item">
+            <span>Current Stock Selling Value:</span>
+            <span class="amount">₹{{ total_stock_value }}</span>
+        </div>
+
+        <div class="profit-item {% if estimated_profit < 0 %}loss{% else %}profit{% endif %}">
+            <span>Estimated Profit:</span>
+            <span class="amount">₹{{ estimated_profit }}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

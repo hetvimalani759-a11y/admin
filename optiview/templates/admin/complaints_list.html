@@ -1,0 +1,194 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+
+<style>
+
+/* PAGE */
+.complaints-page {
+    padding: 20px;
+}
+
+/* TITLE */
+.page-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* CARD CONTAINER */
+.table-card {
+    background: var(--card-bg, #ffffff);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow-x: auto;
+}
+
+/* TABLE */
+.complaints-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* HEADER */
+.complaints-table thead {
+    background: #f5f5f5;
+}
+
+.complaints-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+}
+
+/* BODY */
+.complaints-table td {
+    padding: 12px;
+    border-top: 1px solid #eee;
+}
+
+/* ROW HOVER */
+.complaints-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* STATUS */
+.status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* STATUS COLORS */
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-resolved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* BUTTON */
+.view-btn {
+    background: #1a73e8;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.view-btn:hover {
+    background: #1558b0;
+}
+
+/* EMPTY */
+.empty {
+    text-align: center;
+    padding: 15px;
+    color: gray;
+}
+
+/* DARK MODE */
+body.dark-mode .table-card {
+    background: #1f2937;
+    color: #f9fafb;
+}
+
+body.dark-mode .complaints-table thead {
+    background: #374151;
+}
+
+body.dark-mode .complaints-table tbody tr:hover {
+    background: #273549;
+}
+
+body.dark-mode .complaints-table td {
+    border-top: 1px solid #374151;
+}
+
+</style>
+
+
+<div class="complaints-page">
+
+    <h2 class="page-title">📢 Customer Complaints</h2>
+
+    <div class="table-card">
+
+        <table class="complaints-table">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Order</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for c in complaints %}
+            <tr>
+
+                <td>#{{ c.id }}</td>
+
+                <td>
+                    {{ c.user.username|default:"Guest" }}
+                </td>
+
+                <td>
+                    #{{ c.order_item.order.id }}
+                </td>
+
+                <td>
+                    {{ c.reason }}
+                </td>
+
+                <td>
+                    <span class="status status-{{ c.status }}">
+                        {{ c.status }}
+                    </span>
+                </td>
+
+                <td>
+                    <a href="{% url 'adminpanel:complaint_detail' c.id %}" class="view-btn">
+                        View
+                    </a>
+                </td>
+
+                <td>
+                    {{ c.created_at }}
+                </td>
+
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="7" class="empty">
+                    No complaints found
+                </td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

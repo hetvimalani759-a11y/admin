@@ -29,7 +29,7 @@
           {% for r in monthly_revenue %}
           <tr>
             <td>{{ r.month|date:"F Y" }}</td>
-            <td class="price">₹{{ r.total }}</td>
+            <td class="price">₹{{ r.total |floatformat:0}}</td>
           </tr>
           {% empty %}
           <tr>

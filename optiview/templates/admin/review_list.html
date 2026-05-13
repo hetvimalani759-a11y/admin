@@ -1,0 +1,153 @@
+{% extends "admin/base.html" %}
+
+{% block extra_css %}
+
+<style>
+.reviews-container {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.reviews-card {
+    width: 100%;
+    max-width: 1000px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.reviews-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.reviews-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.reviews-table th,
+.reviews-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--card-border);
+    text-align: left;
+    color: var(--text-main);
+}
+
+.reviews-table th {
+    background: var(--table-head);
+}
+
+.reviews-table tbody tr:hover {
+    background: rgb(229, 229, 229);
+}
+/* ⭐ STAR RATING */
+.review-stars{
+    font-size:18px;
+}
+
+.star{
+    color:#000000;   /* empty star grey */
+}
+
+.star.filled{
+    color:#facc15;   /* yellow star */
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+.no-data {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="reviews-container">
+    <div class="reviews-card">
+
+
+    <div class="reviews-header">
+        <h2>Customer Reviews</h2>
+    </div>
+
+    <table class="reviews-table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>User</th>
+                <th>Product</th>
+                <th>Rating</th>
+                <th>Comment</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for review in reviews %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ review.user.username }}</td>
+                <td>{{ review.product.name }}</td>
+
+                <!-- ⭐ STAR RATING -->
+                <td>
+                    <div class="review-stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                <span class="star filled">★</span>
+                            {% else %}
+                                <span class="star">☆</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </td>
+
+                <td>{{ review.comment }}</td>
+                <td>{{ review.created_at|date:"d M Y" }}</td>
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="6" class="no-data">
+                    No Reviews Found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+
+</div>
+{% endblock %}

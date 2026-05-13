@@ -1,44 +1,233 @@
 {% extends "admin/base.html" %}
 {% load static %}
+
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'admin/css/lens_list.css' %}">
+<style>
+
+.lens-page {
+  padding: 24px;
+}
+
+/* Card */
+.lens-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+}
+
+.page-title {
+  color: var(--text-main);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+/* Add Button */
+.btn-add {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.btn-add:hover {
+  opacity: .9;
+}
+
+/* Table */
+.lens-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.lens-table thead {
+  background: var(--table-head);
+}
+
+.lens-table th,
+.lens-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--card-border);
+  text-align: left;
+  color: var(--text-main);
+}
+
+.lens-table tbody tr:hover {
+  background: rgba(99,102,241,.06);
+}
+
+/* Price */
+.price {
+  font-weight: 600;
+}
+
+/* Status */
+.status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status.active {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.status.inactive {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-edit {
+  background: #eef4ff;
+  color: #2563eb;
+}
+
+.btn-edit:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* Empty */
+.empty {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+}
+
+</style>
 {% endblock %}
 
-{% block content %}
-<div class="lens-page">
-  <div class="lens-card">
-    <h2 class="page-title ripple-text">👓 Lenses</h2>
 
-    <div class="table-wrapper">
-      <table class="lens-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Power Range</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for l in lenses %}
-          <tr>
-            <td>{{ l.name }}</td>
-            <td>{{ l.lens_type }}</td>
-            <td>{{ l.power_range }}</td>
-            <td class="price">₹{{ l.price }}</td>
-            <td class="actions">
-            <button class="btn-edit" onclick="location.href='{% url 'adminpanel:edit_lens' l.id %}'">Edit</button>
-            <button class="btn-delete" onclick="deleteLens({{ l.id }})">Delete</button>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="4" class="empty">No lenses available</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+{% block content %}
+
+<div class="lens-page">
+
+<div class="lens-card">
+
+<h2 class="page-title">👓 Lens Management</h2>
+
+<a href="{% url 'adminpanel:add_lens' %}" class="btn-add">
++ Add Lens
+</a>
+
+<table class="lens-table">
+
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Additional Price</th>
+<th>Power Required</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for l in lenses %}
+
+<tr>
+
+<td>{{ l.name }}</td>
+
+<td>{{ l.description }}</td>
+
+<td class="price">₹{{ l.additional_price }}</td>
+<td>
+{% if l.power_required %}
+<span class="status active">Yes</span>
+{% else %}
+<span class="status inactive">No</span>
+{% endif %}
+</td>
+
+<td>
+{% if l.is_active %}
+<span class="status active">Active</span>
+{% else %}
+<span class="status inactive">Inactive</span>
+{% endif %}
+</td>
+
+<td class="actions">
+
+<a href="{% url 'adminpanel:edit_lens' l.id %}" class="btn-edit">
+Edit
+</a>
+
+<a href="{% url 'adminpanel:delete_lens' l.id %}" 
+   class="btn-delete"
+   onclick="return confirm('Are you sure you want to delete this lens?')">
+Delete
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="5" class="empty">
+No lenses available
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
 </div>
+
+</div>
+
+<script>
+
+function deleteLens(id){
+
+if(confirm("Are you sure you want to delete this lens?")){
+window.location.href="/admin-panel/lenses/delete/" + id + "/";
+}
+
+}
+
+</script>
 {% endblock %}

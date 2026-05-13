@@ -1,0 +1,87 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+.edit-frame-page {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.edit-frame-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: var(--card-shadow);
+}
+
+.edit-frame-card h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.edit-frame-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.edit-frame-card label {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.edit-frame-card input {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-size: 14px;
+}
+
+.edit-frame-card input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.edit-frame-card button {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.edit-frame-card button:hover {
+    opacity: .9;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-frame-page">
+    <div class="edit-frame-card">
+        <h2>Edit Frame Shape: {{ frame_shape.name }}</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <label>Name:</label>
+            <input type="text" name="name" value="{{ frame_shape.name }}" required>
+
+            <button type="submit">Update Frame Shape</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

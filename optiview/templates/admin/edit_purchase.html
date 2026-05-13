@@ -1,0 +1,280 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/purchase.css' %}">
+
+<style>
+/* ===== PAGE CONTAINER ===== */
+.purchase-page {
+  padding: 24px;
+}
+
+/* ===== CARDS ===== */
+.purchase-form-card,
+.purchase-table-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 24px;
+}
+
+.purchase-page h4.purchase-heading {
+  color: var(--text-main) !important;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+/* ===== FORM ===== */
+.purchase-form .form-group {
+  margin-bottom: 14px;
+}
+
+.purchase-form label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.purchase-form input,
+.purchase-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.purchase-form input:focus,
+.purchase-form select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  opacity: .9;
+}
+
+.btn-add-item {
+  background: #eef4ff;
+  color: #2563eb;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn-add-item:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* ===== TABLE ===== */
+.purchase-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.purchase-table th,
+.purchase-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--card-border);
+  text-align: left;
+  color: var(--text-main);
+}
+
+.purchase-table thead {
+  background: var(--table-head);
+}
+
+.purchase-table tbody tr:hover {
+  background: rgba(99, 102, 241, .06);
+}
+
+/* ===== TOTAL BOX ===== */
+.purchase-total-box {
+  text-align: right;
+  margin-top: 14px;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-main);
+}
+
+/* For Chrome, Edge, Safari */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="purchase-page">
+
+    <!-- PURCHASE FORM CARD -->
+    <div class="purchase-form-card">
+        <h4 class="purchase-heading">Edit Purchase</h4>
+
+        <form method="POST" class="purchase-form">
+            {% csrf_token %}
+
+            <!-- Dealer Selection -->
+            <div class="form-group">
+                <label for="dealer">Dealer</label>
+                <select name="dealer" id="dealer">
+                    {% for dealer in dealers %}
+                        <option value="{{ dealer.id }}" {% if dealer.id == purchase.dealer.id %}selected{% endif %}>
+                            {{ dealer.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Bill Number -->
+            <div class="form-group">
+                <label for="bill_number">Bill Number</label>
+                <input type="text" name="bill_number" id="bill_number" value="{{ purchase.bill_number }}">
+            </div>
+
+            <!-- PURCHASE ITEMS TABLE -->
+            <div class="purchase-table-card">
+                <table class="purchase-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Cost Price</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchase-items">
+                        {% for item in purchase.items.all %}
+                        <tr>
+                            <td>
+                                {{ item.variant.product.name }} - {{ item.variant.color.name }}
+                                <input type="hidden" name="variant[]" value="{{ item.variant.id }}">
+                            </td>
+                            <td>
+                                <input type="number" name="quantity[]" value="{{ item.quantity }}" min="1">
+                            </td>
+                            <td>
+                                <input type="number" name="cost_price[]" value="{{ item.cost_price }}" step="0.01" min="0">
+                            </td>
+                            <td>{{ item.get_total }}</td>
+                            <td>
+                                <button type="button" class="btn-delete remove-row">Remove</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Add New Product -->
+                <button type="button" class="btn-add-item" id="add-product-btn">+ Add Product</button>
+
+                <!-- GRAND TOTAL -->
+                <div class="purchase-total-box">
+                    Grand Total: ₹<span id="grand-total">{{ purchase.total_amount }}</span>
+                </div>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <button type="submit" class="btn-primary">Update Purchase</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// REMOVE ROW
+document.addEventListener('click', function(e){
+    if(e.target.classList.contains('remove-row')){
+        e.target.closest('tr').remove();
+        updateGrandTotal();
+    }
+});
+
+// ADD NEW PRODUCT ROW
+document.getElementById('add-product-btn').addEventListener('click', function(){
+    const tbody = document.getElementById('purchase-items');
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+        <td>
+            <select name="variant[]">
+                {% for variant in variants %}
+                    <option value="{{ variant.id }}">{{ variant.product.name }} - {{ variant.color.name }}</option>
+                {% endfor %}
+            </select>
+        </td>
+        <td><input type="number" name="quantity[]" value="1" min="1"></td>
+        <td><input type="number" name="cost_price[]" value="0" step="0.01" min="0"></td>
+        <td>0</td>
+        <td><button type="button" class="btn-delete remove-row">Remove</button></td>
+    `;
+    tbody.appendChild(newRow);
+});
+
+// UPDATE GRAND TOTAL
+function updateGrandTotal(){
+    const rows = document.querySelectorAll('#purchase-items tr');
+    let total = 0;
+    rows.forEach(row => {
+        const qty = parseFloat(row.querySelector('input[name="quantity[]"]').value || 0);
+        const price = parseFloat(row.querySelector('input[name="cost_price[]"]').value || 0);
+        row.querySelector('td:nth-child(4)').innerText = (qty * price).toFixed(2);
+        total += qty * price;
+    });
+    document.getElementById('grand-total').innerText = total.toFixed(2);
+}
+
+// UPDATE TOTAL ON INPUT CHANGE
+document.getElementById('purchase-items').addEventListener('input', function(e){
+    if(e.target.name === 'quantity[]' || e.target.name === 'cost_price[]'){
+        updateGrandTotal();
+    }
+});
+</script>
+{% endblock %}

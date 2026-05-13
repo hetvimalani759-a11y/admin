@@ -18,50 +18,61 @@
     <div class="form-row">
       <div class="form-group">
         <label>Full Name</label>
-        <input type="text" name="full_name" id="full_name" value="{{ request.user.first_name }}">
+        
+        <input type="text" name="full_name" id="full_name" value="{{ address_data.full_name|default:request.user.first_name }}">
       </div>
 
       <div class="form-group">
         <label>Mobile Number</label>
         <div class="phone-row">
-          <select disabled><option>+91</option></select>
-          <input type="text" name="phone" id="phone" maxlength="10">
+         <select disabled><option>+91</option></select>
+        <input type="text" name="phone" id="phone" maxlength="10"
+       value="{{ address_data.phone|default:request.user.profile.phone }}">
         </div>
       </div>
     </div>
 
     <div class="form-group">
       <label>Address</label>
-      <input type="text" name="address" id="address">
+      <input type="text" name="address" id="address" value="{{ address_data.address }}">
     </div>
-
+    <div class="form-group">
+    <label>Area / Locality</label>
+    <input type="text" name="area" id="area" value="{{ address_data.area }}">
+</div>
     <div class="form-row">
       <div class="form-group">
         <label>State</label>
         <select name="state" id="state">
-          <option value="">Select State</option>
-          <option>Gujarat</option>
-          <option>Maharashtra</option>
-          <option>Delhi</option>
-          <option>Karnataka</option>
-          <option>Rajasthan</option>
-        </select>
+  <option value="">Select State</option>
+  <option {% if address_data.state == "Gujarat" %}selected{% endif %}>Gujarat</option>
+  <option {% if address_data.state == "Maharashtra" %}selected{% endif %}>Maharashtra</option>
+  <option {% if address_data.state == "Delhi" %}selected{% endif %}>Delhi</option>
+  <option {% if address_data.state == "Rajasthan" %}selected{% endif %}>Rajasthan</option>
+</select>
       </div>
 
       <div class="form-group">
         <label>City</label>
-        <select name="city" id="city">
-          <option value="">Select City</option>
-        </select>
+        <select name="city" id="city" data-selected="{{ address_data.city }}">
+    {% if address_data.city %}
+        <option value="{{ address_data.city }}" selected>
+            {{ address_data.city }}
+        </option>
+    {% else %}
+        <option value="">Select City</option>
+    {% endif %}
+</select>
       </div>
 
       <div class="form-group">
-        <label>Pincode</label>
-        <input type="text" name="pincode" id="pincode" maxlength="6">
-      </div>
+    <label>Pincode</label>
+    <input type="text" name="pincode" id="pincode" maxlength="6" value="{{ address_data.pincode }}">
+</div>
     </div>
 
-    <div class="address-actions"> <button type="button" id="saveAddressBtn" class="btn btn-primary" {% if has_address %}style="display:none;"{% endif %}> Save Address </button> <button type="button" id="editAddressBtn" class="btn btn-secondary" {% if not has_address %}style="display:none;"{% endif %}> Edit Address </button> </div>
+    <div class="address-actions"> <button type="button" id="saveAddressBtn" class="btn btn-primary" {% if has_address %}style="display:none;"{% endif %}> Save Address </button> 
+    <button type="button" id="editAddressBtn" class="btn btn-secondary" {% if not has_address %}style="display:none;"{% endif %}> Edit Address </button> </div>
   </div>
   <div class="address-preview hidden" id="addressPreview" data-has-address="{{ has_address|yesno:'1,0' }}"></div>
 
@@ -69,14 +80,42 @@
 
 <!-- ===== STEP 2 ===== -->
 <div class="checkout-section disabled" id="paymentSection">
+
   <div class="section-header">2. Payment Method</div>
-  <div class="payment-box">
-    <label><input type="radio" name="payment" value="COD" checked> Cash on Delivery</label>
-    <label><input type="radio" name="payment" value="ONLINE"> Online Payment</label>
+
+  <div class="payment-container">
+
+    <!-- COD CARD -->
+    <label class="payment-card" id="codCard">
+      <input type="radio" name="payment" value="COD" id="codOption" checked>
+      <div class="card-content">
+        <div class="card-icon">💵</div>
+        <div>
+          <div class="card-title">Cash on Delivery</div>
+          <small id="codMessage" class="cod-msg">
+            COD not available above ₹2000
+          </small>
+        </div>
+      </div>
+    </label>
+
+    <!-- ONLINE CARD -->
+    <label class="payment-card">
+      <input type="radio" name="payment" value="ONLINE">
+      <div class="card-content">
+        <div class="card-icon">💳</div>
+        <div>
+          <div class="card-title">Online Payment</div>
+          <small>UPI / Card / Net Banking</small>
+        </div>
+      </div>
+    </label>
+
   </div>
+
 </div>
 
-<!-- ===== STEP 3 ===== -->
+<!-- ===== STEP 3: REVIEW ITEMS ===== -->
 <div class="checkout-section disabled" id="reviewSection">
   <div class="section-header">3. Review Items</div>
   <div class="items-box">
@@ -84,18 +123,57 @@
     {% for item in cart_items %}
     <div class="checkout-item"
          data-id="{{ item.id }}"
-         data-original="{{ item.product.price }}"
-         data-final="{{ item.product.get_final_price }}">
+         data-stock="{% if item.variant %}{{ item.variant.stock }}{% else %}{{ item.product.stock }}{% endif %}"
+         data-original="{% if item.lens %}{{ item.product.price|add:item.lens.additional_price }}{% else %}{{ item.product.price }}{% endif %}"
+         data-final="{{ item.unit_price }}">
 
-      <img src="{{ item.product.image.url }}">
+      <!-- Product Image (Selected Variant) -->
+      <div class="cart-img">
+    {% if item.variant and item.variant.images.all|length > 1 %}
+        <img src="{{ item.variant.images.all.1.image.url }}" alt="{{ item.product.name }}">
+    
+    {% elif item.variant and item.variant.images.first %}
+        <img src="{{ item.variant.images.first.image.url }}" alt="{{ item.product.name }}">
+    
+    {% else %}
+        {% with first_variant=item.product.variants.first %}
+            {% if first_variant and first_variant.images.all|length > 1 %}
+                <img src="{{ first_variant.images.all.1.image.url }}" alt="{{ item.product.name }}">
+            {% elif first_variant and first_variant.images.first %}
+                <img src="{{ first_variant.images.first.image.url }}" alt="{{ item.product.name }}">
+            {% else %}
+                <img src="{% static 'app/images/no-image.png' %}" alt="No Image">
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+</div>
 
+      <!-- Product Info -->
       <div class="item-info">
         <div class="item-name">{{ item.product.name }}</div>
+                            {% if item.lens %}
+<div class="lens-info" style="font-size:0.85rem;color:#555;margin-top:4px;">
+    Lens: {{ item.lens.name }}
+    (+ ₹{{ item.lens.additional_price|floatformat:0 }})
+</div>
+
+{% if item.left_eye_power or item.right_eye_power %}
+<div class="power-info" style="font-size:0.82rem;color:#777;">
+    👁 Left Eye: {{ item.left_eye_power|default:"-" }} |
+    Right Eye: {{ item.right_eye_power|default:"-" }}
+</div>
+{% endif %}
+
+<!-- <div class="lens-price" style="font-size:0.85rem;color:#333;margin-top:2px;">
+    Unit Price w/ Lens:
+    ₹{{ item.unit_price|add:item.lens.additional_price|floatformat:0 }}
+</div> -->
+{% endif %}
 
         <div class="item-price">
-          {% with offer=item.product.get_offer %}
+          {% with offer=item.product.get_best_offer %}
             {% if offer %}
-              <strong class="final-price">₹{{ item.product.get_final_price|floatformat:0 }}</strong>
+              <span class="discounted-price">₹{{ item.product.get_final_price|floatformat:0 }}</span>
               <span class="original-price">₹{{ item.product.price|floatformat:0 }}</span>
               {% if offer.discount_type == "percent" %}
                 <span class="discount-text">({{ offer.discount_value }}% OFF)</span>
@@ -103,31 +181,27 @@
                 <span class="discount-text">(₹{{ offer.discount_value }} OFF)</span>
               {% endif %}
             {% else %}
-              <strong class="final-price">₹{{ item.product.price|floatformat:0 }}</strong>
+              <span class="discounted-price">₹{{ item.product.price|floatformat:0 }}</span>
             {% endif %}
           {% endwith %}
         </div>
       </div>
 
-      <!-- Quantity -->
+      <!-- Quantity Controls -->
       <div class="qty-controls">
         <button type="button" class="qty-btn minus-btn">−</button>
         <span class="qty-number">{{ item.quantity }}</span>
-        <button type="button" class="qty-btn plus-btn" data-stock="{{ item.product.stock }}">+</button>
-
+        <button type="button" class="qty-btn plus-btn" data-stock="{% if item.variant %}{{ item.variant.stock }}{% else %}{{ item.product.stock }}{% endif %}">+</button>
       </div>
 
-
-
-      <!-- ✅ ONLY CHANGE -->
+      <!-- Remove Button -->
       <a href="#" class="remove-btn" data-remove-url="{% url 'app:remove_from_cart' item.id %}">Remove</a>
+
     </div>
     {% endfor %}
 
   </div>
-</div>
-
-<!-- ===== SUMMARY ===== -->
+</div><!-- ===== SUMMARY ===== -->
 <div class="order-summary">
   <h3>Order Summary</h3>
 
@@ -148,8 +222,8 @@
 
   <div class="summary-row">
     <span>Delivery</span>
-    <span>₹<span id="summaryDelivery">{{ delivery }}</span></span>
-  </div>
+    <span><span id="summaryDelivery">{{delivery }}</span></span>
+  </div> 
 
   <hr>
   <div class="saved-banner" id="saved-banner" style="display:none;"></div>
@@ -184,67 +258,409 @@
       <button id="stock-ok" class="modal-confirm">OK</button>
     </div>
   </div>
+  
 </div>
-
+<div id="toast" class="toast"></div>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-{% block extra_js %}
-<script src="{% static 'app/js/checkout.js' %}"></script>
-{% endblock %}
 <script>
-document.getElementById("checkoutForm").addEventListener("submit", function(e) {
+  function showToast(message) {
+  const toast = document.getElementById("toast");
 
-    const selectedPayment = document.querySelector('input[name="payment"]:checked').value;
+  toast.innerText = message;
+  toast.style.background = "#28a745"; // ✅ green success
 
-    if (selectedPayment === "ONLINE") {
-        e.preventDefault();  // stop normal submit
+  toast.classList.add("show");
 
-        const totalAmount = document.getElementById("summaryTotal").innerText;
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+}
+document.addEventListener("DOMContentLoaded", function () {
+
+  /* ===============================
+     GLOBAL
+  =============================== */
+  let isPageLoad = true;
+  let isAddressSaved = false;
+  let targetItemId = null;
+
+  const FREE_DELIVERY_LIMIT = 999;
+  const DELIVERY_CHARGE = 50;
+  const MAX_QTY = 5;
+
+  const csrfToken = document.cookie
+    .split("; ")
+    .find(r => r.startsWith("csrftoken="))
+    ?.split("=")[1];
+
+  /* ===============================
+     ELEMENTS
+  =============================== */
+
+  const state = document.getElementById("state");
+  const city = document.getElementById("city");
+  const area = document.getElementById("area");
+
+  const saveBtn = document.getElementById("saveAddressBtn");
+  const editBtn = document.getElementById("editAddressBtn");
+  const addressBox = document.getElementById("addressBox");
+  const addressPreview = document.getElementById("addressPreview");
+
+  const paymentSection = document.getElementById("paymentSection");
+  const reviewSection = document.getElementById("reviewSection");
+  const placeOrderBtn = document.getElementById("placeOrderBtn");
+
+  const summaryTotal = document.getElementById("summaryTotal");
+  const summaryItems = document.getElementById("summaryItems");
+  const summaryOriginal = document.getElementById("summaryOriginal");
+  const summaryDiscount = document.getElementById("summaryDiscount");
+  const summaryDelivery = document.getElementById("summaryDelivery");
+
+  const codCard = document.getElementById("codCard");
+  const codOption = document.getElementById("codOption");
+  const codMessage = document.getElementById("codMessage");
+
+  const confirmModal = document.getElementById("confirm-modal");
+  const confirmYes = document.getElementById("confirm-yes");
+  const confirmNo = document.getElementById("confirm-no");
+
+  const stockModal = document.getElementById("stock-modal");
+  const stockText = document.getElementById("stock-text");
+  const stockOk = document.getElementById("stock-ok");
+
+  /* ===============================
+     MODALS
+  =============================== */
+
+  function openConfirm(id) {
+    targetItemId = id;
+    confirmModal.style.display = "flex";
+  }
+
+  function closeConfirm() {
+    confirmModal.style.display = "none";
+    targetItemId = null;
+  }
+
+  function openStock(msg) {
+    stockText.innerText = msg;
+    stockModal.style.display = "flex";
+  }
+
+  function closeStock() {
+    stockModal.style.display = "none";
+  }
+
+  confirmNo?.addEventListener("click", closeConfirm);
+  stockOk?.addEventListener("click", closeStock);
+
+  /* ===============================
+     ADDRESS LOGIC
+  =============================== */
+
+  function hasAddressData() {
+    return (
+      full_name.value.trim() &&
+      phone.value.trim() &&
+      address.value.trim() &&
+      state.value &&
+      city.value &&
+      pincode.value.trim()
+    );
+  }
+
+  function validateAddress() {
+    if (!hasAddressData()) return alert("Fill all fields"), false;
+    if (!/^\d{10}$/.test(phone.value)) return alert("Invalid phone"), false;
+    if (!/^\d{6}$/.test(pincode.value)) return alert("Invalid pincode"), false;
+    return true;
+  }
+
+  function renderPreview() {
+    addressPreview.innerHTML = `
+      <strong>${full_name.value}</strong><br>
+      📍 ${address.value}<br>
+      ${area.value}, ${city.value}, ${state.value} - ${pincode.value}<br>
+      📞 ${phone.value}<br><br>
+      <button id="editAddressBtnPreview" class="btn btn-secondary">Edit Address</button>
+    `;
+    document.getElementById("editAddressBtnPreview")
+      ?.addEventListener("click", function(e){
+      e.preventDefault();
+    editBtn.click();
+    });
+  }
+
+  function saveAddress() {
+    if (!validateAddress()) return;
+
+    renderPreview();
+
+    addressBox.classList.add("hidden");
+    addressPreview.classList.remove("hidden");
+
+    saveBtn.style.display = "none";
+    editBtn.style.display = "inline-block";
+
+    paymentSection.classList.remove("disabled");
+    reviewSection.classList.remove("disabled");
+    if (!isPageLoad) {
+      showToast("✅ Address saved successfully!");
+    }
+    isAddressSaved = true;
+    updateSummary();
+  }
+
+  saveBtn?.addEventListener("click", saveAddress);
+
+  editBtn?.addEventListener("click", function (e) {
+  e.preventDefault();   // ✅ IMPORTANT
+
+  addressBox.classList.remove("hidden");
+  addressPreview.classList.add("hidden");
+
+  saveBtn.style.display = "inline-block";
+  editBtn.style.display = "none";
+
+  paymentSection.classList.add("disabled");
+  reviewSection.classList.add("disabled");
+
+  isAddressSaved = false;
+  updateSummary();
+});
+
+  if (hasAddressData()) {
+    saveAddress();   // auto-fill UI
+    isPageLoad = false; // ❗ prevent toast after load
+} 
+
+  /* ===============================
+     CITY + PINCODE
+  =============================== */
+
+  state?.addEventListener("change", () => {
+    fetch(`/api/get-cities/?state=${state.value}`)
+      .then(res => res.json())
+      .then(data => {
+        city.innerHTML = '<option value="">Select City</option>';
+        data.cities.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          city.appendChild(opt);
+        });
+      });
+  });
+
+  function updatePincode() {
+  const areaVal = area.value.trim();
+  const cityVal = city.value.trim();
+  const stateVal = state.value.trim();
+
+  if (!areaVal || !cityVal || !stateVal) return;
+
+  fetch(`/api/get-pincode/?area=${areaVal}&city=${cityVal}&state=${stateVal}`)
+    .then(res => res.json())
+    .then(data => {
+      console.log("API RESPONSE:", data);  // 👈 DEBUG
+      pincode.value = data.pincode || "";
+    });
+}
+
+  area?.addEventListener("input", updatePincode);
+  city?.addEventListener("change", updatePincode);
+
+  /* ===============================
+     SUMMARY
+  =============================== */
+
+  function updateSummary() {
+    let items = 0, original = 0, final = 0;
+
+    document.querySelectorAll(".checkout-item").forEach(row => {
+      const qty = parseInt(row.querySelector(".qty-number").innerText);
+      items += qty;
+      original += row.dataset.original * qty;
+      final += row.dataset.final * qty;
+    });
+
+    const delivery = final >= FREE_DELIVERY_LIMIT ? 0 : DELIVERY_CHARGE;
+
+    summaryItems.innerText = items;
+    summaryOriginal.innerText = parseInt(original);
+    summaryDiscount.innerText = parseInt(original - final);
+    summaryTotal.innerText = parseInt(final + delivery);
+    summaryDelivery.innerText = delivery === 0 ? "Free 🎉" : "₹" + delivery;
+
+    // ✅ SAVED AMOUNT BANNER
+    const banner = document.getElementById("saved-banner");
+const saved = parseInt(original - final);
+
+if (saved > 0) {
+  banner.style.display = "block";
+  banner.innerText = `🎉 You saved ₹${saved}!`;
+} else {
+  banner.style.display = "none";
+}
+
+    placeOrderBtn.disabled = (!items || !isAddressSaved);
+    updateCOD();
+  }
+
+  updateSummary();
+
+  /* ===============================
+     CART API
+  =============================== */
+
+  const post = url => fetch(url, {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": csrfToken,
+      "X-Requested-With": "XMLHttpRequest"
+    }
+  }).then(r => r.json());
+
+  /* ===============================
+     QUANTITY + / -
+  =============================== */
+
+  document.body.addEventListener("click", e => {
+
+    const plus = e.target.closest(".plus-btn");
+    const minus = e.target.closest(".minus-btn");
+    const remove = e.target.closest(".remove-btn");
+
+    if (plus) {
+      const row = plus.closest(".checkout-item");
+      const id = row.dataset.id;
+      const qtyEl = row.querySelector(".qty-number");
+
+      if (+qtyEl.innerText >= MAX_QTY) {
+        return openStock("Max limit reached");
+      }
+
+      post(`/cart/increase/${id}/`).then(d => {
+        if (!d.success) return openStock(d.message);
+        qtyEl.innerText = d.quantity;
+        updateSummary();
+      });
+    }
+
+    if (minus) {
+      const row = minus.closest(".checkout-item");
+      const id = row.dataset.id;
+      const qtyEl = row.querySelector(".qty-number");
+
+      if (+qtyEl.innerText === 1) {
+        return openConfirm(id);
+      }
+
+      post(`/cart/decrease/${id}/`).then(d => {
+        qtyEl.innerText = d.quantity;
+        updateSummary();
+      });
+    }
+
+    if (remove) {
+      const row = remove.closest(".checkout-item");
+      openConfirm(row.dataset.id);
+    }
+
+  });
+
+  confirmYes?.addEventListener("click", () => {
+    if (!targetItemId) return;
+
+    post(`/cart/remove/${targetItemId}/`).then(() => {
+      document.querySelector(`.checkout-item[data-id="${targetItemId}"]`)?.remove();
+      closeConfirm();
+      updateSummary();
+    });
+  });
+
+  /* ===============================
+     COD
+  =============================== */
+
+  function updateCOD() {
+  const total = parseFloat(summaryTotal.innerText) || 0;
+
+  const onlineOption = document.querySelector('input[value="ONLINE"]');
+
+  if (total > 2000) {
+    // ❌ Disable COD
+    codOption.checked = false;
+    codOption.disabled = true;
+    codCard.classList.add("disabled");
+    codMessage.style.display = "block";
+
+    // ✅ AUTO SELECT ONLINE
+    if (onlineOption) {
+      onlineOption.checked = true;
+    }
+
+  } else {
+    // ✅ Enable COD
+    codOption.disabled = false;
+    codCard.classList.remove("disabled");
+    codMessage.style.display = "none";
+
+    // ✅ DEFAULT BACK TO COD (optional)
+    codOption.checked = true;
+  }
+}
+
+  /* ===============================
+     RAZORPAY
+  =============================== */
+
+  document.getElementById("checkoutForm")
+    ?.addEventListener("submit", function (e) {
+
+      const selected = document.querySelector('input[name="payment"]:checked');
+      if (!selected) return;
+
+      if (selected.value === "ONLINE") {
+        e.preventDefault();
 
         fetch("{% url 'app:create_order' %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({
-                amount: totalAmount
-            })
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
+          },
+          body: JSON.stringify({ amount: summaryTotal.innerText })
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
 
-            var options = {
-                "key": data.key,
-                "amount": data.amount * 100,
-                "currency": "INR",
-                "name": "Optiview",
-                "description": "Order Payment",
-                "order_id": data.order_id,
-                "handler": function (response) {
+          const rzp = new Razorpay({
+            key: data.key,
+            amount: data.amount * 100,
+            currency: "INR",
+            name: "Optiview",
+            order_id: data.order_id,
 
-                    // Append payment details to form
-                    const form = document.getElementById("checkoutForm");
+            handler: function (response) {
+              const form = document.getElementById("checkoutForm");
 
-                    const paymentInput = document.createElement("input");
-                    paymentInput.type = "hidden";
-                    paymentInput.name = "razorpay_payment_id";
-                    paymentInput.value = response.razorpay_payment_id;
-                    form.appendChild(paymentInput);
+              const input = document.createElement("input");
+              input.type = "hidden";
+              input.name = "razorpay_payment_id";
+              input.value = response.razorpay_payment_id;
 
-                    form.submit();  // submit normally after success
-                },
-                "theme": {
-                    "color": "#007bff"
-                }
-            };
+              form.appendChild(input);
+              form.submit();
+            }
+          });
 
-            var rzp = new Razorpay(options);
-            rzp.open();
+          rzp.open();
         });
-    }
+      }
+  });
 
 });
 </script>
-
 {% endblock %}

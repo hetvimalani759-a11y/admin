@@ -29,12 +29,13 @@
         margin-bottom: 20px;
     }
 
-    input {
+    input, select, textarea {
         width: 100%;
         padding: 12px;
         margin-bottom: 14px;
         border-radius: 8px;
         border: 1px solid #ccc;
+        box-sizing: border-box;
     }
 
     button {
@@ -75,18 +76,27 @@
     {% for message in messages %}
         <div class="error">{{ message }}</div>
     {% endfor %}
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <input type="password" name="password2" placeholder="Confirm Password" required>
 
-    <button type="submit">Register</button>
+    <form method="POST">
+        {% csrf_token %}
+        <!-- User fields -->
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="password2" placeholder="Confirm Password" required>
 
-
-
-</form>
+        <!-- UserProfile fields -->
+        <input type="text" name="phone" placeholder="Phone (10 digits)" maxlength="10">
+        <input type="date" name="dob" placeholder="Date of Birth">
+        <select name="gender">
+            <option value="">Select Gender</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+        </select>
+        <textarea name="address" placeholder="Address" rows="3"></textarea>
+       
+        <button type="submit">Register</button>
+    </form>
 
     <a href="{% url 'app:login' %}">Already have an account? Login</a>
 </div>

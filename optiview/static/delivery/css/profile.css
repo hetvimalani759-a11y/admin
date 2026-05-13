@@ -11,3 +11,11 @@
     font-size: 16px;
     margin: 8px 0;
 }
+
+.profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;   /* 👈 circle banave */
+    object-fit: cover;    /* image stretch na thay */
+    border: 3px solid #ddd;
+}

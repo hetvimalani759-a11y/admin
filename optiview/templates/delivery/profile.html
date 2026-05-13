@@ -1,0 +1,96 @@
+{% extends 'delivery/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'delivery/style.css' %}">
+
+<!-- SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- ✅ MESSAGE BLOCK ADD KARO -->
+{% if messages %}
+    {% for message in messages %}
+        {% if "profile" in message.tags %}
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '{{ message }}',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+
+<nav class="navbar">
+
+    <h2>🚚 Delivery Dashboard</h2>
+
+    <div class="nav-actions">
+
+        <a href="{% url 'delivery:edit_profile' %}" class="edit-profile-btn">
+            <i class="fas fa-user-edit"></i> Edit Profile
+        </a>
+        
+        <a href="{% url 'delivery:delivery_change_password' %}" class="logout-btn">
+            <i class="fas fa-key"></i> Change Password
+        </a>
+        
+
+    </div>
+
+</nav>
+<!-- Profile Card -->
+<div class="card">
+    
+    <div class="profile-image-wrapper">
+    
+        <div class="profile-ring">
+            {% if delivery_person.profile_image %}
+                <img src="{{ delivery_person.profile_image.url }}"
+                     class="profile-img"
+                     alt="Profile">
+            {% else %}
+                <img src="{% static 'delivery/default.png' %}"
+                     class="profile-img"
+                     alt="Profile">
+            {% endif %}
+             
+            <span class="status-dot"></span>
+        </div>
+
+    </div>
+
+    <div class="profile-row">
+        <span>Username:</span>
+        <p>{{ request.user.username }}</p>
+    </div>
+
+    <div class="profile-row">
+        <span>Email:</span>
+        <p>{{ request.user.email|default:"-" }}</p>
+    </div>
+
+    <div class="profile-row">
+        <span>Phone:</span>
+        <p>{{ delivery_person.phone }}</p>
+    </div>
+
+    <div class="profile-row">
+        <span>Address:</span>
+        <p>{{ delivery_person.address }}</p>
+    </div>
+
+    <div class="profile-row">
+        <span>Joining date:</span>
+        <p>{{ delivery_person.joining_date }}</p>
+    </div>
+<!-- Back to Dashboard Button -->
+    <a href="{% url 'delivery:delivery_dashboard' %}" class="back-btn">⬅️ Back to Dashboard</a>
+
+</div>
+
+{% endblock %}

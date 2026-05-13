@@ -1,43 +1,92 @@
+{% extends "delivery/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>My Orders</title>
- 
-<link rel="stylesheet" href="{% static 'delivery/my_orders.css' %}">
 
-</head>
-<body>
+{% block title %}My Orders{% endblock %}
 
-<h2>📦 My Orders</h2>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'delivery/css/my_orders.css' %}">
+{% endblock %}
 
-<table border="1" cellpadding="10">
-    <tr>
-        <th>Order ID</th>
-        <th>Customer</th>
-        <th>Address</th>
-        <th>Status</th>
-    </tr>
+{% block content %}
 
-    {% for order in orders %}
-    <tr>
-        <td>{{ order.order_id }}</td>
-        <td>{{ order.customer_name }}</td>
-        <td>{{ order.address }}</td>
-        <td class="status {{ order.status|lower }}">
-          {{ order.status }}
-        </td>
-        <td class="status delivered">Delivered</td>
-        <td class="status pending">Pending</td>
-        <td class="status cancelled">Cancelled</td>
+<div class="orders-page">
+    
 
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="4">❌ No orders found</td>
-    </tr>
-    {% endfor %}
-</table>
 
-</body>
-</html>
+    <h2 class="page-title">📦 My Orders</h2>
+     <!-- Back to Dashboard Button -->
+    <a href="{% url 'delivery:delivery_dashboard' %}" class="back-btn">⬅️ Back to Dashboard</a>
+
+    <table class="orders-table">
+        <thead>
+            <tr>
+                <th>Order No</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Payment</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% if orders %}
+                {% for order in orders %}
+                <tr>
+                    <td>{{ order.id }}</td>
+
+                    <!-- Customer Name -->
+                    <td>{{ order.full_name }}</td>
+
+                    <!-- Phone -->
+                    <td>{{ order.phone }}</td>
+
+                    <!-- Full Address -->
+                    <td>
+                        {{ order.address }},
+                        {{ order.city }},
+                        {{ order.state }} -
+                        {{ order.pincode }}
+                    </td>
+
+                    <!-- Payment Method -->
+                    <td>
+    <strong>{{ order.payment_method }}</strong><br>
+
+   {% if order.payment_method == "COD" %}
+
+    {% if order.status == "delivered" or order.status == "partially_delivered" %}
+        <span class="paid">✅ Paid (COD)</span><br>
+        ₹{{ order.final_total|floatformat:0 }}
+    {% else %}
+        💰₹{{ order.final_total|floatformat:0 }}
+        <span class="pending">Pay on Delivery</span>
+    {% endif %}
+
+{% else %}
+
+    {% if order.payment_status %}
+        <span class="paid">✅ Paid</span>
+    {% else %}
+        <span class="pending">❌ Pending</span>
+    {% endif %}
+
+{% endif %}
+</td>
+                   <td> {{ order.status }} </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="no-orders">
+                        ❌ No orders found
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

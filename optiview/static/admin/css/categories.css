@@ -18,7 +18,23 @@
   font-weight: 600;
   opacity: 1;
 }
+.category-form input,
+.category-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 14px;
+}
 
+.category-form input:focus,
+.category-form textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+}
 /* Form */
 .category-form .form-group {
   margin-bottom: 14px;

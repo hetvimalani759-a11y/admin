@@ -1,41 +1,79 @@
 {% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
     <title>Delivery Login</title>
+
     <link rel="stylesheet" href="{% static 'delivery/css/login.css' %}">
 </head>
+
 <body>
 
-
 <div class="overlay">
+
     <div class="login-box">
+
         <h2>Delivery Login</h2>
 
-        {% if error %}
-            <p class="error">{{ error }}</p>
+        <!-- Django Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
         {% endif %}
 
-<form method="post" onsubmit="return validateLogin()">
-    
-    {% csrf_token %}
+        <!-- Login Form -->
+        <form method="post" onsubmit="return validateLogin()">
 
-    <input type="text" id="username" name="username" placeholder="Username">
-    <span id="userError" class="error"></span>
+            {% csrf_token %}
 
-    <input type="password" id="password" name="password" placeholder="Password">
-    <span id="passError" class="error"></span>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                placeholder="Username"
+            >
 
-    <button type="submit">Login</button>
-    <br><br>
-    <a href="{% url 'delivery:forgot_password' %}">Forgot Password?</a>
-   
+            <span id="userError" class="error"></span>
 
 
-</form>
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                placeholder="Password"
+            >
+
+            <span id="passError" class="error"></span>
+
+
+            <button type="submit">
+                Login
+            </button>
+
+            <br><br>
+
+        <div class="text-center mb-3">
+          <a href="{% url 'delivery:delivery_forgot_password' %}" class="forgot-link">
+          Forgot Password?
+          </a>
+        </div>
+
+        </form>
+
+    </div>
+
+</div>
+
 
 <script>
+
 function validateLogin() {
+
     let valid = true;
 
     const username = document.getElementById("username").value.trim();
@@ -56,7 +94,9 @@ function validateLogin() {
 
     return valid;
 }
+
 </script>
+
 
 </body>
 </html>

@@ -7,7 +7,7 @@
 <style>
     body {
         font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(to right, #7ebaee, #ffffff);
+        background: linear-gradient(to right, #386f9f, hsl(241, 66%, 62%));
         display: flex;
         justify-content: center;
         align-items: center;
@@ -47,20 +47,20 @@
         padding: 12px;
         border: none;
         border-radius: 8px;
-        background: linear-gradient(to right, #634ffe, #3700fe);
+        background: linear-gradient(to right, #574da2, #3700fe);
         color: white;
         font-size: 16px;
         cursor: pointer;
         transition: 0.3s;
     }
     button:hover {
-        background: linear-gradient(to right, #00f2fe, #4facfe);
+        background: linear-gradient(to right,  #574da2, #4facfe);
     }
     a {
         display: inline-block;
         margin-top: 15px;
         text-decoration: none;
-        color: #4facfe;
+        color: #145e9f;
         font-weight: bold;
     }
     .messages p {
@@ -68,6 +68,7 @@
         margin: 10px 0 0 0;
         font-size: 14px;
     }
+    
 </style>
 </head>
 <body>
@@ -80,12 +81,16 @@
         <button type="submit">Login</button>
     </form>
     <a href="{% url 'app:register' %}">Don't have an account? Register</a>
-
+    <div class="text-end mb-3">
+    <a href="{% url 'app:forgot_password' %}" class="forgot-link">
+        Forgot Password?
+    </a>
     <div class="messages">
         {% for message in messages %}
         <p>{{ message }}</p>
         {% endfor %}
     </div>
+</div>
 </div>
 </body>
 </html>

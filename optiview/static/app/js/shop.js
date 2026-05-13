@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     /* ---------- TOAST ---------- */
     let toastEl = null;
     let hideTimer = null;
-
+    
     function showToast(message, type = "success") {
         if (!toastEl) {
             toastEl = document.createElement("div");
@@ -131,3 +131,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateCartCount();
 });
+function toggleSub(id) {
+    const box = document.getElementById("sub-" + id);
+    box.style.display = box.style.display === "block" ? "none" : "block";
+}
+
+function toggleSection(header){
+    const section = header.closest(".filter-section");
+    section.classList.toggle("active");
+}
+
+function toggleSub(id){
+    const box = document.getElementById("sub-"+id);
+    box.style.display = box.style.display === "block" ? "none" : "block";
+}

@@ -22,6 +22,7 @@
                 <th>Username</th>
                 <th>Email</th>
                 <th>Phone</th>
+                <th>Joining Date</th>
             </tr>
         </thead>
         <tbody>
@@ -30,6 +31,8 @@
                 <td class="name">{{ dp.user.username }}</td>
                 <td>{{ dp.user.email }}</td>
                 <td>{{ dp.phone }}</td>
+                <td>{{ dp.joining_date }}</td>
+                
             </tr>
             {% empty %}
             <tr>

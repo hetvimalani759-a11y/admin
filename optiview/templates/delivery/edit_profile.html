@@ -1,0 +1,158 @@
+{% extends 'delivery/base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- SweetAlert CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="card profile-card">
+
+<script>
+if (window.history.replaceState) {
+    window.history.replaceState(null, null, window.location.href);
+}
+</script>
+
+<h3>✏️ Edit Profile</h3>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <label>Profile Photo</label>
+    <input type="file" name="profile_image" accept="image/*">
+
+    <label>Username</label>
+    <input type="text" name="username" value="{{ user.username }}" required>
+
+    <label>Email</label>
+    <input type="email" name="email" value="{{ user.email }}" required>
+
+    
+    <label>Joined Date</label>
+    <input type="text" value="{{ user.date_joined|date:'d M Y' }}" disabled>
+
+    <label>Phone</label>
+    <input type="text"
+           name="phone"
+           value="{{ delivery_person.phone }}"
+           pattern="[0-9]{10}"
+           maxlength="10"
+           inputmode="numeric"
+           title="Phone number must be exactly 10 digits"
+           required>
+
+    <label>Address</label>
+    <input type="text"
+           name="address"
+           value="{{ delivery_person.address }}"
+           required
+           minlength="5">
+
+     <div class="btn-group">
+
+    <button type="submit" class="btn btn-save">
+        Save changes
+    </button>
+
+    <a href="{% url 'delivery:delivery_profile' %}" class="btn btn-cancel">
+        Cancel
+    </a>
+
+</div>
+
+</form>
+</div>
+
+
+<!-- ✅ SUCCESS MESSAGE + AUTO REDIRECT -->
+{% if messages %}
+    {% for message in messages %}
+        {% if "profile" in message.tags %}
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '{{ message }}',
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            // 2 seconds pachi profile page redirect
+            setTimeout(function() {
+                window.location.href = "{% url 'delivery_profile' %}";
+            }, 2000);
+        </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+
+<!-- ❌ PHONE ERROR MESSAGE -->
+{% if error_message %}
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Invalid Phone Number',
+    text: '{{ error_message }}'
+});
+</script>
+{% endif %}
+
+
+<style>
+.profile-card {
+    max-width: 520px;
+    margin: auto;
+}
+
+.profile-card label {
+    margin-top: 12px;
+    display: block;
+    font-weight: 500;
+}
+
+.profile-card input {
+    width: 100%;
+    padding: 9px;
+    margin-top: 4px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.btn-group {
+    margin-top: 22px;
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.btn-save {
+    background: #198754;
+    color: #fff;
+}
+
+.btn-save:hover {
+    background: #157347;
+    transform: translateY(-1px);
+}
+
+.btn-cancel {
+    background: #dc3545;
+    color: #fff;
+}
+
+.btn-cancel:hover {
+    background: #bb2d3b;
+    transform: translateY(-1px);
+}
+</style>
+
+{% endblock %}

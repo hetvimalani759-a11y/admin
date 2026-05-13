@@ -44,8 +44,9 @@ class OfferAdmin(admin.ModelAdmin):
     )
 
     search_fields = ('name',)
+from .models import Material
 
-
+admin.site.register(Material)
 from .models import Order
 
 @admin.register(Order)
@@ -70,7 +71,22 @@ admin.site.register(Category)
 
 admin.site.register(DashboardImage)
 
-@admin.register(Purchase)
-class PurchaseAdmin(admin.ModelAdmin):
-    list_display = ('product', 'dealer_name', 'quantity', 'purchase_date', 'cost_price')
-    list_filter = ('purchase_date', 'dealer_name', 'product')
+from django.contrib import admin
+from .models import Dealer
+
+@admin.register(Dealer)
+class DealerAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone', 'email')
+    from django.contrib import admin
+# from .models import GlassesType
+
+# @admin.register(GlassesType)
+# class GlassesTypeAdmin(admin.ModelAdmin):
+#     list_display = ("id", "name", "is_active", "created_at")
+#     search_fields = ("name",)
+from .models import SubCategory
+
+@admin.register(SubCategory)
+class SubCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'category', 'allow_lens', 'is_active')
+    list_editable = ('allow_lens',)

@@ -15,10 +15,7 @@
 
   <!-- Search -->
   <form method="GET" class="search-form">
-    <input type="text"
-           name="search"
-           placeholder="Search product..."
-           value="{{ search }}">
+    <input type="text" name="search" placeholder="Search product..." value="{{ search }}">
     <button type="submit" class="btn-search">Search</button>
   </form>
 
@@ -32,12 +29,16 @@
           <th>Price</th>
           <th>Color</th>
           <th>Stock</th>
+          <th>Frame Type</th>
+          <th>Frame Shape</th>
+          <th>Material</th> 
           <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for p in products %}
         <tr>
+          <!-- Image -->
           <td>
             {% with first_variant=p.variants.first %}
               {% if first_variant and first_variant.images.first %}
@@ -47,39 +48,43 @@
               {% endif %}
             {% endwith %}
           </td>
+
+          <!-- Basic fields -->
           <td class="name">{{ p.name }}</td>
           <td>{{ p.brand.name }}</td>
           <td class="price">₹{{ p.price }}</td>
           <td>
-  {% if p.variants.exists %}
-    {% for v in p.variants.all %}
-      {{ v.color }}{% if not forloop.last %}, {% endif %}
-    {% endfor %}
-  {% else %}
-    {{ p.color|default:"No color" }}
-  {% endif %}
-</td>
+            {% if p.variants.exists %}
+              {% for v in p.variants.all %}
+                {{ v.color }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            {% else %}
+              {{ p.color|default:"No color" }}
+            {% endif %}
+          </td>
           <td>
-  {% if p.total_stock %}
-    {{ p.total_stock }}
-  {% else %}
-    {{ p.stock }}
-  {% endif %}
-</td>
+    {% for v in p.variants.all %}
+        {{ v.color.name }}: {{ v.stock }}<br>
+    {% empty %}
+        0
+    {% endfor %}
 
+          </td>
+
+          <!-- New fields -->
+          <td>{{ p.frame_type.name|default:"-" }}</td>
+          <td>{{ p.frame_shape.name|default:"-" }}</td>
+          <td>{{ p.material.name|default:"-" }}</td>  <!-- ✅ NEW -->
+
+          <!-- Actions -->
           <td class="actions">
             <a href="{% url 'adminpanel:edit_product' p.id %}" class="btn-edit">Edit</a>
-            <button type="button"
-                    class="btn-delete"
-                    data-id="{{ p.id }}"
-                    data-name="{{ p.name }}">
-              Delete
-            </button>
+            <button type="button" class="btn-delete" data-id="{{ p.id }}" data-name="{{ p.name }}">Delete</button>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" class="no-data">No products found</td>
+          <td colspan="9" class="no-data">No products found</td>
         </tr>
         {% endfor %}
       </tbody>

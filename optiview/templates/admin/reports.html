@@ -1,0 +1,397 @@
+{% extends "admin/base.html" %}
+
+{% block extra_css %}
+<style>
+.reports-container {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.reports-card {
+    width: 100%;
+    max-width: 1000px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.reports-header {
+    margin-bottom: 20px;
+}
+
+.reports-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* FILTER AREA */
+.report-filters{
+    display:grid;
+    grid-template-columns: repeat(4,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.filter-group{
+    display:flex;
+    flex-direction:column;
+}
+
+.filter-group label{
+    font-size:13px;
+    margin-bottom:5px;
+    color:var(--text-main);
+}
+
+.filter-group select,
+.filter-group input{
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid var(--card-border);
+    font-size:14px;
+}
+
+/* BUTTONS */
+.report-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-filter {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-download {
+    background: #10b981;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-filter:hover,
+.btn-download:hover {
+    opacity: .9;
+}
+
+/* TABLE */
+.reports-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.reports-table th,
+.reports-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--card-border);
+    text-align: left;
+    color: var(--text-main);
+}
+
+.reports-table th {
+    background: var(--table-head);
+}
+
+.reports-table tbody tr:hover {
+    background: rgba(99,102,241,.06);
+}
+
+.no-data {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="reports-container">
+<div class="reports-card">
+
+<div class="reports-header">
+<h2>Reports</h2>
+</div>
+
+<form method="GET">
+
+<div class="report-filters">
+
+<div class="filter-group">
+<label>Report Type</label>
+<select name="type" required>
+<option value="">Select Report</option>
+
+<option value="purchase" {% if report_type == "purchase" %}selected{% endif %}>Purchase</option>
+<option value="sales" {% if report_type == "sales" %}selected{% endif %}>Sales</option>
+<option value="cancel" {% if report_type == "cancel" %}selected{% endif %}>Cancelled Orders</option>
+<option value="return_order" {% if report_type == "return_order" %}selected{% endif %}>Returned Orders</option>
+<option value="pending_orders" {% if report_type == "pending_orders" %}selected{% endif %}>Pending Orders</option>
+<option value="users" {% if report_type == "users" %}selected{% endif %}>Users</option>
+<option value="dealer" {% if report_type == "dealer" %}selected{% endif %}>Dealers</option>
+<option value="purchase_return" {% if report_type == "purchase_return" %}selected{% endif %}>Purchase Returns</option>
+<option value="offer" {% if report_type == "offer" %}selected{% endif %}>Offers</option>
+<option value="complaint" {% if report_type == "complaint" %}selected{% endif %}>Complaints</option>
+<option value="low_stock" {% if report_type == "low_stock" %}selected{% endif %}>Low Stock</option>
+<option value="top_products" {% if report_type == "top_products" %}selected{% endif %}>Top Products</option>
+<option value="delivery_person" {% if report_type == "delivery_person" %}selected{% endif %}>Delivery Person</option>
+<option value="product_performance" {% if report_type == "product_performance" %}selected{% endif %}>Product Performance</option>
+<option value="complaint_analysis" {% if report_type == "complaint_analysis" %}selected{% endif %}>Complaint Analysis</option>
+
+</select>
+</div>
+
+<div class="filter-group">
+<label>Dealer</label>
+<select name="dealer">
+<option value="">All Dealers</option>
+{% for d in dealers %}
+<option value="{{ d.id }}" {% if request.GET.dealer == d.id|stringformat:"s" %}selected{% endif %}>{{ d.name }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="filter-group">
+<label>From Date</label>
+<input type="date" name="from_date" value="{{ request.GET.from_date }}">
+</div>
+
+<div class="filter-group">
+<label>To Date</label>
+<input type="date" name="to_date" value="{{ request.GET.to_date }}">
+</div>
+
+</div>
+
+<div class="report-buttons">
+<button type="submit" class="btn-filter">Filter</button>
+<button type="submit" name="download" value="pdf" class="btn-download">Download PDF</button>
+</div>
+
+</form>
+
+<br>
+
+<table class="reports-table">
+{% if data %}
+<!-- Dynamically generate table headers and rows based on report type -->
+{% if report_type == "purchase" %}
+<tr>
+<th>Bill No</th><th>Dealer</th><th>Total Amount</th><th>Date</th>
+</tr>
+{% for p in data %}
+<tr>
+<td>{{ p.bill_number }}</td>
+<td>{{ p.dealer.name }}</td>
+<td>{{ p.total_amount }}</td>
+<td>{{ p.purchase_date }}</td>
+</tr>
+{% endfor %}
+
+{% elif report_type == "sales" or report_type == "cancel"  or report_type == "pending_orders" %}
+<tr>
+<th>Order No</th><th>User</th><th>Total Amount</th><th>Status</th><th>Date</th>
+</tr>
+{% for o in data %}
+<tr>
+<td>{{ o.order_number }}</td>
+<td>{{ o.user.username }}</td>
+<td>{{ o.total_amount }}</td>
+<td>{{ o.status }}</td>
+<td>{{ o.created_at|date:"Y-m-d" }}</td>
+</tr>
+{% endfor %}
+{% elif report_type == "return_order" %}
+<tr>
+<th>Order No</th><th>Product</th><th>Variant</th><th>Qty</th><th>User</th><th>Date</th>
+</tr>
+{% for o in data %}
+<tr>
+<td>{{ o.order.order_number }}</td>
+<td>{{ o.product.name }}</td>
+<td>{{ o.variant.color }}</td>
+<td>{{ o.quantity }}</td>
+<td>{{ o.order.user.get_full_name|default:o.order.user.username }}</td>
+<td>{{ o.order.created_at|date:"Y-m-d" }}</td>
+</tr>
+{% endfor %}
+{% elif report_type == "users" %}
+<tr>
+<th>ID</th><th>Username</th><th>Email</th><th>Date Joined</th>
+</tr>
+{% for u in data %}
+<tr>
+<td>{{ u.id }}</td><td>{{ u.username }}</td><td>{{ u.email }}</td><td>{{ u.date_joined|date:"Y-m-d" }}</td>
+</tr>
+{% endfor %}
+
+{% elif report_type == "dealer" %}
+<tr>
+<th>ID</th><th>Name</th><th>Phone</th><th>Email</th>
+</tr>
+{% for d in data %}
+<tr>
+<td>{{ d.id }}</td><td>{{ d.name }}</td><td>{{ d.phone }}</td><td>{{ d.email }}</td>
+</tr>
+{% endfor %}
+
+{% elif  report_type == "purchase_return" %}
+<tr>
+    <th>Return ID</th>
+    <th>Dealer</th>
+    <th>Product</th>
+    <th>Qty</th>
+    <th>Date</th>
+</tr>
+{% for r in data %}
+<tr>
+    <td>{{ r.id }}</td>
+    <td>{{ r.purchase_item.purchase.dealer.name }}</td>
+    <td>{{ r.purchase_item.variant.product.name }}</td>
+    <td>{{ r.quantity }}</td>
+    <td>{{ r.return_date|date:"Y-m-d" }}</td>
+</tr>
+{% endfor %}
+
+
+{% elif  report_type == "offer" %}
+<tr>
+    <th>ID</th>
+    <th>Title</th>
+    <th>Discount Type</th>
+    <th>Discount Value</th>
+    <th>Start Date</th>
+    <th>End Date</th>
+</tr>
+{% for o in data %}
+<tr>
+    <td>{{ o.id }}</td>
+    <td>{{ o.name }}</td>
+    <td>{{ o.discount_type }}</td>
+    <td>{{ o.discount_value }}</td>
+    <td>{{ o.start_date|date:"Y-m-d" }}</td>
+    <td>{{ o.end_date|date:"Y-m-d" }}</td>
+</tr>
+{% endfor %}
+
+{% elif report_type == "delivery_person" %}
+<tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Phone</th>
+    <th>Joining Date</th>
+    <th>Assigned Orders</th>
+</tr>
+{% for d in data %}
+<tr>
+    <td>{{ d.user.get_full_name|default:d.user.username }}</td>
+    <td>{{ d.user.email }}</td>
+    <td>{{ d.phone }}</td>
+    <td>{{ d.joining_date|date:"Y-m-d" }}</td>
+    <td>{{ d.assigned_orders }}</td>
+</tr>
+{% endfor %}
+
+{% elif report_type == "complaint" %}
+<tr>
+<th>ID</th><th>User</th><th>Reason</th><th>Description</th><th>Status</th><th>Date</th>
+</tr>
+{% for c in data %}
+<tr>
+<td>{{ c.id }}</td>
+<td>{{ c.user.username }}</td>
+<td>{{ c.reason }}</td>
+<td>{{ c.description }}</td>
+<td>{{ c.status }}</td>
+<td>{{ c.created_at|date:"Y-m-d" }}</td>
+</tr>
+{% endfor %}
+{% elif  report_type == "low_stock" %}
+<tr>
+    <th>Product</th>
+    <th>Variant</th>
+    <th>Stock</th>
+</tr>
+{% for p in data %}
+<tr>
+    <td>{{ p.product.name }}</td>
+    <td>{{ p.color.name  }}</td>
+    <td>{{ p.stock }}</td>
+</tr>
+{% endfor %}
+
+
+{% elif report_type == "top_products" %}
+<tr>
+<th>Product Name</th><th>Quantity Sold</th>
+</tr>
+{% for p in data %}
+<tr>
+<td>{{ p.product__name }}</td><td>{{ p.total_qty }}</td>
+</tr>
+{% endfor %}
+
+{% elif report_type == "dealer_sales" %}
+<tr>
+<th>Dealer Name</th><th>Total Sales</th>
+</tr>
+{% for d in data %}
+<tr>
+<td>{{ d.dealer__name }}</td><td>{{ d.total_sales }}</td>
+</tr>
+{% endfor %}
+
+{% elif report_type == "revenue" %}
+<tr>
+<th>Total Revenue</th>
+</tr>
+<tr>
+<td>₹{{ data.0.total_revenue }}</td>
+</tr>
+
+{% elif report_type == "product_performance" %}
+<tr>
+<th>Product Name</th><th>Sold Qty</th><th>Returned Qty</th>
+</tr>
+{% for p in data %}
+<tr>
+<td>{{ p.product__name }}</td><td>{{ p.sold_qty }}</td><td>{{ p.returned_qty|default:0 }}</td>
+</tr>
+{% endfor %}
+
+{% elif report_type == "complaint_analysis" %}
+<tr>
+<th>Status</th><th>Count</th>
+</tr>
+{% for c in data %}
+<tr>
+<td>{{ c.status }}</td><td>{{ c.count }}</td>
+</tr>
+{% endfor %}
+
+{% endif %}
+
+{% else %}
+<tr>
+<td colspan="10" class="no-data">Select a report type to view data</td>
+</tr>
+{% endif %}
+
+</table>
+
+</div>
+</div>
+
+{% endblock %}

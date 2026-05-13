@@ -6,152 +6,230 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="order-page">
 
-  <h2 class="order-title">📦 My Orders</h2>
+<h2 class="order-title">📦 My Orders</h2>
 
-  <!-- FILTER TABS -->
-  <div class="order-filters">
-    <button class="filter-btn active" data-status="all">All</button>
-    <button class="filter-btn" data-status="Pending">Pending</button>
-    <button class="filter-btn" data-status="Shipped">Shipped</button>
-    <button class="filter-btn" data-status="Delivered">Delivered</button>
-    <button class="filter-btn" data-status="Cancelled">Cancelled</button>
+{% if orders %}
+
+{% for o in orders %}
+
+<div class="order-card">
+
+  <!-- ================= ORDER HEADER ================= -->
+  <div class="order-header">
+    <div>
+      <strong>Order #{{ o.order.id }}</strong><br>
+      <small>{{ o.order.created_at|date:"M d, Y • H:i" }}</small>
+    </div>
+
+    <div class="order-actions">
+      <a href="{% url 'app:order_detail' o.order.id %}" class="track-btn">🚚 Track</a>
+      <a href="{% url 'app:order_invoice' o.order.id %}" class="invoice-btn">🧾 Invoice</a>
+    </div>
   </div>
 
-  {% if orders %}
-    {% for o in orders %}
-      {% for item in o.order.items.all %}
-      <div class="order-card" data-status="{{ o.order.status }}" data-item-id="{{ item.id }}">
+  <!-- ================= ITEMS ================= -->
+  {% for item in o.order.items.all %}
 
-        <!-- ORDER HEADER -->
-        <div class="order-header">
-          <strong>Order #{{ o.order.id }}</strong>
-          <small>{{ o.order.created_at|date:"M d, Y • H:i" }}</small>
-          <span class="status-badge status-{{ o.order.status|lower }}">{{ o.order.status }}</span>
-        </div>
+  <div class="order-item">
 
-        <!-- PRODUCT CARD -->
-        <div class="order-item">
-
-          <div class="item-image-wrapper">
-            {% if item.product.image %}
-            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-image">
+    <!-- IMAGE -->
+    <div class="item-image-wrapper">
+      <div class="cart-img">
+    {% if item.variant and item.variant.images.all|length > 1 %}
+        <img src="{{ item.variant.images.all.1.image.url }}" alt="{{ item.product.name }}">
+    
+    {% elif item.variant and item.variant.images.first %}
+        <img src="{{ item.variant.images.first.image.url }}" alt="{{ item.product.name }}">
+    
+    {% else %}
+        {% with first_variant=item.product.variants.first %}
+            {% if first_variant and first_variant.images.all|length > 1 %}
+                <img src="{{ first_variant.images.all.1.image.url }}" alt="{{ item.product.name }}">
+            {% elif first_variant and first_variant.images.first %}
+                <img src="{{ first_variant.images.first.image.url }}" alt="{{ item.product.name }}">
             {% else %}
-            <img src="{% static 'app/images/no-image.png' %}" alt="No image" class="item-image">
+                <img src="{% static 'app/images/no-image.png' %}" alt="No Image">
             {% endif %}
-          </div>
+        {% endwith %}
+    {% endif %}
+</div>
+    </div>
 
-          <div class="item-info">
-            <h4>{{ item.product.name }}</h4>
-            <p>Qty: {{ item.quantity }}</p>
-            <p>Price: ₹{{ item.product.get_final_price }}</p>
-          </div>
+    <!-- INFO -->
+    <div class="item-info">
+      <h4>{{ item.product.name }}</h4>
+      <p>Qty: {{ item.quantity }}</p>
+      <p>Price: ₹{{ item.price|floatformat:0 }}</p>
 
-          <div class="item-actions">
+      <span class="status-badge status-{{ item.status|lower }}">
+        {{ item.status|title }}
+      </span>
+    </div>
 
-    <!-- If Cancelled -->
-    {% if o.order.status == "Cancelled" %}
-        <span class="cancelled-badge">❌ Order Cancelled</span>
+    <!-- ACTIONS -->
+    <div class="item-actions">
+
+      <!-- ================= CANCEL ================= -->
+      {% if item.status == "pending" or item.status == "accepted" %}
+
+      <form method="POST" action="{% url 'app:cancel_order_item' item.id %}">
+        {% csrf_token %}
+
+        <input type="number"
+               name="quantity"
+               min="1"
+               max="{{ item.quantity }}"
+               value="1"
+               style="width:80px;">
+
+        <button type="submit"
+                class="cancel-btn"
+                onclick="return confirm('Cancel selected quantity?')">
+          Cancel
+        </button>
+      </form>
+
+      {% endif %}
+
+      <!-- ================= RETURN ================= -->
+      {% if item.status == "delivered" %}
+
+        {% if item.return_status == "none" %}
+
+        <form method="POST" action="{% url 'app:return_request' item.id %}">
+          {% csrf_token %}
+
+          <input type="number"
+                 name="quantity"
+                 min="1"
+                 max="{{ item.quantity }}"
+                 value="1"
+                 style="width:80px;">
+
+          <button type="submit" class="return-btn">
+            ↩ Return
+          </button>
+        </form>
+
+        {% elif item.return_status == "requested" %}
+          <span class="return-badge requested">⏳ Return Requested</span>
+
+        {% elif item.return_status == "approved" %}
+          <span class="return-badge approved">✅ Return Approved</span>
+
+        {% elif item.return_status == "rejected" %}
+          <span class="return-badge rejected">❌ Return Rejected</span>
+
+        {% elif item.return_status == "completed" %}
+          <span class="return-badge completed">♻ Return Completed</span>
+
+        {% endif %}
+
+        <!-- ================= FEEDBACK ================= -->
+        {% if item.review_set.count > 0 %}
+          <span class="feedback-done">✅ Feedback Given</span>
+        {% else %}
+          <a href="{% url 'app:add_feedback' item.id %}" class="feedback-btn">
+            ⭐ Add Feedback
+          </a>
+        {% endif %}
+
+        <!-- ================= COMPLAINT ================= -->
+        {% with complaint=item.complaint_set.first %}
+
+          {% if not complaint %}
+            <a href="{% url 'adminpanel:add_complaint' item.id %}" class="complaint-btn">
+              ⚠ Complaint
+            </a>
+          {% else %}
+
+            {% if complaint.status == "resolved" %}
+              <p style="color:green;">✅ Complaint resolved</p>
+            {% elif complaint.status == "rejected" %}
+              <p style="color:red;">❌ Complaint rejected</p>
+            {% else %}
+              <p style="color:orange;">⏳ Complaint under review</p>
+            {% endif %}
+
+          {% endif %}
+
+        {% endwith %}
+
+      {% endif %}
+
+      <!-- ================= REFUND ================= -->
+      {% if item.refund_status == "initiated" %}
+        <span class="refund-badge">💰 Refund Processing</span>
+      {% elif item.refund_status == "completed" %}
+        <span class="refund-badge completed">✅ Refund Completed</span>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- ================= TIMELINE ================= -->
+  <div class="status-timeline">
+
+    <div class="timeline-step active">
+      <span class="icon">✓</span>
+      <span class="label">Placed</span>
+    </div>
+
+    {% if item.status == "cancelled" %}
+
+      <div class="timeline-connector active"></div>
+      <div class="timeline-step active">
+        <span class="icon">✕</span>
+        <span class="label">Cancelled</span>
+      </div>
 
     {% else %}
 
-        <!-- Track button (hide if delivered optional) -->
-        
-        <a href="{% url 'app:order_detail' o.order.id %}" class="track-btn">
-            🚚 Track
-        </a>
-        
+      <div class="timeline-connector {% if item.status == 'out_for_delivery' or item.status == 'delivered' %}active{% endif %}"></div>
 
-        <!-- Cancel button -->
-        {% if o.order.status != "Delivered" %}
-        <a href="{% url 'app:cancel_order' o.order.id %}"
-           class="cancel-btn"
-           onclick="return confirm('Are you sure you want to cancel this order?')">
-           Cancel Order
-        </a>
-        {% endif %}
+      <div class="timeline-step {% if item.status == 'out_for_delivery' or item.status == 'delivered' %}active{% endif %}">
+        <span class="icon">✓</span>
+        <span class="label">Shipped</span>
+      </div>
 
-        <!-- Invoice button -->
-        <a href="{% url 'app:order_invoice' o.order.id %}" class="invoice-btn">
-            🧾 Invoice
-        </a>
+      <div class="timeline-connector {% if item.status == 'delivered' %}active{% endif %}"></div>
+
+      <div class="timeline-step {% if item.status == 'delivered' %}active{% endif %}">
+        <span class="icon">✓</span>
+        <span class="label">Delivered</span>
+      </div>
 
     {% endif %}
 
+  </div>
+
+  {% endfor %}
+
+  <!-- ================= ORDER TOTAL ================= -->
+  <div class="order-footer">
+    <strong>Total: ₹{{ o.order.total_amount|floatformat:0 }}</strong>
+  </div>
+
 </div>
 
+{% endfor %}
 
-          {% if o.order.status == "Delivered" %}
-          <div class="rating-box">
-            <span class="rating-label">Rate product:</span>
-            <div class="stars" data-rating="{{ item.rating|default:0 }}">
-              <i data-value="1">★</i>
-              <i data-value="2">★</i>
-              <i data-value="3">★</i>
-              <i data-value="4">★</i>
-              <i data-value="5">★</i>
-            </div>
+{% else %}
 
-            <span class="rating-text"></span>
-          </div>
-          {% endif %}
+<div class="empty-orders">
+  <h4>No Orders Yet</h4>
+  <p>You haven't placed any orders.</p>
 
-        </div>
-
-        <!-- TIMELINE -->
-        <div class="status-timeline">
-          {% for step in o.timeline %}
-          <div class="timeline-step {% if step.active %}active{% endif %}">
-            <span class="icon">✓</span>
-            <span class="label">{{ step.status }}</span>
-          </div>
-          {% if not forloop.last %}
-          <div class="timeline-connector"></div>
-          {% endif %}
-          {% endfor %}
-        </div>
-
-      </div>
-      {% endfor %}
-    {% endfor %}
-  {% else %}
-    <div class="empty-orders">
-      <h4>No Orders Yet</h4>
-      <p>You haven’t placed any orders.</p>
-      <a href="{% url 'app:shop' %}" class="shop-btn">🛍 Start Shopping</a>
-    </div>
-  {% endif %}
+  <a href="{% url 'app:shop' %}" class="shop-btn">
+    🛍 Start Shopping
+  </a>
 </div>
 
+{% endif %}
 
-<!-- CANCEL MODAL -->
-<div id="cancelModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3>Cancel Order</h3>
-        <p>Are you sure you want to cancel this order?</p>
-
-        <div class="modal-actions">
-            <button id="cancelNo" class="btn-no">No</button>
-            <button id="cancelYes" class="btn-yes">Yes, Cancel</button>
-        </div>
-    </div>
 </div>
 
-{% endblock %}
-<!-- CANCEL MODAL -->
-<div id="cancelModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3>Cancel Order</h3>
-        <p>Are you sure you want to cancel this order?</p>
-
-        <div class="modal-actions">
-            <button id="cancelNo" class="btn-no">No</button>
-            <button id="cancelYes" class="btn-yes">Yes, Cancel</button>
-        </div>
-    </div>
-</div>
-
-{% block extra_js %}
-<script src="{% static 'app/js/order_history.js' %}"></script>
 {% endblock %}

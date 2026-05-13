@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Accepted Orders</title>
+    <link rel="stylesheet" href="{% static 'delivery/css/style.css' %}">
+     
+    <link rel="stylesheet" href="{% static 'delivery/css/orders1.css' %}">
+</head>
+<body>
+
+<h2 class="section-title">✅ Accepted Orders</h2>
+<!-- Back to Dashboard Button -->
+    <a href="{% url 'delivery:delivery_dashboard' %}" class="back-btn">⬅️ Back to Dashboard</a>
+
+<table class="orders-table">
+    <tr>
+        <th>ID</th>
+        <th>Customer</th>
+        <th>Status</th>
+    </tr>
+
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.full_name }}</td>
+        <td>
+        
+            <span class="status {{ order.status }}">
+                {{ order.status }}
+            </span>
+        </td>
+          
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="2" class="no-orders">
+            No accepted orders found
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
+<script>
+document.querySelectorAll(".dashboard-btn").forEach(btn => {
+    btn.addEventListener("click", function(e) {
+
+        const circle = document.createElement("span");
+        circle.classList.add("ripple");
+
+        const rect = this.getBoundingClientRect();
+
+        circle.style.left = e.clientX - rect.left + "px";
+        circle.style.top = e.clientY - rect.top + "px";
+
+        this.appendChild(circle);
+
+        setTimeout(() => circle.remove(), 600);
+    });
+});
+</script>
+<script>
+window.addEventListener("load", () => {
+    document.body.classList.add("show-page");
+});
+
+document.querySelectorAll(".dashboard-btn").forEach(link => {
+    link.addEventListener("click", function(e) {
+
+        const url = this.href;
+        e.preventDefault();
+
+        document.body.style.opacity = "0";
+        document.body.style.transform = "translateX(-40px)";
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 300);
+    });
+});
+</script>

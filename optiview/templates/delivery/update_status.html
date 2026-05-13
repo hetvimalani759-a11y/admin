@@ -1,0 +1,158 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'delivery/css/update_status.css' %}">
+
+<div class="main-content">
+
+<h2 class="page-title">🚚 Update Order Status</h2>
+<!-- Back to Dashboard Button -->
+    <a href="{% url 'delivery:delivery_dashboard' %}" class="back-btn">⬅️ Back to Dashboard</a>
+
+<div class="table-box">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Products</th>
+                <th>Total Qty</th>
+                <th>Customer</th>
+                <th>Address</th>
+                <th>Payment</th>
+                <th>Order Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for order in orders %}
+            <tr>
+
+                <!-- Order ID -->
+                <td>#{{ order.id }}</td>
+
+                <!-- Products -->
+                <td>
+                    {% for item in order.items.all %}
+                        {{ item.product.name }} ({{ item.quantity }})<br>
+                    {% endfor %}
+                </td>
+
+                <!-- Total Quantity -->
+                <td>
+                    {{ order.items.all|length }}
+                </td>
+
+                <!-- Customer -->
+                <td>{{ order.full_name }}</td>
+
+                <!-- Address -->
+                <td>
+                    {{ order.address }},
+                    {{ order.city }},
+                    {{ order.state }} -
+                    {{ order.pincode }}
+                </td>
+
+                <!-- Payment -->
+                <td>
+    <strong>{{ order.payment_method }}</strong><br>
+
+   {% if order.payment_method == "COD" %}
+
+    {% if order.status == "delivered" or order.status == "partially_delivered" %}
+        <span class="paid">✅ Paid (COD)</span><br>
+        ₹{{ order.final_total|floatformat:0 }}
+    {% else %}
+        💰₹{{ order.final_total|floatformat:0 }}
+        <span class="pending">Pay on Delivery</span>
+    {% endif %}
+
+{% else %}
+
+    {% if order.payment_status %}
+        <span class="paid">✅ Paid</span>
+    {% else %}
+        <span class="pending">❌ Pending</span>
+    {% endif %}
+
+{% endif %}
+</td>
+
+                <!-- Order Status -->
+                <td>
+                    <span class="badge {{ order.status }}">
+                        {{ order.status|title }}
+                    </span>
+                </td>
+
+                <!-- Actions -->
+                <td>
+
+    <!-- ACCEPT / REJECT ONLY ONCE -->
+    {% if order.status == "assigned" %}
+        <form method="POST" action="{% url 'delivery:accept_reject_order' order.id %}">
+            {% csrf_token %}
+
+            <button type="submit" name="action" value="accept" class="btn blue">
+                Accept
+            </button>
+
+            <button type="submit" name="action" value="reject" class="btn red">
+                Reject
+            </button>
+        </form>
+    {% endif %}
+
+
+    <!-- ITEM STATUS LOOP -->
+    {% for item in order.items.all %}
+
+        {% if item.status == "accepted" %}
+            <form method="POST" action="{% url 'delivery:update_item_status' item.id %}">
+                {% csrf_token %}
+                <button type="submit" name="action" value="out" class="btn orange">
+                    Out for Delivery
+                </button>
+            </form>
+
+        {% elif item.status == "out_for_delivery" %}
+            <form method="POST" action="{% url 'delivery:update_item_status' item.id %}">
+                {% csrf_token %}
+                <button type="submit" name="action" value="complete" class="btn green">
+                    Complete
+                </button>
+            </form>
+
+        {% elif item.status == "delivered" %}
+            <span class="text-green">Delivered</span><br>
+
+        {% elif item.status == "rejected" %}
+            <span class="text-red">Rejected</span><br>
+
+        {% elif item.status == "cancelled" %}
+            <span class="text-red">Cancelled</span><br>
+
+        {% endif %}
+
+    {% endfor %}
+
+</td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align:center; padding:20px;">
+                    🚫 No Orders Available
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+
+</div>

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'adminpanel',
     'app',
     'delivery',
+    'orders'
   
 ]
 
@@ -155,23 +156,23 @@ MEDIA_ROOT = BASE_DIR / 'media'
 APPEND_SLASH = True
 BASE_DIR=Path(__file__).resolve().parent.parent
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'         # Your SMTP server
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = 'harshanavadiya074@gmail.com'
-EMAIL_HOST_PASSWORD = 'qybe darg xxqe yphb'
-
+EMAIL_HOST_USER='asitamalani@gmail.com'
+EMAIL_HOST_PASSWORD='qeidttttnnzvjfsf'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # LOGIN_URL = '/login/'
 # LOGIN_REDIRECT_URL = '/'
 # LOGOUT_REDIRECT_URL = '/login/'
 # LOGIN_REDIRECT_URL = "/"
 # LOGOUT_REDIRECT_URL = "/"
 
-LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/login/"
+# Authentication redirects
+LOGIN_URL = '/login/'               # customer login page
+LOGIN_REDIRECT_URL = "/"             # after login, go home
+LOGOUT_REDIRECT_URL = "/login/"      # after logout, go to login page
 
-LOGIN_URL = '/admin-panel/login/'  
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-

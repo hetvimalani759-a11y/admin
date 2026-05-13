@@ -31,6 +31,12 @@
             <label>Subcategory Name</label>
             <input type="text" name="name" required>
           </div>
+          <div class="form-group">
+  <label style="display:flex; align-items:center; gap:8px;">
+    <input type="checkbox" name="allow_lens">
+    Allow Lens Selection
+  </label>
+</div>
 
           <button type="submit" class="btn-primary w-100">Add Subcategory</button>
         </form>
@@ -45,9 +51,10 @@
         <table class="subcategory-table">
           <thead>
             <tr>
-              <th>#</th>
+              <th>Id</th>
               <th>Subcategory</th>
               <th>Category</th>
+              <th>Allow Lens</th>
               <th class="actions-col">Actions</th>
             </tr>
           </thead>
@@ -57,6 +64,13 @@
               <td>{{ forloop.counter }}</td>
               <td>{{ sub.name }}</td>
               <td>{{ sub.category.name }}</td>
+              <td>
+  {% if sub.allow_lens %}
+      ✅
+  {% else %}
+      ❌
+  {% endif %}
+</td>
               <td class="actions">
                 <button type="button"
                         class="btn-edit"

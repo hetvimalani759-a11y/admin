@@ -2,6 +2,27 @@ document.addEventListener("DOMContentLoaded", function () {
     const accountBtn = document.getElementById("accountBtn");
     const accountDropdown = document.getElementById("accountDropdown");
 
+    function markAsRead(id, element) {
+    fetch(`/notification/read/${id}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": document.getElementById("csrf-token").value,
+            "Content-Type": "application/json"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "success") {
+            element.remove(); // remove from UI
+
+            // update count
+            let countEl = document.getElementById("notif-count");
+            let count = parseInt(countEl.innerText) || 0;
+            countEl.innerText = Math.max(count - 1, 0);
+        }
+    })
+    .catch(err => console.error("Error:", err));
+}
     accountBtn.addEventListener("click", () => {
         accountDropdown.classList.toggle("show");
     });
@@ -13,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    
     
 
 
@@ -35,12 +57,23 @@ document.addEventListener("DOMContentLoaded", function () {
                     notifCount.innerText = notifications.length;
 
                     notifications.forEach(n => {
-                        const div = document.createElement("div");
-                        div.classList.add("notif-item");
-                        div.innerHTML = `<p><strong>${n.title}</strong></p><p>${n.message}</p>`;
+                    const div = document.createElement("div");
+                    div.classList.add("notif-item");
 
-                        notifItems.appendChild(div);
+                    div.innerHTML = `
+                        <p><strong>${n.title}</strong></p>
+                        <p>${n.message}</p>
+                        `;
+
+                    // ✅ ADD THIS (VERY IMPORTANT)
+                    div.addEventListener("click", function (e) {
+                        e.stopPropagation();   // prevent dropdown close
+                        console.log("CLICKED:", n.id); // debug
+                        markAsRead(n.id, div);
                     });
+
+                    notifItems.appendChild(div);
+                });
                 }
             });
 

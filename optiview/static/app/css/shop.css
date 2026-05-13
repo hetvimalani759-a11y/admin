@@ -407,3 +407,107 @@ body {
     height: 250px;   /* same as container */
     object-fit: cover;   /* or contain */
 }
+/* ================= FILTER SIDEBAR PREMIUM ================= */
+
+.filter-sidebar {
+    background: #ffffff;
+    padding: 25px 20px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+    position: sticky;
+    top: 20px;
+    transition: 0.3s ease;
+}
+
+/* Section Heading */
+.filter-sidebar h5 {
+    font-weight: 600;
+    font-size: 15px;
+    color: #0d6efd;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Divider Line */
+.filter-sidebar hr {
+    margin: 18px 0;
+    opacity: 0.1;
+}
+
+/* Filter Items */
+.filter-item {
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: 0.2s ease;
+}
+
+.filter-item:hover {
+    background: rgba(13,110,253,0.05);
+}
+
+/* Checkbox */
+.filter-item input[type="checkbox"] {
+    accent-color: #0d6efd;
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+/* Label */
+.filter-item label {
+    margin-left: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Price Input */
+.filter-sidebar input[type="number"] {
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 8px;
+    transition: 0.3s ease;
+}
+
+.filter-sidebar input[type="number"]:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+}
+
+/* Apply Button */
+.filter-sidebar .btn-primary {
+    background: linear-gradient(45deg, #0d6efd, #3b82f6);
+    border: none;
+    border-radius: 14px;
+    padding: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: 0.3s ease;
+}
+
+.filter-sidebar .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(13,110,253,0.35);
+}
+.parent-cat {
+    cursor: pointer;
+}
+
+.toggle-sub {
+    font-size: 0.9rem;
+    color: #5b4de0;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from {opacity:0; transform: translateY(-5px);}
+    to {opacity:1; transform: translateY(0);}
+}
+
+.filter-section .filter-body {
+    display: none; /* Hide by default */
+}
+
+.filter-section.active .filter-body {
+    display: block; /* Show when active */
+}

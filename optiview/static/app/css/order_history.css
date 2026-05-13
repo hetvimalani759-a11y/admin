@@ -62,7 +62,12 @@
   padding: 10px 0;
   border-top: 1px solid #eee;
 }
-
+.item-image-wrapper img {
+    width: 100px;       /* or whatever fits your design */
+    height: auto;       /* maintain aspect ratio */
+    object-fit: cover;  /* crop nicely if needed */
+    border-radius: 8px; /* optional rounded corners */
+}
 .item-image { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
 
 .item-info { flex: 1; }
@@ -82,9 +87,9 @@
   text-align: center;
 }
 
-.track-btn { background: #0073e6; color: #fff; }
-.invoice-btn { background: #2a0039; color: #fff; }
-.cancel-btn { background: red; color: #fff; }
+.track-btn { background: #7597b9; color: #2b0505; }
+.invoice-btn { background: #94b198; color: #000000; }
+.cancel-btn { background: rgb(233, 129, 129); color: #000000; }
 
 .rating-box { margin-top: 10px; }
 .stars i {
@@ -180,4 +185,170 @@
 @keyframes popupFade {
     from { transform: scale(0.9); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
+}
+
+/* TIMELINE BASE */
+.status-timeline {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* STEP */
+.timeline-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* CIRCLE */
+.timeline-step .icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #d1d5db;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+/* ACTIVE CIRCLE */
+.timeline-step.active .icon {
+    background: #16a34a;   /* GREEN */
+}
+
+/* CONNECTOR LINE */
+.timeline-connector {
+    flex: 1;
+    height: 3px;
+    background: #d1d5db;   /* DEFAULT GREY */
+    margin: 0 10px;
+}
+
+/* ACTIVE CONNECTOR */
+.timeline-connector.active {
+    background: #16a34a;   /* GREEN */
+}
+
+.return-btn{
+background:#b497ad;
+color:rgb(0, 0, 0);
+border:none;
+padding:8px 14px;
+border-radius:6px;
+cursor:pointer;
+font-size:13px;
+}
+
+.return-btn:hover{
+background:#baa17d;
+}
+
+.return-badge{
+background:#fff3cd;
+color:#856404;
+padding:6px 10px;
+border-radius:6px;
+font-size:12px;
+display:inline-block;
+}
+
+.return-badge.approved{
+background:#d4edda;
+color:#000000;
+}
+
+.return-badge.rejected{
+background:#f8d7da;
+color:#76484c;
+}
+
+.return-badge.completed{
+background:#cce5ff;
+color:#004085;
+}
+
+
+/* FEEDBACK SECTION */
+
+.feedback-section{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 16px;
+margin-top:12px;
+border-top:1px solid #eee;
+background:#fafafa;
+border-radius:6px;
+}
+
+.feedback-left{
+font-size:14px;
+color:#555;
+font-weight:500;
+}
+
+.feedback-right{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.feedback-btn{
+background:#0a3f5e;
+color:#fff;
+padding:7px 16px;
+border-radius:5px;
+text-decoration:none;
+font-size:13px;
+font-weight:500;
+transition:0.2s;
+}
+
+.feedback-btn:hover{
+background:#218838;
+}
+
+.reviewed-badge{
+background:#e8f8ef;
+color:#2e7d32;
+padding:6px 12px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+}
+
+
+.complaint-btn{
+background:#414289d0;
+color:rgb(250, 250, 250);
+padding:6px 14px;
+border-radius:6px;
+text-decoration:none;
+font-size:13px;
+}
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* COLORS */
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-resolved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-rejected {
+    background: #f8d7da;
+    color: #721c24;
 }

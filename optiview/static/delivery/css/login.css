@@ -67,3 +67,25 @@ body {
     display: block;
     margin-bottom: 10px;
 } 
+
+.alert{
+padding:10px;
+margin-bottom:12px;
+border-radius:6px;
+font-size:14px;
+}
+
+.alert.success{
+background:#e6ffed;
+color:#2e7d32;
+}
+
+.alert.error{
+background:#ffe5e5;
+color:#c62828;
+}
+
+.error{
+color:red;
+font-size:13px;
+}
