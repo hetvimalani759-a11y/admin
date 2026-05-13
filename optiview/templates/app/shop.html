@@ -1,106 +1,649 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Shop</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
+{% extends 'app/base.html' %}
+{% load static %}
 
-<header class="header">
-    <div class="logo">Optiview</div>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/shop/">Shop</a>
-        <a href="/contact/">Contact</a>
-        <a href="/about/">About</a>
-        <a href="/products/">products</a>
-        <a href="/lenses/">lenses</a>
-    </nav>
-</header>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/shop.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
-<section class="shop-section">
-    <h2>Shop Goggles</h2>
+<style>
+/* ================= PRODUCT CARD ================= */
+.product-card {
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    transition: 0.2s ease;
+}
+.product-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 
-    <!-- SEARCH + FILTER -->
-    <div class="filter-bar">
-        <input type="text" placeholder="Search products...">
+/* ================= IMAGE SLIDER ================= */
+.product-image-slider {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    border-radius: 6px;
+    cursor: pointer;
+}
+.product-image-slider img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+.color-swatch {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    margin-right: 5px;
+    border: 1px solid #aaa;
+    cursor: pointer;
+}
+.price-row { margin-top: 8px; }
+.discounted-price { font-weight: bold; color: #5b4de0; }
+.original-price { text-decoration: line-through; color: #888; margin-left: 8px; }
+.discount-text { color: #28a745; margin-left: 5px; font-size: 0.85rem; }
+.card-actions { margin-top: 10px; }
 
-        <select>
-            <option>Category</option>
-            <option>Men</option>
-            <option>Women</option>
-        </select>
+/* ================= FILTER SIDEBAR ================= */
+.filter-section {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+}
+.filter-header .arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+/* Rotate arrow when active */
+.filter-section.active .arrow {
+    transform: rotate(180deg);
+}
+/* Hide filter body by default */
+.filter-section .filter-body {
+    display: none;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+/* Show filter body when active */
+.filter-section.active .filter-body {
+    display: block;
+}
+.subcategory-box {
+    display: none; /* initially hidden */
+    margin-top: 5px;
+}
+.subcategory-box.active {
+    display: block;
+}
+/* Material filter same as brand */
+.filter-section {
+    margin-bottom: 15px;
+}
 
-        <select>
-            <option>Sub-Category</option>
-            <option>Sport</option>
-            <option>Classic</option>
-            <option>Premium</option>
-        </select>
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
 
-        <button class="btn">Search</button>
+.filter-item input {
+    cursor: pointer;
+}
+
+.filter-item label {
+    cursor: pointer;
+    font-size: 14px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="text-center mb-4">🛍 Shop Goggles</h2>
+
+    <div class="row">
+<!-- ================= FILTER SIDEBAR ================= -->
+<div class="col-md-3">
+    <form method="GET" class="filter-sidebar">
+
+        <!-- CATEGORY FILTER -->
+        <div class="filter-section active">
+            <div class="filter-header" onclick="toggleSection(this)">
+                <span>Category</span>
+                <span class="arrow">⌄</span>
+            </div>
+            <div class="filter-body">
+                {% for cat in categories %}
+                <div class="filter-category mb-2">
+                    <div class="d-flex justify-content-between align-items-center parent-cat">
+                        <div>
+                            <input type="checkbox" name="category" value="{{ cat.id }}" 
+                                {% if cat.id|stringformat:"s" in selected_categories %}checked{% endif %}>
+                            <label class="fw-semibold">{{ cat.name }}</label>
+                        </div>
+                        {% if cat.subcategories.exists %}
+                        <span onclick="toggleSub({{ cat.id }});event.stopPropagation();" style="cursor:pointer;">⌄</span>
+                        {% endif %}
+                    </div>
+                    <div id="sub-{{ cat.id }}" class="subcategory-box {% if cat.id|stringformat:'s' in selected_subcategories %}active{% endif %}">
+                        {% for sub in cat.subcategories.all %}
+                        <div class="filter-item">
+                            <input type="checkbox" name="subcategory" value="{{ sub.id }}"
+                                {% if sub.id|stringformat:"s" in selected_subcategories %}checked{% endif %}>
+                            <label>{{ sub.name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- FRAME TYPE FILTER -->
+        <div class="filter-section">
+            <div class="filter-header" onclick="toggleSection(this)">
+                <span>Frame Type</span>
+                <span class="arrow">⌄</span>
+            </div>
+            <div class="filter-body">
+                <div class="filter-group mt-2">
+                    {% for type in frame_types %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="frame_type" value="{{ type.id }}"
+                               {% if type.id|stringformat:"s" in selected_frames %}checked{% endif %}>
+                        <label class="form-check-label">{{ type.name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- FRAME SHAPE FILTER -->
+        <div class="filter-section">
+            <div class="filter-header" onclick="toggleSection(this)">
+                <span>Frame Shape</span>
+                <span class="arrow">⌄</span>
+            </div>
+            <div class="filter-body">
+                <div class="filter-group mt-2">
+                    {% for shape in frame_shapes %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="frame_shape" value="{{ shape.id }}"
+                               {% if shape.id|stringformat:"s" in selected_shapes %}checked{% endif %}>
+                        <label class="form-check-label">{{ shape.name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- PRICE FILTER -->
+        <div class="filter-section">
+            <div class="filter-header" onclick="toggleSection(this)">
+                <span>Price Range</span>
+                <span class="arrow">⌄</span>
+            </div>
+            <div class="filter-body mt-2">
+                <input type="number" name="min_price" value="{{ request.GET.min_price }}" placeholder="Min Price" class="form-control mb-2">
+                <input type="number" name="max_price" value="{{ request.GET.max_price }}" placeholder="Max Price" class="form-control">
+            </div>
+        </div>
+
+        <!-- COLOR FILTER -->
+        <div class="filter-section">
+            <div class="filter-header" onclick="toggleSection(this)">
+                <span>Color</span>
+                <span class="arrow">⌄</span>
+            </div>
+            <div class="filter-body mt-2">
+                {% for color in colors %}
+                <div class="filter-item">
+                    <input type="checkbox" name="color" value="{{ color.id }}"
+                        {% if color.id|stringformat:"s" in selected_colors %}checked{% endif %}>
+                    <label>{{ color.name }}</label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- BRAND FILTER -->
+        <div class="filter-section">
+            <div class="filter-header" onclick="toggleSection(this)">
+                <span>Brand</span>
+                <span class="arrow">⌄</span>
+            </div>
+            <div class="filter-body mt-2">
+                {% for brand in brands %}
+                <div class="filter-item">
+                    <input type="checkbox" name="brand" value="{{ brand.id }}"
+                        {% if brand.id|stringformat:"s" in selected_brands %}checked{% endif %}>
+                    <label>{{ brand.name }}</label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- STOCK FILTER -->
+        <div class="filter-section">
+            <div class="filter-header" onclick="toggleSection(this)">
+                <span>Stock</span>
+                <span class="arrow">⌄</span>
+            </div>
+            <div class="filter-body mt-2">
+                <div class="filter-item">
+                    <input type="checkbox" name="stock" value="1" {% if request.GET.stock %}checked{% endif %}>
+                    <label>In Stock</label>
+                </div>
+            </div>
+        </div>
+<!-- ================= MATERIAL ================= -->
+<div class="filter-section">
+    <div class="filter-header" onclick="toggleSection(this)">
+        <span>Material</span>
+        <span class="arrow">⌄</span>
     </div>
-    
-    <div class="shop-container">
-        {% for product in products %}
-        <div class="product-card">
-            <img src="{% static product.image %}" alt="{{ product.name }}">
-            <h3>{{ product.name }}</h3>
-            <p>₹{{ product.price }}</p>
 
-            <a href="/product/{{ product.id }}/" class="btn primary">
-                Buy Now
-            </a>
+    <div class="filter-body">
+        {% for material in materials %}
+        <div class="filter-item">
+            <input type="checkbox"
+                name="material"
+                value="{{ material.id }}"
+                {% if material.id|stringformat:"s" in selected_materials %}checked{% endif %}>
+            <label>{{ material.name }}</label>
         </div>
         {% endfor %}
     </div>
-</section>
+</div>
+        <button type="submit" class="btn btn-primary w-100 mt-3">
+    Apply Filters
+</button>
 
-<footer class="figma-footer">
+<button type="button"
+        class="btn btn-outline-secondary w-100 mt-2"
+        onclick="clearFilters()">
+    Clear Filters
+</button>
 
-    <div class="footer-grid">
+    </form>
 
-        <div class="footer-col">
-            <h4>Optiview</h4>
-            <p>
-                Premium goggles designed for style,
-                comfort and eye protection.
-            </p>
-        </div>
+</div>
+        <!-- ================= PRODUCTS GRID ================= -->
+        <div class="col-md-9">
+            <div class="row g-3">
 
-        <div class="footer-col">
-            <h4>Quick Links</h4>
-            <p><a href="/">Home</a></p>
-            <p><a href="/shop/">Shop</a></p>
-            <p><a href="/about/">About Us</a></p>
-            <p><a href="/contact/">Contact</a></p>
-        </div>
+                {% for product in products %}
+                <div class="col-md-4">
+                    <div class="product-card">
+                        
 
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p>Email: info@optiview.com</p>
-            <p>Phone: +91 98765 43210</p>
-            <p>Mon - Sat: 9AM - 8PM</p>
-        </div>
+                        <!-- IMAGE -->
+                        <div class="product-image-slider" data-url="{% url 'app:product_detail' product.id %}">
+                            {% if product.variants.first and product.variants.first.images.all|length > 1 %}
+    <img class="product-main-image" src="{{ product.variants.first.images.all.1.image.url }}">
+{% elif product.variants.first and product.variants.first.images.first %}
+    <img class="product-main-image" src="{{ product.variants.first.images.first.image.url }}">
+{% else %}
+    <img class="product-main-image" src="{% static 'app/images/default.png' %}">
+{% endif %}
+                        </div>
 
-        <div class="footer-col">
-            <h4>Follow Us</h4>
-            <p>Facebook</p>
-            <p>Instagram</p>
-            <p>Twitter</p>
+                        <!-- PRODUCT INFO -->
+                        <div class="mt-2">
+                            <div class="text-muted small">{{ product.brand|default:"Brand Name" }}</div>
+                            <h6>{{ product.name }}</h6>
+
+                            <!-- Color Swatches -->
+                            {% if product.variants.exists %}
+                            <div class="mb-2">
+                                {% for variant in product.variants.all %}
+                                    {% if variant.images.first %}
+                                    <span class="color-swatch"
+                                          style="background-color: {{ variant.color.code }}"
+                                          {% if variant.images.all|length > 1 %}
+    data-image="{{ variant.images.all.1.image.url }}"
+{% else %}
+    data-image="{{ variant.images.first.image.url }}"
+{% endif %}
+                                          data-variant="{{ variant.id }}"
+                                          data-stock="{{ variant.stock }}"></span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            <!-- Price -->
+                            <div class="price-row">
+                                {% with offer=product.get_best_offer %}
+                                    {% if offer %}
+                                        <span class="discounted-price">₹{{ product.get_final_price|floatformat:0 }}</span>
+                                        <span class="original-price">₹{{ product.price|floatformat:0 }}</span>
+                                        {% if offer.discount_type == "percent" %}
+                                            <span class="discount-text">({{ offer.discount_value }}% OFF)</span>
+                                        {% else %}
+                                            <span class="discount-text">(₹{{ offer.discount_value }} OFF)</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="discounted-price">₹{{ product.price|floatformat:0 }}</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+
+                            
+                            <!-- Buttons -->
+                            <div class="card-actions d-flex gap-2 mt-2">
+                                
+                                 {% if product.has_stock %}
+
+    {% if product.subcategory and product.subcategory.allow_lens %}
+        <a href="{% url 'app:product_detail' product.id %}" 
+           class="btn btn-warning btn-sm">
+            👓 Select Lens
+        </a>
+    {% else %}
+        <button class="btn btn-primary btn-sm add-to-cart-btn"
+                data-id="{{ product.id }}"
+                data-variant-id="{% if product.variants.first %}{{ product.variants.first.id }}{% endif %}">
+            🛒 Add to Cart
+        </button>
+    {% endif %}
+
+{% else %}
+    <button class="btn btn-secondary btn-sm" disabled>
+        Out of Stock
+    </button>
+{% endif %}
+
+                                <button class="btn btn-sm toggle-wishlist-btn"
+                                        data-id="{{ product.id }}">
+                                    {% if product.id in wishlist_ids %}
+                                        <i class="fa-solid fa-heart text-danger"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-heart"></i>
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No products found.</p>
+                {% endfor %}
+
+            </div>
         </div>
 
     </div>
+</div>
+{% endblock %}
 
-    <div class="footer-brand">
-        <h2>Optiview</h2>
-        <p>© 2026 Optiview. All rights reserved.</p>
-    </div>
+{% block extra_js %}
+<script>
+// ================= CLEAR FILTERS =================
+window.clearFilters = function(){
+    window.location.href = "{% url 'app:shop' %}";
+}
 
-</footer>
+document.addEventListener("DOMContentLoaded", () => {
 
+    const csrfToken =
+        document.querySelector("[name=csrfmiddlewaretoken]")?.value ||
+        document.getElementById("csrf-token")?.value;
+// // ================= AUTO SELECT FIRST VARIANT =================
+// ================= AUTO SELECT FIRST VARIANT WITH STOCK CHECK =================
+document.querySelectorAll(".product-card").forEach(card => {
 
+    const swatches = card.querySelectorAll(".color-swatch");
+    const mainImage = card.querySelector(".product-main-image");
+    const addBtn = card.querySelector(".add-to-cart-btn");
 
-</body>
-</html>
+    // ❌ No variants
+    if (!swatches.length) return;
+
+    // ✅ Find FIRST IN-STOCK variant
+    let selected = Array.from(swatches)
+        .find(s => parseInt(s.dataset.stock) > 0);
+
+    // ❗ If no stock → fallback first
+    if (!selected) {
+        selected = swatches[0];
+    }
+
+    // ✅ Set image
+    if (mainImage && selected.dataset.image) {
+        mainImage.src = selected.dataset.image;
+    }
+
+    // ✅ Set variant ID
+    if (addBtn) {
+        addBtn.dataset.variantId = selected.dataset.variant;
+    }
+
+    // ✅ STOCK UI HANDLE
+    const stock = parseInt(selected.dataset.stock);
+
+    if (addBtn) {
+        if (stock > 0) {
+            addBtn.disabled = false;
+            addBtn.classList.remove("btn-secondary");
+            addBtn.classList.add("btn-primary");
+            addBtn.innerText = "🛒 Add to Cart";
+        } else {
+            addBtn.disabled = true;
+            addBtn.classList.remove("btn-primary");
+            addBtn.classList.add("btn-secondary");
+            addBtn.innerText = "Out of Stock";
+        }
+    }
+
+    // ✅ Highlight selected color
+    swatches.forEach(s => s.style.border = "1px solid #aaa");
+    selected.style.border = "2px solid black";
+
+});
+
+// ================= CHANGE IMAGE ON COLOR CLICK =================
+document.querySelectorAll(".color-swatch").forEach(swatch => {
+    swatch.addEventListener("click", () => {
+
+        const card = swatch.closest(".product-card");
+        const mainImage = card.querySelector(".product-main-image");
+        const addBtn = card.querySelector(".add-to-cart-btn");
+
+        const stock = parseInt(swatch.dataset.stock);
+
+        // Change image
+        if (mainImage) mainImage.src = swatch.dataset.image;
+
+        // Save variant id
+        if (addBtn) {
+            addBtn.dataset.variantId = swatch.dataset.variant;
+
+            // 🔥 STOCK CHECK LOGIC
+            if (stock <= 0) {
+                addBtn.disabled = true;
+                addBtn.classList.remove("btn-primary");
+                addBtn.classList.add("btn-secondary");
+                addBtn.innerText = "Out of Stock";
+            } else {
+                addBtn.disabled = false;
+                addBtn.classList.remove("btn-secondary");
+                addBtn.classList.add("btn-primary");
+                addBtn.innerText = "🛒 Add to Cart";
+            }
+        }
+
+        // Highlight selected color
+        card.querySelectorAll(".color-swatch").forEach(s => {
+            s.style.border = "1px solid #aaa";
+        });
+        swatch.style.border = "2px solid black";
+    });
+});
+    // ================= TOAST FUNCTION =================
+    let toastEl = null;
+
+    function showToast(message, type = "success") {
+        if (!toastEl) {
+            toastEl = document.createElement("div");
+            toastEl.style.position = "fixed";
+            toastEl.style.top = "20px";
+            toastEl.style.right = "20px";
+            toastEl.style.zIndex = "9999";
+            document.body.appendChild(toastEl);
+        }
+
+        toastEl.innerHTML = `
+            <div style="
+                background:${type === "success" ? "#5ec8ec" : "#dc3545"};
+                color:white;
+                padding:10px 16px;
+                border-radius:6px;
+                box-shadow:0 4px 10px rgba(0,0,0,.15);
+                margin-bottom:8px;">
+                ${message}
+            </div>`;
+
+        setTimeout(() => toastEl.innerHTML = "", 2500);
+    }
+
+    // ================= REDIRECT ON IMAGE CLICK =================
+    document.querySelectorAll(".product-image-slider").forEach(slider => {
+        slider.addEventListener("click", e => {
+            if (e.target.classList.contains("color-swatch")) return;
+            const url = slider.dataset.url;
+            if (url) window.location.href = url;
+        });
+    });
+
+    // ================= GLOBAL CLICK HANDLER =================
+    document.body.addEventListener("click", async e => {
+
+        // ================= ADD TO CART =================
+        const cartBtn = e.target.closest(".add-to-cart-btn");
+        if (cartBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (cartBtn.disabled) {
+                showToast("❌ Product is out of stock", "error");
+                return;
+            }
+
+            // ✅ FIXED: check variant_id instead of selectedImage
+            if (!cartBtn.dataset.variantId) {
+                showToast("⚠️ Please select a color before adding to cart", "error");
+                return;
+            }
+
+            if (cartBtn.dataset.added === "true") {
+                window.location.href = "/cart/";
+                return;
+            }
+
+            if (cartBtn.dataset.loading === "true") return;
+            cartBtn.dataset.loading = "true";
+
+            try {
+                const res = await fetch(`/add-to-cart/${cartBtn.dataset.id}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        variant_id: cartBtn.dataset.variantId   // ✅ FIXED
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+
+                    // ✅ Update cart count instantly
+                    const cartCountEl = document.getElementById("cart-count");
+                    if (cartCountEl) {
+                        cartCountEl.innerText = data.cart_count;
+                    }
+
+                    showToast("🛒 Added to cart");
+
+                    cartBtn.textContent = "🛒 Go to Cart";
+                    cartBtn.classList.remove("btn-primary");
+                    cartBtn.classList.add("btn-success");
+                    cartBtn.dataset.added = "true";
+
+                } else {
+                    showToast(data.error || "Failed to add", "error");
+                }
+
+            } catch (err) {
+                showToast("Please login before adding to cart", "error");
+            } finally {
+                cartBtn.dataset.loading = "false";
+            }
+
+            return;
+        }
+
+        // ================= WISHLIST TOGGLE =================
+        const wishBtn = e.target.closest(".toggle-wishlist-btn");
+        if (wishBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const icon = wishBtn.querySelector("i");
+
+            try {
+                const res = await fetch(`/wishlist/toggle/${wishBtn.dataset.id}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+
+                const data = await res.json();
+
+                if (data.status === "added") {
+                    icon.classList.remove("fa-regular");
+                    icon.classList.add("fa-solid", "text-danger");
+                    showToast("💖 Added to wishlist");
+                } else if (data.status === "removed") {
+                    icon.classList.remove("fa-solid", "text-danger");
+                    icon.classList.add("fa-regular");
+                    showToast("💔 Removed from wishlist");
+                }
+
+            } catch (err) {
+                showToast("Please login before adding to wishlist", "error");
+            }
+        }
+
+    });
+
+    // ================= FILTER TOGGLE FUNCTIONS =================
+    window.toggleSection = function(header){
+        const section = header.closest(".filter-section");
+        section.classList.toggle("active");
+    }
+
+    window.toggleSub = function(id){
+        const box = document.getElementById("sub-"+id);
+        box.classList.toggle("active");
+    }
+
+});
+</script>
+{% endblock %}

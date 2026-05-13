@@ -1,0 +1,93 @@
+.lens-page {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.lens-card {
+  width: 100%;
+  max-width: 980px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: var(--card-shadow);
+}
+
+.page-title {
+  margin-bottom: 16px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.lens-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.lens-table thead {
+  background: var(--table-head);
+}
+
+.lens-table th,
+.lens-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--card-border);
+  color: var(--text-main);
+}
+
+.lens-table tbody tr:hover {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.price {
+  font-weight: 600;
+}
+
+.empty {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+}
+/* Reusable Actions Buttons */
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-edit {
+    background: #eef4ff;
+    color: #2563eb;
+}
+
+.btn-edit:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: white;
+}

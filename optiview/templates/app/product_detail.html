@@ -1,87 +1,873 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{{ product.name }}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
-<header class="header">
-    <div class="logo">Optiview</div>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/shop/">Shop</a>
-        <a href="/contact/">Contact</a>
-        <a href="/about/">About</a>
-        <a href="/products/">products</a>
-        <a href="/lenses/">lenses</a>
-    </nav>
-</header>
+{% extends 'app/base.html' %}
+{% load static %}
 
-<section class="product-detail">
-    <div class="detail-container">
+{% block extra_css %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
 
-        <img src="{% static product.image %}" alt="{{ product.name }}">
+<style>
 
-        <div class="detail-info">
-            <h2>{{ product.name }}</h2>
-            <p class="price">₹{{ product.price }}</p>
+/* ================= GLOBAL ================= */
+body {
+    background: #f4f6f9;
+}
 
-            <p class="desc">{{ product.description }}</p>
+.product-page {
+    background: #fff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.05);
+}
 
-            <p><strong>Category:</strong> {{ product.category }}</p>
-            <p><strong>Sub-Category:</strong> {{ product.subcategory }}</p>
+/* ================= GALLERY ================= */
+.gallery-wrapper {
+    text-align: center;
+}
 
-            <button class="btn primary">Add to Cart</button>
+.main-image {
+    width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: 14px;
+    background: #fafafa;
+    padding: 20px;
+}
+
+.thumbnail-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.thumbnail-row img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    transition: 0.2s ease;
+}
+
+.thumbnail-row img:hover {
+    transform: scale(1.05);
+}
+.thumbnail-row img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}
+
+.thumbnail-row img.active {
+    border: 2px solid #000;
+}
+/* ================= PRODUCT INFO ================= */
+.product-brand {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #777;
+}
+
+.product-title {
+    font-size: 30px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.price-section {
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.original-price {
+    text-decoration: line-through;
+    font-size: 16px;
+    color: #888;
+    margin-left: 10px;
+}
+
+.discount-text {
+    color: #28a745;
+    margin-left: 8px;
+}
+
+.stock-status {
+    font-weight: 500;
+    margin-top: 10px;
+}
+
+.delivery-info {
+    font-size: 14px;
+    color: #2a7a2a;
+}
+
+/* ================= COLOR OPTIONS ================= */
+.color-options {
+    margin-top: 20px;
+}
+
+.color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-block;
+    cursor: pointer;
+    border: 2px solid #ddd;
+    margin-right: 8px;
+    transition: 0.2s;
+}
+
+.color-swatch.active {
+    border: 2px solid #000;
+}
+
+/* ================= BUTTONS ================= */
+.action-buttons {
+    margin-top: 25px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    border-radius: 8px;
+    padding: 10px 18px;
+}
+.lens-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 350px;
+    height: 100%;
+    background: white;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+    transition: 0.3s ease;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.lens-panel.active {
+    right: 0;
+}
+
+.close-btn {
+    float: right;
+    font-size: 22px;
+    cursor: pointer;
+}
+/* ================= REVIEWS ================= */
+.review-section {
+    margin-top: 50px;
+}
+
+.review-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.review-card strong {
+    font-size: 15px;
+}
+
+.review-card p {
+    margin: 6px 0 0;
+    font-size: 14px;
+}
+.review-stars{
+font-size:20px;
+margin:5px 0;
+}
+
+.star{
+color:#ccc;
+}
+
+.star.filled{
+color:#ffc107;
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+<input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+
+<div class="container py-5">
+<div class="product-page">
+
+<div class="row g-5">
+
+    <!-- ================= LEFT SIDE ================= -->
+    <div class="col-md-5 gallery-wrapper">
+
+        <img id="main-image"
+             class="main-image"
+             src="{% if product.variants.first and product.variants.first.images.first %}
+                    {{ product.variants.first.images.first.image.url }}
+                  {% else %}
+                    {% static 'app/images/default.png' %}
+                  {% endif %}">
+
+        <div id="thumbnail-container" class="thumbnail-row"></div>
+
+        {% if product.variants.exists %}
+        <div class="color-options">
+            <strong>Available Colors:</strong><br><br>
+            {% for variant in product.variants.all %}
+            <span class="color-swatch"
+                  style="background: {{ variant.color.code|default:'#000' }}"
+                  data-images='[
+                    {% for img in variant.images.all %}
+                        "{{ img.image.url }}"{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                  ]'
+                  data-variant="{{ variant.id }}"
+                  data-stock="{{ variant.stock }}"
+                  data-delivery="{{ product.estimated_delivery_days|default:'3-5' }}">
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+
+
+    <!-- ================= RIGHT SIDE ================= -->
+    <div class="col-md-7">
+
+        <div class="product-brand">
+            {{ product.brand|default:"Brand Name" }}
+        </div>
+
+        <div class="product-title">
+            {{ product.name }}
+        </div>
+
+        <!-- PRICE -->
+        <div class="price-section">
+            {% with offer=product.get_best_offer %}
+                {% if offer %}
+                    ₹{{ product.get_final_price|floatformat:0 }}
+                    <span class="original-price">
+                        ₹{{ product.price|floatformat:0 }}
+                    </span>
+
+                    {% if offer.discount_type == "percent" %}
+                        <span class="discount-text">
+                            ({{ offer.discount_value }}% OFF)
+                        </span>
+                    {% else %}
+                        <span class="discount-text">
+                            (₹{{ offer.discount_value }} OFF)
+                        </span>
+                    {% endif %}
+                {% else %}
+                    ₹{{ product.price|floatformat:0 }}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="stock-status">
+            Stock: <span id="stock-status"></span>
+        </div>
+
+        <div id="delivery-status" class="delivery-info"></div>
+
+        <hr>
+
+        <p style="white-space: pre-line;">
+    {{ product.description|default:"No product description available." }}
+</p>
+
+        <!-- BUTTONS -->
+        <div class="action-buttons">
+
+           {% if product.has_stock %}
+
+    {% if product.subcategory and product.subcategory.allow_lens %}
+        <button class="btn btn-primary open-lens-panel"
+        data-id="{{ product.id }}">
+    👓 Add with Lens
+</button>
+    {% else %}
+        <button class="btn btn-primary add-to-cart-btn"
+                data-id="{{ product.id }}"
+                data-variant-id="{% if product.variants.first %}{{ product.variants.first.id }}{% endif %}">
+            🛒 Add to Cart
+        </button>
+    {% endif %}
+
+{% else %}
+    <button class="btn btn-secondary" disabled>
+        Out of Stock
+    </button>
+{% endif %}
+
+            <!-- Virtual Try On -->
+            <a href="{% url 'app:virtualtryon' product.id %}"
+               class="btn btn-outline-dark">
+                👁️ Virtual Try-On
+            </a>
+
+            <!-- Wishlist -->
+            <button class="btn btn-light toggle-wishlist-btn"
+                    data-id="{{ product.id }}">
+                {% if product.id in wishlist_ids %}
+                    <i class="fa-solid fa-heart text-danger"></i>
+                {% else %}
+                    <i class="fa-regular fa-heart"></i>
+                {% endif %}
+            </button>
+
         </div>
 
     </div>
-</section>
 
-<footer class="figma-footer">
+</div>
 
-    <div class="footer-grid">
 
-        <div class="footer-col">
-            <h4>Optiview</h4>
-            <p>
-                Premium goggles designed for style,
-                comfort and eye protection.
-            </p>
+
+
+<!-- ================= REVIEWS ================= -->
+
+<div class="review-section">
+    <h4>Customer Reviews</h4>
+
+{% if reviews %}
+    {% for review in reviews %}
+    <div class="review-card">
+        
+        <strong>{{ review.user.username }}</strong>
+
+        <!-- Star Rating -->
+        <div class="review-stars">
+            {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}
+                    <span class="star filled">★</span>
+                {% else %}
+                    <span class="star">☆</span>
+                {% endif %}
+            {% endfor %}
         </div>
 
-        <div class="footer-col">
-            <h4>Quick Links</h4>
-            <p><a href="/">Home</a></p>
-            <p><a href="/shop/">Shop</a></p>
-            <p><a href="/about/">About Us</a></p>
-            <p><a href="/contact/">Contact</a></p>
-            <p><a href="/products/">products</a></p>
-            <p><a href="/lenses/">lenses</a></p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p>Email: info@optiview.com</p>
-            <p>Phone: +91 98765 43210</p>
-            <p>Mon - Sat: 9AM - 8PM</p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Follow Us</h4>
-            <p>Facebook</p>
-            <p>Instagram</p>
-            <p>Twitter</p>
-        </div>
+        <p>{{ review.comment }}</p>
 
     </div>
+    {% endfor %}
+{% else %}
+    <p>No reviews yet.</p>
+{% endif %}
 
-    <div class="footer-brand">
-        <h2>Optiview</h2>
-        <p>© 2026 Optiview. All rights reserved.</p>
-    </div>
 
-</footer>
+</div>
 
-</body>
-</html>
+
+<!-- LENS SIDE PANEL -->
+<div id="lensPanel" class="lens-panel">
+<div class="lens-content">
+
+<span id="closeLensPanel" class="close-btn">&times;</span>
+
+<h4>Select Lens</h4>
+
+<div id="lensList" style="margin-top:15px;">
+
+{% for lens in lenses %}
+<label class="d-block mb-2">
+
+<input type="radio"
+       name="lens_type"
+       value="{{ lens.id }}"
+       data-power="{{ lens.power_required }}">
+
+<strong>{{ lens.name }}</strong>
+<span class="text-muted">( + ₹{{ lens.additional_price }} )</span>
+
+</label>
+{% endfor %}
+
+</div>
+
+<!-- POWER FIELDS -->
+<div id="powerFields" style="display:none; margin-top:15px;">
+
+<h6>Enter Eye Power</h6>
+
+<input type="number"
+       step="0.25"
+       min="-20"
+       max="20"
+       placeholder="Left Eye Power"
+       class="form-control mb-2"
+       id="leftEyePower">
+
+<input type="number"
+       step="0.25"
+       min="-20"
+       max="20"
+       placeholder="Right Eye Power"
+       class="form-control"
+       id="rightEyePower">
+
+</div>
+
+<button id="confirmLensBtn"
+        class="btn btn-success mt-3 w-100">
+Add to Cart
+</button>
+
+</div>
+</div>
+</div>
+</div>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+/* ---------------- VARIABLES ---------------- */
+
+const csrfToken = document.getElementById("csrf-token")?.value;
+
+const mainImage = document.getElementById("main-image");
+const stockStatus = document.getElementById("stock-status");
+const deliveryStatus = document.getElementById("delivery-status");
+const thumbnailContainer = document.getElementById("thumbnail-container");
+
+const lensPanel = document.getElementById("lensPanel");
+const powerFields = document.getElementById("powerFields");
+const confirmLensBtn = document.getElementById("confirmLensBtn");
+
+let selectedProductId = null;
+
+
+/* ---------------- TOAST ---------------- */
+
+let toastContainer;
+
+function showToast(message, type="success"){
+
+if(!toastContainer){
+toastContainer=document.createElement("div");
+toastContainer.style.cssText="position:fixed;top:20px;right:20px;z-index:9999;";
+document.body.appendChild(toastContainer);
+}
+
+const toast=document.createElement("div");
+
+toast.style.cssText=`
+background:${type==="success"?"#5ec8ec":"#dc3545"};
+color:white;
+padding:10px 16px;
+border-radius:6px;
+margin-bottom:8px;
+box-shadow:0 4px 10px rgba(0,0,0,.15);
+`;
+
+toast.textContent=message;
+
+toastContainer.appendChild(toast);
+
+setTimeout(()=>toast.remove(),2500);
+
+}
+
+
+/* ---------------- VARIANT UPDATE ---------------- */
+
+function updateVariant(swatch){
+const allImages = JSON.parse(swatch.dataset.images || "[]");
+
+// ❌ remove first image
+const images = allImages.slice(1);
+const stock = parseInt(swatch.dataset.stock || 0);
+
+document.querySelectorAll(".color-swatch").forEach(s=>s.classList.remove("active"));
+swatch.classList.add("active");
+
+if (images.length > 0) {
+    mainImage.src = images[0];
+} else {
+    mainImage.src = "/static/app/images/default.png";
+}
+
+if(thumbnailContainer){
+
+thumbnailContainer.innerHTML = "";
+
+images.forEach((img, index) => {
+
+    const thumb = document.createElement("img");
+    thumb.src = img;
+
+    // set first image active
+    if (index === 0) {
+        thumb.classList.add("active");
+    }
+
+    thumb.addEventListener("click", () => {
+
+        // change main image
+        mainImage.src = img;
+
+        // remove active from all
+        document.querySelectorAll("#thumbnail-container img")
+            .forEach(t => t.classList.remove("active"));
+
+        // add active to clicked
+        thumb.classList.add("active");
+    });
+
+    thumbnailContainer.appendChild(thumb);
+});
+
+}
+
+if(stockStatus){
+stockStatus.innerText = stock>0 ? "In Stock":"Out of Stock";
+stockStatus.style.color = stock>0 ? "green":"red";
+}
+
+if(deliveryStatus){
+
+if(stock>0){
+deliveryStatus.innerHTML = `🚚 Delivery in <strong>${swatch.dataset.delivery}</strong> days`;
+deliveryStatus.style.color = "#2a7a2a";
+}else{
+deliveryStatus.innerHTML = "Currently unavailable";
+deliveryStatus.style.color = "gray";
+}
+
+}
+const addBtn = document.querySelector(".add-to-cart-btn");
+const lensBtn = document.querySelector(".open-lens-panel");
+
+if (stock > 0) {
+
+    if (addBtn) {
+        addBtn.disabled = false;
+        addBtn.classList.remove("btn-secondary");
+        addBtn.classList.add("btn-primary");
+        addBtn.textContent = "🛒 Add to Cart";
+        addBtn.dataset.added = "false";
+    }
+
+    if (lensBtn) {
+        lensBtn.disabled = false;
+    }
+
+} else {
+
+    if (addBtn) {
+        addBtn.disabled = true;
+        addBtn.classList.remove("btn-primary");
+        addBtn.classList.add("btn-secondary");
+        addBtn.textContent = "Out of Stock";
+    }
+
+    if (lensBtn) {
+        lensBtn.disabled = true;
+    }
+
+}
+}
+
+
+/* ---------------- AUTO SELECT FIRST VARIANT ---------------- */
+
+// ✅ Auto select FIRST IN-STOCK variant
+const allSwatches = document.querySelectorAll(".color-swatch");
+
+let selected = null;
+
+// Find first in-stock variant
+allSwatches.forEach(swatch => {
+    if (!selected && parseInt(swatch.dataset.stock) > 0) {
+        selected = swatch;
+    }
+});
+
+// If no stock variant found → fallback to first
+if (!selected && allSwatches.length > 0) {
+    selected = allSwatches[0];
+}
+
+// Apply selection
+if (selected) {
+    updateVariant(selected);
+}
+/* ---------------- COLOR CLICK ---------------- */
+
+document.querySelectorAll(".color-swatch").forEach(swatch=>{
+swatch.addEventListener("click",function(){
+updateVariant(this);
+});
+});
+
+
+/* ---------------- ADD TO CART FUNCTION ---------------- */
+
+async function addToCart(productId,variantId,extraData={}){
+
+try{
+
+const res = await fetch(`/add-to-cart/${productId}/`,{
+
+method:"POST",
+
+headers:{
+"X-CSRFToken":csrfToken,
+"X-Requested-With":"XMLHttpRequest",
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+variant_id:variantId,
+...extraData
+})
+
+});
+
+const data=await res.json();
+
+if(data.success){
+
+const cartCount=document.getElementById("cart-count");
+
+if(cartCount){
+cartCount.innerText=data.cart_count;
+}
+
+showToast("🛒 Added to cart");
+
+return true;
+
+}else{
+
+showToast(data.error,"error");
+
+}
+
+}catch(err){
+
+showToast("Please login first","error");
+
+}
+
+return false;
+
+}
+
+
+/* ---------------- NORMAL ADD TO CART ---------------- */
+
+document.body.addEventListener("click", async function(e) {
+    const cartBtn = e.target.closest(".add-to-cart-btn");
+    if (!cartBtn) return;
+
+    // Check if this button has already added item
+    if (cartBtn.dataset.added === "true") {
+        // Navigate to cart instead of adding again
+        window.location.href = "/cart/";
+        return;
+    }
+
+    e.preventDefault();
+
+    if (cartBtn.disabled) {
+        showToast("Out of stock", "error");
+        return;
+    }
+
+    const activeSwatch = document.querySelector(".color-swatch.active");
+    if (!activeSwatch) {
+        showToast("Select color", "error");
+        return;
+    }
+
+    const variantId = activeSwatch.dataset.variant;
+    const success = await addToCart(cartBtn.dataset.id, variantId);
+
+    if (success) {
+        cartBtn.textContent = "🛒 Go to Cart";
+        cartBtn.classList.remove("btn-primary");
+        cartBtn.classList.add("btn-success");
+
+        // ⚡ Set flag to prevent duplicate add
+        cartBtn.dataset.added = "true";
+    }
+});
+
+/* ---------------- WISHLIST ---------------- */
+
+document.body.addEventListener("click",async function(e){
+
+const wishBtn=e.target.closest(".toggle-wishlist-btn");
+
+if(wishBtn){
+
+e.preventDefault();
+
+const icon=wishBtn.querySelector("i");
+
+try{
+
+const res=await fetch(`/wishlist/toggle/${wishBtn.dataset.id}/`,{
+
+method:"POST",
+
+headers:{
+"X-CSRFToken":csrfToken,
+"X-Requested-With":"XMLHttpRequest"
+}
+
+});
+
+const data=await res.json();
+
+if(data.status==="added"){
+
+icon.classList.remove("fa-regular");
+icon.classList.add("fa-solid","text-danger");
+
+showToast("💖 Added to wishlist");
+
+}else{
+
+icon.classList.remove("fa-solid","text-danger");
+icon.classList.add("fa-regular");
+
+showToast("💔 Removed from wishlist");
+
+}
+
+}catch(err){
+
+showToast("Login required","error");
+
+}
+
+}
+
+});
+
+
+/* ---------------- OPEN LENS PANEL ---------------- */
+
+document.body.addEventListener("click",function(e){
+
+const lensBtn=e.target.closest(".open-lens-panel");
+
+if(lensBtn){
+
+selectedProductId=lensBtn.dataset.id;
+
+lensPanel.classList.add("active");
+
+}
+
+if(e.target.id==="closeLensPanel"){
+lensPanel.classList.remove("active");
+}
+
+});
+
+
+/* ---------------- LENS SELECTION ---------------- */
+
+document.querySelectorAll('input[name="lens_type"]').forEach(radio=>{
+
+radio.addEventListener("change",function(){
+
+const powerRequired = this.dataset.power === "True";
+
+if(powerRequired){
+powerFields.style.display = "block";
+}else{
+powerFields.style.display = "none";
+}
+
+});
+
+});
+
+
+/* ---------------- ADD TO CART WITH LENS ---------------- */
+
+if(confirmLensBtn){
+
+confirmLensBtn.addEventListener("click",async function(){
+
+const lens=document.querySelector('input[name="lens_type"]:checked');
+
+if(!lens){
+alert("Select lens");
+return;
+}
+
+const activeSwatch=document.querySelector(".color-swatch.active");
+
+if(!activeSwatch){
+alert("Select color");
+return;
+}
+
+const variantId=activeSwatch.dataset.variant;
+
+const powerRequired = lens.dataset.power === "True";
+
+let extraData={
+lens_id:lens.value
+};
+
+if(powerRequired){
+
+const left = parseFloat(document.getElementById("leftEyePower").value);
+const right = parseFloat(document.getElementById("rightEyePower").value);
+
+// Check empty
+if(isNaN(left) || isNaN(right)){
+showToast("Enter valid eye power","error");
+return;
+}
+
+// Range validation
+if(left < -20 || left > 20 || right < -20 || right > 20){
+showToast("Power must be between -20 to +20","error");
+return;
+}
+
+// Optional: step validation (0.25 steps)
+if((left * 100) % 25 !== 0 || (right * 100) % 25 !== 0){
+showToast("Power must be in steps of 0.25","error");
+return;
+}
+
+extraData.left_eye = left;
+extraData.right_eye = right;
+
+}
+const success=await addToCart(
+selectedProductId,
+variantId,
+extraData
+);
+
+if(success){
+lensPanel.classList.remove("active");
+}
+
+});
+
+}
+
+});
+
+</script>
+{% endblock %}

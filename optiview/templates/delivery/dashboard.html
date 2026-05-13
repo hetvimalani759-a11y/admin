@@ -1,0 +1,91 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Delivery Dashboard</title>
+
+
+<!-- Sweet Alert -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="{% static 'delivery/css/dashboard.css' %}">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+    <div class="nav-left">
+        <h2>🚚 Delivery Dashboard</h2>
+    </div>
+</header>
+
+<div class="container">
+
+
+<!-- ================= SIDEBAR ================= -->
+<div class="sidebar">
+
+    <a class="active">
+        <i class="fa fa-home"></i> Dashboard
+    </a>
+
+    <a href="{% url 'delivery:my_orders' %}">
+        <i class="fa fa-box"></i> My Orders
+    </a>
+
+    <a href="{% url 'delivery:update_status' %}">
+        <i class="fa fa-edit"></i> Order Status
+    </a>
+
+    <a href="{% url 'delivery:delivery_profile' %}">
+        <i class="fa fa-user"></i> Profile
+    </a>
+
+    <a href="{% url 'delivery:delivery_logout' %}"
+       onclick="return confirmLogout();">
+        <i class="fa fa-sign-out-alt"></i> Logout
+    </a>
+
+</div>
+
+
+<!-- ================= LOGOUT ALERT ================= -->
+
+<script>
+function confirmLogout() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You will be logged out!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3b8132',
+        confirmButtonText: 'Yes, logout',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = "{% url 'delivery:delivery_logout' %}";
+        }
+    });
+    return false;
+}
+</script>
+
+
+<!-- ================= CHART JS ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="{% static 'delivery/js/dashboard.js' %}"></script>
+
+</body>
+</html>

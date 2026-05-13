@@ -1,0 +1,386 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Page */
+.orders-page{
+    padding:20px;
+}
+
+/* Header */
+.page-header h2{
+    font-size:24px;
+    font-weight:600;
+    margin-bottom:20px;
+}
+
+/* Card */
+.table-card{
+    background: var(--card-bg);
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.05);
+    min-width: 100%;
+    overflow-x: auto;
+    
+}
+
+/* Table */
+.table-card-wrapper {
+    width: 100%;
+    overflow-x: auto;   /* horizontal scroll on wrapper */
+}
+
+.table-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.table-scroll {
+    display: block;           /* must be block for scroll */
+    min-width: 1400px;        /* table width larger than container */
+    overflow-x: auto;         /* horizontal scroll */
+    overflow-y: hidden;       /* hide vertical scroll */
+}
+
+/* Optional: make scrollbar visible and thin at bottom */
+.table-scroll::-webkit-scrollbar {
+    height: 8px;              /* horizontal scrollbar thickness */
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+    background-color: #c1c1c1;
+    border-radius: 4px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+.orders-table thead{
+    background:#f7f7f7;
+}
+
+.orders-table th{
+    padding:12px;
+    text-align:left;
+    font-weight:600;
+    border-bottom:1px solid #eee;
+}
+
+.orders-table td{
+    padding:12px;
+    border-bottom:1px solid #f0f0f0;
+}
+
+/* Hover */
+.orders-table tbody tr:hover{
+    background:#fafafa;
+}
+
+/* Dropdown */
+.orders-table select{
+    padding:5px 8px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    background:#fff;
+}
+
+/* Status Badges */
+.status{
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:500;
+}
+
+.status-delivered{
+    background:#e6f8ec;
+    color:#1a7f37;
+}
+
+.status-cancelled{
+    background:#ffecec;
+    color:#d93025;
+}
+
+.status-accepted{
+    background:#e8f0fe;
+    color:#1a73e8;
+}
+
+.status-out{
+    background:#fff7e6;
+    color:#d48806;
+}
+
+/* Return */
+.return-request{
+    color:#a48755;
+    font-weight:500;
+}
+
+.return-approved{
+    color:#1a7f37;
+    font-weight:500;
+}
+
+.return-rejected{
+    color:#d93025;
+    font-weight:500;
+}
+
+/* Buttons */
+button{
+    padding:5px 10px;
+    border:none;
+    border-radius:6px;
+    background:#1a73e8;
+    color:white;
+    cursor:pointer;
+    font-size:12px;
+}
+
+button:hover{
+    background:#1558b0;
+}
+
+/* View Details */
+.orders-table a{
+    color:#1a73e8;
+    text-decoration:none;
+    font-weight:500;
+}
+
+.orders-table a:hover{
+    text-decoration:underline;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="orders-page">
+
+<div class="page-header">
+    <h2>📦 Orders</h2>
+</div>
+
+<div class="table-card-wrapper">
+    <div class="table-card">
+        <div class="table-scroll">
+        <table class="orders-table">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User</th>
+                    <th>Product</th>
+                    <th>Variant Color</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Lens</th>
+                    <th>Left Eye Power</th>
+                    <th>Right Eye Power</th>
+                    <th>Delivery Boy</th>
+                    <th>Status</th>
+                    <th>Return</th>
+                    <th>Refund</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            {% for order in orders %}
+                {% for item in order.items.all %}
+
+                <tr>
+
+                    <td>{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td>{{ item.product.name }}</td>
+                    <!-- Variant Color -->
+                        <td>
+                            {% if item.variant %}
+                                <span style="display:inline-block;width:20px;height:20px;border-radius:50%;background-color:{{ item.variant.color }};margin-right:5px;" title="{{ item.variant.color }}"></span>
+                                {{ item.variant.color }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    <td>{{ item.quantity }}</td>
+
+                    <td>
+    ₹{{ item.price }} × {{ item.quantity }} =
+    <strong>₹{{ item.total_price }}</strong>
+
+    {% if forloop.last %}
+    {% if order.calculated_total != 0%}
+<div style="
+    margin-top:10px;
+    padding:10px;
+    background:#f8f9fa;
+    border-radius:6px;
+    border:1px solid #eee;
+    display:inline-block;
+    min-width:160px;
+">
+
+    <div style="font-size:13px;">Subtotal: ₹{{ order.calculated_total }}</div>
+
+    {% if order.delivery_charge == 0 %}
+        <div style="color:green; font-size:13px;">Delivery: Free</div>
+    {% else %}
+        <div style="font-size:13px;">Delivery: ₹{{ order.delivery_charge }}</div>
+    {% endif %}
+
+    <div style="font-weight:600; margin-top:6px; font-size:14px;">
+        Final: ₹{{ order.final_total }}
+    </div>
+
+</div>
+{% endif %}
+{% endif %}
+</td>
+                    <td>{{ item.lens_type|default:"-" }}</td>
+                    <td>{{ item.left_eye_power|default:"-" }}</td>
+                    <td>{{ item.right_eye_power|default:"-" }}</td>
+                    {% if forloop.first %}
+
+                    <!-- DELIVERY BOY -->
+                    <td rowspan="{{ order.items.count }}">
+                        <form method="POST" action="{% url 'adminpanel:assign_delivery' order.id %}">
+                            {% csrf_token %}
+
+                            <select name="delivery_person"
+                                    onchange="this.form.submit()"
+                                    {% if order.status == "accepted" or order.status == "out_for_delivery" or order.status == "partially_delivered" or order.status == "delivered" or order.status == "cancelled" %}
+                                    disabled
+                                    {% endif %}>
+
+                                <option value="">Assign Delivery Boy</option>
+
+                                {% for boy in delivery_boys %}
+                                    <option value="{{ boy.id }}"
+                                    {% if order.delivery_person and order.delivery_person.id == boy.id %}selected{% endif %}
+                                    {% if boy in order.rejected_by.all %}disabled{% endif %}>
+                                        {{ boy.user.username }}
+                                    </option>
+                                {% endfor %}
+
+                            </select>
+
+                        </form>
+                    </td>
+
+                    <!-- STATUS -->
+                    <td rowspan="{{ order.items.count }}">
+                        {{ order.status }}
+                    </td>
+
+                    {% endif %}
+
+                    <!-- RETURN -->
+                    <td>
+
+                        {% if item.return_status == "requested" %}
+
+                            <span style="color:orange;">Return Requested</span>
+
+                            <form method="POST" action="{% url 'adminpanel:approve_return' item.id %}">
+                                {% csrf_token %}
+                                <button style="margin-top:5px;">Approve</button>
+                            </form>
+
+                            <form method="POST" action="{% url 'adminpanel:return_reject' item.id %}">
+                                {% csrf_token %}
+                                <button style="margin-top:5px;">Reject</button>
+                            </form>
+
+                        {% elif item.return_status == "approved" %}
+
+                            <span style="color:green;">Return Approved</span>
+
+                        {% elif item.return_status == "rejected" %}
+
+                            <span style="color:red;">Return Rejected</span>
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+                    <!-- REFUND -->
+                    <td>
+
+                        {% if item.refund_status == "initiated" %}
+
+                            <span style="color:orange;">Refund Processing</span>
+
+                            <form method="POST" action="{% url 'adminpanel:complete_refund' item.id %}">
+                                {% csrf_token %}
+                                <button style="margin-top:5px;">Complete Refund</button>
+                            </form>
+
+                        {% elif item.refund_status == "completed" %}
+
+                            <span style="color:green;">Refund Completed</span>
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+                    {% if forloop.first %}
+
+                    <!-- CREATED -->
+                    <td rowspan="{{ order.items.count }}">
+                        {{ order.created_at|date:"Y-m-d H:i" }}
+                    </td>
+
+                    <!-- ACTION -->
+                    <td rowspan="{{ order.items.count }}">
+                        <a href="{% url 'adminpanel:order_detail' order.id %}">
+                            View Details
+                        </a>
+                    </td>
+
+                    {% endif %}
+
+                </tr>
+
+                {% endfor %}
+
+            {% empty %}
+
+                <tr>
+                    <td colspan="11" style="text-align:center;">
+                        🚫 No orders found
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+        </div>
+
+    </div>
+</div>
+
+</div>
+
+{% endblock %}

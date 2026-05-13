@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'adminpanel',
-    'app'
-    
+    'app',
+    'delivery',
+    'orders'
+  
 ]
 
 
@@ -74,6 +76,7 @@ TEMPLATES = [
                 'adminpanel.context_processors.notification_count',  # ✅
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'app.context_processors.cart_count'
             ],
         },
     },
@@ -83,6 +86,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'optiview.wsgi.application'
 
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -123,7 +127,16 @@ USE_I18N = True
 
 TIME_ZONE = 'Asia/Kolkata'
 USE_TZ = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+# For customer panel
+CUSTOMER_SESSION_COOKIE_NAME = 'customer_sessionid'
 
+# For admin panel (Django default)
+# SESSION_COOKIE_NAME = 'sessionid'
+
+RAZORPAY_KEY_ID = "rzp_test_SERWErY8A9nrrB"
+RAZORPAY_KEY_SECRET = "PcAqW8MeVM71yccqhV4h6Tuq"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
@@ -138,5 +151,28 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+APPEND_SLASH = True
+BASE_DIR=Path(__file__).resolve().parent.parent
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'         # Your SMTP server
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER='asitamalani@gmail.com'
+EMAIL_HOST_PASSWORD='qeidttttnnzvjfsf'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# LOGIN_URL = '/login/'
+# LOGIN_REDIRECT_URL = '/'
+# LOGOUT_REDIRECT_URL = '/login/'
+# LOGIN_REDIRECT_URL = "/"
+# LOGOUT_REDIRECT_URL = "/"
+
+# Authentication redirects
+LOGIN_URL = '/login/'               # customer login page
+LOGIN_REDIRECT_URL = "/"             # after login, go home
+LOGOUT_REDIRECT_URL = "/login/"      # after logout, go to login page
+
+# Media files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

@@ -1,77 +1,143 @@
-{% extends 'admin/base.html' %}
-{% url 'adminpanel:add_category' %}
-{% url 'adminpanel:add_subcategory' %}
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/products.css' %}">
+{% endblock %}
 
 {% block content %}
+<div class="products-page">
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Products</h4>
-    <a href="{% url 'adminpanel:add_category' %}" class="btn btn-primary">
-    ➕ Add Category
-</a>
+  <div class="page-header">
+    <h2 class="category-heading ripple-text">📦 Products</h2>
+    <a href="{% url 'adminpanel:add_product' %}" class="btn-add">+ Add Product</a>
+  </div>
 
-<a href="{% url 'adminpanel:add_subcategory' %}" class="btn btn-secondary">
-    ➕ Add SubCategory
-</a>
-<a href="{% url 'adminpanel:add_product' %}" class="btn btn-success">
-    ➕ Add Product
-    </a>
-</div>
+  <!-- Search -->
+  <form method="GET" class="search-form">
+    <input type="text" name="search" placeholder="Search product..." value="{{ search }}">
+    <button type="submit" class="btn-search">Search</button>
+  </form>
 
-<!-- SINGLE SEARCH BAR -->
-<form method="GET" class="mb-3 d-flex justify-content-end">
-    <input type="text"
-           name="search"
-           class="form-control w-25 me-2"
-           placeholder="Search product..."
-           value="{{ search }}">
-    <button type="submit" class="btn btn-primary btn-sm">
-        Search
-    </button>
-</form>
-
-
-<!-- PRODUCT TABLE -->
-<table class="table table-bordered table-hover">
-    <thead>
+  <div class="table-card">
+    <table class="product-table">
+      <thead>
         <tr>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Brand</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Action</th>
+          <th class="img-col">Image</th>
+          <th>Name</th>
+          <th>Brand</th>
+          <th>Price</th>
+          <th>Color</th>
+          <th>Stock</th>
+          <th>Frame Type</th>
+          <th>Frame Shape</th>
+          <th>Material</th> 
+          <th class="actions-col">Actions</th>
         </tr>
-    </thead>
-
-    <tbody>
+      </thead>
+      <tbody>
         {% for p in products %}
         <tr>
-            
-            <td>
-                <img src="{{ p.image.url }}" width="60">
-            </td>
-            <td>{{ p.name }}</td>
-            <td>{{ p.brand }}</td>
-            <td>₹{{ p.price }}</td>
-            <td>{{ p.stock }}</td>
-            <td>
-                <a href="{% url 'adminpanel:edit_product' p.id %}"
-                   class="btn btn-sm btn-warning">Edit</a>
+          <!-- Image -->
+          <td>
+            {% with first_variant=p.variants.first %}
+              {% if first_variant and first_variant.images.first %}
+                <img src="{{ first_variant.images.first.image.url }}" class="product-img" alt="{{ p.name }}">
+              {% else %}
+                <img src="{% static 'admin/images/no-image.png' %}" class="product-img" alt="No Image">
+              {% endif %}
+            {% endwith %}
+          </td>
 
-                <a href="{% url 'adminpanel:delete_product' p.id %}"
-                   class="btn btn-sm btn-danger"
-                   onclick="return confirm('Delete product?')">
-                   Delete
-                </a>
-            </td>
+          <!-- Basic fields -->
+          <td class="name">{{ p.name }}</td>
+          <td>{{ p.brand.name }}</td>
+          <td class="price">₹{{ p.price }}</td>
+          <td>
+            {% if p.variants.exists %}
+              {% for v in p.variants.all %}
+                {{ v.color }}{% if not forloop.last %}, {% endif %}
+              {% endfor %}
+            {% else %}
+              {{ p.color|default:"No color" }}
+            {% endif %}
+          </td>
+          <td>
+    {% for v in p.variants.all %}
+        {{ v.color.name }}: {{ v.stock }}<br>
+    {% empty %}
+        0
+    {% endfor %}
+
+          </td>
+
+          <!-- New fields -->
+          <td>{{ p.frame_type.name|default:"-" }}</td>
+          <td>{{ p.frame_shape.name|default:"-" }}</td>
+          <td>{{ p.material.name|default:"-" }}</td>  <!-- ✅ NEW -->
+
+          <!-- Actions -->
+          <td class="actions">
+            <a href="{% url 'adminpanel:edit_product' p.id %}" class="btn-edit">Edit</a>
+            <button type="button" class="btn-delete" data-id="{{ p.id }}" data-name="{{ p.name }}">Delete</button>
+          </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="6" class="text-center">No products found</td>
+          <td colspan="9" class="no-data">No products found</td>
         </tr>
         {% endfor %}
-    </tbody>
-</table>
+      </tbody>
+    </table>
+  </div>
 
+  <!-- Delete Modal -->
+  <div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
+      <h5>Delete Product</h5>
+      <p id="deleteText"></p>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" id="cancelDelete">Cancel</button>
+        <form id="deleteForm" method="post">
+          {% csrf_token %}
+          <button type="submit" class="modal-confirm">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'admin/js/products.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    const modal = document.getElementById('deleteModal');
+    const deleteText = document.getElementById('deleteText');
+    const deleteForm = document.getElementById('deleteForm');
+    const cancelBtn = document.getElementById('cancelDelete');
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const productId = btn.dataset.id;
+            const productName = btn.dataset.name;
+            deleteText.textContent = `Are you sure you want to delete "${productName}"?`;
+            deleteForm.action = `/admin-panel/products/delete/${productId}/`;
+            modal.style.display = 'flex';
+        });
+    });
+
+    cancelBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+});
+</script>
 {% endblock %}

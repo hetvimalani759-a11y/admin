@@ -1,0 +1,103 @@
+body {
+    /* background:url('/static/admin/css/my.jpg'); */
+    background-color: #cdb4e6;
+    color: #1f2937;
+    font-family: "Inter", system-ui, sans-serif;
+}
+
+.main-content {
+    margin-left: 0 !important;
+    padding: 25px;
+}
+
+/* TITLE */
+.dashboard-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 22px;
+    color: #0f172a;
+}
+
+/* GRID */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 22px;
+}
+
+/* CARDS */
+.stat-card {
+    background: linear-gradient(135deg, #e8edf5, #f6f8fc);
+    border-radius: 18px;
+    padding: 22px 24px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    transition: 0.3s ease;
+    cursor: pointer;
+    border: 1px solid #dbe1ea;
+}
+
+.stat-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.12);
+}
+
+/* ICON */
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: white;
+    margin-bottom: 14px;
+}
+
+/* COLORS */
+.blue { background: linear-gradient(135deg, #4f46e5, #6366f1); }
+.green { background: linear-gradient(135deg, #22c55e, #16a34a); }
+.orange { background: linear-gradient(135deg, #fb923c, #f97316); }
+.purple { background: linear-gradient(135deg, #a855f7, #9333ea); }
+.red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+/* TEXT */
+.stat-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.stat-value {
+    font-size: 30px;
+    font-weight: 800;
+    margin-top: 6px;
+    color: #0f172a;
+}
+
+/* SMALL WIDGETS */
+.widget-card {
+    background: #f1f5f9;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+    border: 1px solid #dbe1ea;
+    transition: 0.3s ease;
+}
+
+.widget-card:hover {
+    transform: translateY(-4px);
+}
+
+/* LOW STOCK */
+.low-stock {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .dashboard-title {
+        font-size: 22px;
+    }
+}

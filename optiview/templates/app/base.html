@@ -1,0 +1,161 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Optiview | Premium Eyewear</title>
+    {% load static %}
+
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'css/all.min.css' %}">
+
+
+    
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"> -->
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'app/css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+<body>
+    {% csrf_token %}
+    <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+<!-- ================= HEADER ================= -->
+<header class="main-header">
+    <div class="container header-container">
+        
+
+        <div class="logo">
+            <span class="logo-main">Opti</span><span class="logo-accent">view</span>
+        </div>
+
+        <form method="GET" action="/shop/" class="search-bar">
+    <input type="text" 
+           name="q" 
+           placeholder="Search entire store here..." 
+           value="{{ request.GET.q }}">
+    <button type="submit">🔍</button>
+</form>
+        <div class="nav-icons">
+            <!-- 🔔 NOTIFICATIONS -->
+            {% if user.is_authenticated %}
+            <div class="position-relative notif-wrapper" id="notif-wrapper">
+
+                <button id="notif-btn" class="notif-btn">
+                <i class="fa-regular fa-bell"></i>
+                <span id="notif-count" class="notif-count">0</span>
+            </button>
+
+            <div id="notif-box" class="notif-box">      
+            <div id="notif-items"></div>
+        </div>
+
+    </div>
+    {% endif %}
+
+
+            <!-- Cart -->
+            <a href="/cart/" class="icon {% if request.path == '/cart/' %}active-icon{% endif %}">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="count">{{ cart_count }}</span>
+            </a>
+
+            <!-- Wishlist -->
+            <a href="/wishlist/" class="icon {% if request.path == '/wishlist/' %}active-icon{% endif %}">
+                <i class="fa-regular fa-heart"></i>
+            </a>
+
+            <!-- Account -->
+            <div class="account">
+    <button id="accountBtn">
+        <i class="fa-regular fa-user"></i>
+    </button>
+
+    <div class="account-dropdown" id="accountDropdown">
+        {% if user.is_authenticated and not user.is_staff %}
+            <p class="welcome">Hi, {{ user.username }}</p>
+            <a href="{% url 'app:profile' %}" class="nav-link">Profile</a>
+            <a href="{% url 'app:logout' %}" class="nav-link">Logout</a>
+        {% else %}
+            <a href="{% url 'app:login' %}" class="nav-link">Login</a>
+            <a href="{% url 'app:register' %}" class="nav-link">Register</a>
+        {% endif %}
+    </div>
+</div>
+
+        </div>
+    </div><ul>
+        <nav class="nav-links">
+
+            <a href="/" class='nav-link' class="{% if request.path == '/' %}active{% endif %}">Home</a>
+            <a href="/shop/"class='nav-link' class="{% if request.path == '/shop/' %}active{% endif %}">Shop</a>
+            <a href="/about/" class='nav-link'class="{% if request.path == '/about/' %}active{% endif %}">About</a>
+            <a href="/contact/"class='nav-link' class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a>
+            <a href="/orders/history/" class='nav-link'class="{% if request.path == '/orders/history/' %}active{% endif %}">My Orders</a>
+            <!-- <a href="/virtual_tryon/" class='nav-link' class="{% if request.path == '/virtual_tryon/' %}active{% endif %}">Virtual Try-On</a> -->
+
+        </nav>
+        
+    </nav>
+</header>
+
+<!-- ================= CONTENT ================= -->
+{% block content %}{% endblock %}
+
+<!-- ================= FOOTER ================= -->
+<footer class="main-footer">
+    <div class="container footer-grid">
+        <div>
+            <h4>Optiview</h4>
+            <p>Premium goggles crafted for clarity and confidence.</p>
+        </div>
+
+        <div>
+            <h5>Quick Links</h5>
+            <p><a href="/">Home</a></p>
+            <p><a href="/shop/">Shop</a></p>
+            <p><a href="/about/">About Us</a></p>
+            <p><a href="/contact/">Contact</a></p>
+        </div>
+
+        <div>
+            <h5>Contact</h5>
+            <p>📧 twinseyeoptics@gmail.com</p>
+            <p>📞 +91 8160133978</p>
+            <p>Mon - Sun : 9AM - 8PM</p>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        © 2026 Optiview. All rights reserved.
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{% if messages %}
+<script>
+    {% for message in messages %}
+        Swal.fire({
+            icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}",
+            title: "{{ message|escapejs }}",
+            showConfirmButton: false,
+            timer: 2000
+        });
+    {% endfor %}
+</script>
+{% endif %}
+ <!-- Bootstrap JS -->
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'app/js/base.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,98 @@
+/* Page title */
+.page-header h2 {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Add button */
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(79,70,229,0.3);
+}
+
+/* Table card */
+.table {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+/* Table header */
+.table thead {
+    background: #f1f5f9;
+}
+
+.table thead th {
+    padding: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* Table rows */
+.table tbody tr {
+    transition: 0.2s ease-in-out;
+}
+
+.table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* Table cells */
+.table td {
+    padding: 14px;
+    vertical-align: middle;
+}
+
+/* Status badges */
+.status-active {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.status-inactive {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* Form card */
+.card {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* Form inputs */
+.form-control {
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+}
+
+.form-control:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+}
+
+/* Submit button */
+.btn-success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border: none;
+    padding: 10px;
+    font-weight: 600;
+    border-radius: 10px;
+}
+
+.btn-success:hover {
+    opacity: 0.9;
+}

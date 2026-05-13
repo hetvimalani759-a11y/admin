@@ -1,0 +1,110 @@
+/* ==============================
+   DELIVERY PAGE BACKGROUND
+============================== */
+.delivery-page {
+    padding: 40px 20px !important;
+    min-height: 80vh !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: linear-gradient(135deg, #7ebaee 0%, #ffffff 100%) !important;
+    font-family: 'Segoe UI', sans-serif !important;
+}
+
+/* ==============================
+   GLASS CARD
+============================== */
+.category-form-card {
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+    padding: 30px !important;
+    width: 100% !important;
+    max-width: 500px !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.category-form-card:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ==============================
+   HEADING
+============================== */
+.category-heading {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    margin-bottom: 24px !important;
+    color: #0f172a !important;
+    text-align: center !important;
+}
+
+/* ==============================
+   FORM
+============================== */
+.category-form .form-group {
+    margin-bottom: 18px !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.category-form label {
+    font-weight: 600 !important;
+    margin-bottom: 6px !important;
+    color: #0f172a !important;
+}
+
+.category-form input {
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+    font-size: 14px !important;
+}
+
+.category-form input:focus {
+    border-color: #7ebaee !important;
+    box-shadow: 0 0 8px rgba(126, 186, 238, 0.4) !important;
+}
+
+/* ==============================
+   BUTTON
+============================== */
+.category-form .btn-primary {
+    background: #7ebaee !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    padding: 12px 0 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    transition: background 0.3s ease, transform 0.2s ease !important;
+}
+
+.category-form .btn-primary:hover {
+    background: #5aa2d1 !important;
+    transform: translateY(-2px) !important;
+}
+
+.category-form .btn-primary:active {
+    transform: translateY(0) !important;
+}
+
+/* ==============================
+   RESPONSIVE
+============================== */
+@media (max-width: 576px) {
+    .category-form-card {
+        padding: 20px !important;
+    }
+
+    .category-heading {
+        font-size: 20px !important;
+    }
+}

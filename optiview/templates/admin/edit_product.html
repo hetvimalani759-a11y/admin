@@ -1,45 +1,450 @@
 {% extends 'admin/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/edit_product.css' %}">
+<style>
+/* ================= Global ================= */
+.category-input, .category-input:focus {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border:1px solid #555;
+    border-radius:6px;
+    padding:8px 12px;
+    width:100%;
+    box-sizing:border-box;
+}
+.btn-primary { background-color:#5b4de0; border:none; color:#fff; padding:10px 15px; border-radius:6px; cursor:pointer;}
+.btn-cancel { background-color:#555; color:#fff; padding:10px 15px; text-align:center; display:inline-block; border-radius:6px; text-decoration:none;}
+.ripple-text { transition: 0.3s; }
+.ripple-text:hover { opacity:0.85; }
+
+/* ================= Variant Box ================= */
+.variant-box {
+    border:1px solid #444;
+    padding:15px;
+    margin-bottom:15px;
+    border-radius:8px;
+    position:relative;
+    background-color: var(--card-bg);
+}
+.remove-variant {
+    position:absolute;
+    top:5px;
+    right:5px;
+    cursor:pointer;
+    color:#ff6b6b;
+    font-weight:bold;
+}
+.images-container div {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:5px;
+}
+.image-item {
+    display: flex;
+    align-items: center;
+    border: 1px solid #555;
+    gap: 10px;
+    margin-top: 6px; 
+    background: var(--input-bg);
+    border: 1px solid #555;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    min-width: 180px;
+    
+}
+.file-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    
+}
+
+.file-label {
+    flex: 1;
+    font-size: 14px;
+}
+
+.remove-variant-image {
+    color: red;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+
+.remove-variant-image {
+    cursor: pointer;
+    color: #ff6b6b;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
 {% block content %}
+<div class="edit-product-page">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="category-form-card">
+                <h4 class="category-heading ripple-text">✏️ Edit Product</h4>
 
-<h4>Edit Product</h4>
+                <form method="post" enctype="multipart/form-data" id="productForm">
+                    {% csrf_token %}
 
-<form method="POST" enctype="multipart/form-data" class="card p-4">
-    {% csrf_token %}
+                    <!-- Category -->
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select name="category" id="category" class="category-input" required>
+                            <option value="">Select Category</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-    <div class="mb-3">
-    <label>Product Name</label>
-    <select name="name" class="form-control" required>
-      <option>eyeglasses</option>
-      <option>lens</option>
-      <option>frame</option>
-    </select>
-  </div>
+                    <!-- Subcategory -->
+                    <div class="form-group">
+                        <label>Subcategory</label>
+                        <select name="subcategory" id="subcategory" class="category-input" required>
+                            <option value="">Select Subcategory</option>
+                            {% for subcat in subcategories %}
+                                <option value="{{ subcat.id }}" {% if product.subcategory.id == subcat.id %}selected{% endif %}>
+                                    {{ subcat.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
 
-    <div class="mb-3">
-        <label>Brand</label>
-        <input type="text" name="brand" class="form-control" value="{{ product.brand }}">
+                    <!-- Product Name -->
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" name="name" class="category-input" value="{{ product.name }}" required>
+                    </div>
+
+                    <!-- Brand -->
+                    <div class="form-group">
+                        <label>Brand</label>
+                        <select name="brand" class="category-input" required>
+                            <option value="">Select Brand</option>
+                            {% for brand in brands %}
+                                <option value="{{ brand.id }}" {% if product.brand and product.brand.id == brand.id %}selected{% endif %}>
+                                    {{ brand.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" class="category-input" rows="4" required>{{ product.description }}</textarea>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="number" name="price" step="0.01" class="category-input" value="{{ product.price }}" required>
+                    </div>
+
+                    <!-- Frame Type -->
+                    <div class="form-group">
+                        <label>Frame Type</label>
+                        <select name="frame_type" class="category-input" required>
+                            <option value="">Select Frame Type</option>
+                            {% for frame in frame_types %}
+                                <option value="{{ frame.id }}" {% if product.frame_type and product.frame_type.id == frame.id %}selected{% endif %}>
+                                    {{ frame.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Frame Shape -->
+                    <div class="form-group">
+                        <label>Frame Shape</label>
+                        <select name="frame_shape" class="category-input" required>
+                            <option value="">Select Shape</option>
+                            {% for shape in frame_shapes %}
+                                <option value="{{ shape.id }}" {% if product.frame_shape and product.frame_shape.id == shape.id %}selected{% endif %}>
+                                    {{ shape.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Material -->
+                    <div class="form-group">
+                        <label>Material</label>
+                        <select name="material" class="category-input" required>
+                            <option value="">Select Material</option>
+                            {% for mat in materials %}
+                                <option value="{{ mat.id }}" {% if product.material and product.material.id == mat.id %}selected{% endif %}>
+                                    {{ mat.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Variants -->
+                    <h5 class="mt-4">Variants (Color + Stock + Images)</h5>
+<div id="variantsContainer">
+    {% for variant in product.variants.all %}
+        <div class="variant-box category-form-card" data-variant="{{ forloop.counter0 }}">
+
+            <input type="hidden" name="variants[{{ forloop.counter0 }}][id]" value="{{ variant.id }}">
+            <span class="remove-variant">✖</span>
+
+            <!-- Color -->
+            <div class="form-group">
+                <label>Color</label>
+                <select name="variants[{{ forloop.counter0 }}][color]" class="category-input" required>
+                    <option value="">Select Color</option>
+                    {% for color in colors %}
+                        <option value="{{ color.id }}" {% if variant.color.id == color.id %}selected{% endif %}>
+                            {{ color.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Stock -->
+            <div class="form-group">
+                <label>Stock</label>
+                <input type="number" name="variants[{{ forloop.counter0 }}][stock]" class="category-input" value="{{ variant.stock }}" required>
+            </div>
+
+            <!-- Images -->
+            <div class="form-group">
+                <label>Images</label>
+
+                <div class="images-container">
+
+                    {% for img in variant.images.all %}
+                        <div class="file-name image-item">
+
+                            <input type="file" name="replace_image_{{ img.id }}">
+
+                            <span class="file-label">
+                                {{ img.image.name|cut:"products/variants/" }}
+                            </span>
+
+                            <input type="hidden" 
+                                name="variants[{{ forloop.parentloop.counter0 }}][existing_images][]" 
+                                value="{{ img.id }}">
+
+                            <input type="hidden" 
+                                name="delete_image_{{ img.id }}" 
+                                class="delete-flag" 
+                                value="">
+
+                            <span class="remove-variant-image">✖</span>
+
+                        </div>
+                    {% endfor %}
+
+                </div> <!-- ✅ CLOSE images-container -->
+
+                <button type="button" class="btn-add-image btn-primary">+ Add Image</button>
+
+            </div> <!-- ✅ CLOSE form-group -->
+
+        </div> <!-- ✅ CLOSE variant-box -->
+
+    {% endfor %}
+</div>
+
+<button type="button" class="btn-primary ripple-text mb-3" id="addVariantBtn">
+    + Add Variant
+</button>       
+                    <!-- Actions -->
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary w-100 ripple-text">Update Product</button>
+                        <a href="{% url 'adminpanel:product_list' %}" class="btn-cancel w-100 mt-2 ripple-text">Back</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
     </div>
+</div>
+{% endblock %}
 
-    <div class="mb-3">
-        <label>Price</label>
-        <input type="number" name="price" class="form-control" value="{{ product.price }}">
-    </div>
+{% block extra_js %}
+<script>document.addEventListener('DOMContentLoaded', function () {
 
-    <div class="mb-3">
-        <label>Stock</label>
-        <input type="number" name="stock" class="form-control" value="{{ product.stock }}">
-    </div>
+    // =========================
+    // CATEGORY → SUBCATEGORY
+    // =========================
+    const categorySelect = document.getElementById('category');
+    const subcategorySelect = document.getElementById('subcategory');
 
-    <div class="mb-3">
-        <label>Image</label><br>
-        <img src="{{ product.image.url }}" width="80" class="mb-2"><br>
-        <input type="file" name="image" class="form-control">
-    </div>
+    function loadSubcategories(categoryId, selectedSubId = null) {
+        if (!categoryId) {
+            subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
+            return;
+        }
 
-    <button class="btn btn-success">Update</button>
-    <a href="{% url 'adminpanel:product_list' %}" class="btn btn-secondary">Back</a>
-</form>
+        fetch(`/admin-panel/subcategories/${categoryId}/`)
+            .then(res => res.json())
+            .then(data => {
+                subcategorySelect.innerHTML = '<option value="">Select Subcategory</option>';
 
+                data.forEach(sub => {
+                    const selected = String(sub.id) === String(selectedSubId) ? 'selected' : '';
+                    subcategorySelect.innerHTML += `<option value="${sub.id}" ${selected}>${sub.name}</option>`;
+                });
+            })
+            .catch(err => console.error('Error:', err));
+    }
 
+    loadSubcategories(categorySelect.value, '{{ product.subcategory.id }}');
 
+    categorySelect.addEventListener('change', function () {
+        loadSubcategories(this.value);
+    });
+
+    // =========================
+    // VARIANTS
+    // =========================
+    const addVariantBtn = document.getElementById('addVariantBtn');
+    const variantsContainer = document.getElementById('variantsContainer');
+
+    let variantCount = document.querySelectorAll('.variant-box').length;
+
+    // =========================
+    // CREATE IMAGE INPUT
+    // =========================
+    function createImageInput(variantNum, existingFileName = "") {
+
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('file-name', 'image-item');
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.name = `variants[${variantNum}][images][]`;
+
+        const fileLabel = document.createElement('span');
+        fileLabel.classList.add('file-label');
+        fileLabel.innerText = existingFileName || "No file chosen";
+
+        input.addEventListener("change", function () {
+            fileLabel.innerText = this.files[0]?.name || "No file chosen";
+        });
+
+        const removeBtn = document.createElement('span');
+        removeBtn.innerHTML = '✖';
+        removeBtn.classList.add('remove-variant-image');
+
+        removeBtn.addEventListener('click', () => {
+            wrapper.remove();
+        });
+
+        wrapper.appendChild(input);
+        wrapper.appendChild(fileLabel);
+        wrapper.appendChild(removeBtn);
+
+        return wrapper;
+    }
+
+    // =========================
+    // EVENT DELEGATION (BEST)
+    // =========================
+    document.addEventListener('click', function (e) {
+
+        // ❌ REMOVE VARIANT
+        if (e.target.classList.contains('remove-variant')) {
+            e.target.closest('.variant-box').remove();
+        }
+
+        // ➕ ADD IMAGE
+        if (e.target.classList.contains('btn-add-image')) {
+            const variantBox = e.target.closest('.variant-box');
+            const imagesContainer = variantBox.querySelector('.images-container');
+
+            const variantNum = Array.from(document.querySelectorAll('.variant-box')).indexOf(variantBox);
+
+            imagesContainer.appendChild(createImageInput(variantNum));
+        }
+
+        // ❌ REMOVE IMAGE (EXISTING + NEW)
+        if (e.target.classList.contains('remove-variant-image')) {
+
+            const imageItem = e.target.closest('.file-name');
+            const deleteInput = imageItem.querySelector('.delete-flag');
+
+            if (deleteInput) {
+                // EXISTING IMAGE → mark delete
+                deleteInput.value = "1";
+                imageItem.style.display = "none";
+            } else {
+                // NEW IMAGE → remove
+                imageItem.remove();
+            }
+        }
+    });
+
+    // =========================
+    // FILE NAME UPDATE (EDIT PAGE)
+    // =========================
+    document.addEventListener('change', function (e) {
+
+        if (e.target.type === 'file') {
+
+            const label = e.target.parentElement.querySelector('.file-label');
+
+            if (label) {
+                label.innerText = e.target.files[0]?.name || "No file chosen";
+            }
+        }
+    });
+
+    // =========================
+    // ADD NEW VARIANT
+    // =========================
+    addVariantBtn.addEventListener('click', () => {
+
+        const index = variantCount++;
+
+        let colorOptions = `<option value="">Select Color</option>`;
+        {% for color in colors %}
+            colorOptions += `<option value="{{ color.id }}">{{ color.name }}</option>`;
+        {% endfor %}
+
+        const variantBox = document.createElement('div');
+        variantBox.classList.add('variant-box', 'category-form-card');
+
+        variantBox.innerHTML = `
+            <span class="remove-variant">✖</span>
+
+            <div class="form-group">
+                <label>Color</label>
+                <select name="variants[${index}][color]" class="category-input" required>
+                    ${colorOptions}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Stock</label>
+                <input type="number" name="variants[${index}][stock]" class="category-input" required>
+            </div>
+
+            <div class="form-group">
+                <label>Images</label>
+                <div class="images-container"></div>
+                <button type="button" class="btn-add-image btn-primary">+ Add Image</button>
+            </div>
+        `;
+
+        variantsContainer.appendChild(variantBox);
+    });
+
+});</script>
 {% endblock %}

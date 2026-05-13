@@ -1,0 +1,233 @@
+/* ================= RESET ================= */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body{
+    background: #f4f6fb;
+}
+
+/* ================= NAVBAR ================= */
+.navbar{
+    background: #1f3b6f;
+    color: #fff;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ================= LAYOUT ================= */
+.container{
+    display: flex;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar{
+    width: 230px;
+    background: #eef1f8;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.sidebar a{
+    display: block;
+    padding: 12px;
+    margin-bottom: 10px;
+    color: #333;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.sidebar a.active,
+.sidebar a:hover{
+    background: #1f3b6f;
+    color: #fff;
+}
+
+/* ================= MAIN CONTENT ================= */
+.main{
+    flex: 1;
+    padding: 30px;
+}
+
+/* ================= DASHBOARD TOP ================= */
+.dashboard-top {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* ================= CARDS ================= */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 cards per row */
+    gap: 20px;
+}
+
+.dashboard-btn{
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Dashboard Card */
+.dashboard-card{
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    width: 190px;
+    height: 130px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: all 0.35s ease;
+}
+
+/* Hover Lift */
+.dashboard-card:hover{
+    transform: translateY(-8px);
+    box-shadow: 0 18px 35px rgba(0,0,0,0.15);
+}
+
+/* Glow Effect */
+.dashboard-card::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(99,102,241,0.15),
+        transparent
+    );
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.dashboard-card:hover::before{
+    opacity: 1;
+}
+
+/* Click Animation */
+.dashboard-card:active{
+    transform: scale(0.96);
+}
+
+/* Card Text */
+.dashboard-card p{
+    font-size: 26px;
+}
+
+.dashboard-card h5{
+    margin: 10px 0 6px;
+    color: #555;
+}
+
+.dashboard-card h2{
+    font-size: 30px;
+    font-weight: 700;
+    color: #1f3b6f;
+}
+
+/* ================= PIE CHART ================= */
+.chart-wrapper{
+     flex: 0 0 25%; 
+    width: 250px;   /* 👈 size ghatadi */
+    height: 250px;  /* 👈 size ghatadi */
+}
+#orderPieChart{
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ================= TABLE (IF USED) ================= */
+.orders-table{
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.orders-table th{
+    background: #1f3b6f;
+    color: #fff;
+    padding: 14px;
+    text-align: left;
+}
+
+.orders-table td{
+    padding: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.orders-table tr:hover{
+    background: #f1f5ff;
+}
+
+/* ================= STATUS ================= */
+.status{
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.status.placed{ color: orange; }
+.status.outfordelivery{ color: #2563eb; }
+.status.delivered{ color: green; }
+
+/* ================= EMPTY MESSAGE ================= */
+.no-orders{
+    text-align: center;
+    padding: 20px;
+    color: gray;
+}
+
+/* ACTIVE ORDERS */
+
+.active-orders{
+    margin-top:30px;
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.active-orders h3{
+    margin-bottom:15px;
+}
+
+.active-orders-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.active-orders-table th,
+.active-orders-table td{
+    padding:10px;
+    text-align: center;
+    border-bottom:1px solid #eee;
+}
+
+.status{
+    padding:5px 10px;
+    border-radius:6px;
+    font-size:13px;
+}
+
+.status.assigned{
+    background:#e3f2fd;
+    color:#1976d2;
+}
+
+.status.delivery{
+    background:#fff3cd;
+    color:#856404;
+}

@@ -1,203 +1,284 @@
-{% extends 'admin/base.html' %}
+{% extends "admin/base.html" %}
+{% load static %}
 
 {% block extra_css %}
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
 {% endblock %}
 
 {% block content %}
+<h2 class="dashboard-title">📊 Admin Dashboard</h2>
 
-<h2 class="mb-4">Dashboard</h2>
+<!-- DASHBOARD CARDS -->
+<div class="dashboard-grid">
+  <a href="{% url 'adminpanel:product_list' %}" class="dash-card blue">
+    <div class="dash-icon">📦</div>
+    <div>
+      <p>Total Products</p>
+      <h3>{{ total_products }}</h3>
+    </div>
+  </a>
 
+  <a href="{% url 'adminpanel:orders_list' %}" class="dash-card purple">
+    <div class="dash-icon">🛒</div>
+    <div>
+      <p>Total Orders</p>
+      <h3>{{ total_orders }}</h3>
+    </div>
+  </a>
+
+  <a href="{% url 'adminpanel:revenue_dashboard'%}" class="dash-card green">
+    <div class="dash-icon">💰</div>
+    <div>
+      <p>Total Revenue</p>
+      <h3>₹{{ total_revenue |floatformat:0}}</h3>
+    </div>
+  </a>
+
+  <a href="{% url 'adminpanel:lens_list' %}" class="dash-card orange">
+    <div class="dash-icon">👓</div>
+    <div>
+      <p>Total Lenses</p>
+      <h3>{{ total_lenses }}</h3>
+    </div>
+  </a>
+
+  <a href="{% url 'adminpanel:user_list' %}" class="dash-card teal">
+    <div class="dash-icon">👤</div>
+    <div>
+      <p>Total Users</p>
+      <h3>{{ total_users }}</h3>
+    </div>
+  </a>
+
+  <a href="{% url 'adminpanel:low_stock_products' %}" class="dash-card red">
+    <div class="dash-icon">⚠️</div>
+    <div>
+      <p>Low Stock</p>
+      <h3>{{ low_stock }}</h3>
+    </div>
+  </a>
+</div>
+
+<!-- CHARTS -->
+<div class="charts-row">
+  <div class="mini-chart-card">
+    <h4>📦 Order Status</h4>
+    <div class="mini-chart-box">
+      <div class="chart-box">
+      <canvas id="orderPieChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="mini-chart-card">
+    <h4>💵 Weekly Revenue</h4>
+    <div class="mini-chart-box">
+      <div class="chart-box">
+      <canvas id="weeklyRevenueChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- LATEST PRODUCTS -->
+<!-- <div class="dash-section">
+  <h4>🆕 Latest Products</h4>
+  <div class="latest-products">
+    {% for product in latest_products %}
+      <div class="latest-item">
+        <span>{{ product.name }}</span>
+        <span class="price">₹{{ product.price }}</span>
+      </div>
+    {% empty %}
+      <p class="muted">No products found</p>
+    {% endfor %}
+  </div>
+</div> -->
+
+<!-- COMPANY CARD -->
+<div class="company-card">
+  {% if company.logo %}
+    <img src="{{ company.logo.url }}" class="company-logo">
+  {% endif %}
+  <div>
+    <h3>{{ company.name }}</h3>
+    <p>📍 {{ company.address }}</p>
+    <p>📞 {{ company.phone }} | 📧 {{ company.email }}</p>
+  </div>
+  
+</div>
+<div class="dashboard-actions">
+    {% if company %}
+    <a href="{% url 'adminpanel:company_update' %}" class="btn-primary">✏️ Edit Company Info</a>
+    {% else %}
+    <a href="{% url 'adminpanel:company_create' %}" class="btn-success">➕ Add Company Info</a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<div class="row g-4">
-
-    <!-- Stats Cards -->
-    <div class="col-md-3">
-        <div class="card stat p-3 text-center">
-            <h6>Total Products</h6>
-            <h3>{{ total_products }}</h3>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card stat p-3 text-center">
-            <h6>Orders</h6>
-            <h3>{{ total_orders }}</h3>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card stat p-3 text-center">
-            <h6>Revenue</h6>
-            <h3>₹{{ total_revenue }}</h3>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card stat p-3 text-center">
-            <h6>Lenses</h6>
-            <h3>{{ total_lenses }}</h3>
-        </div>
-    </div>
-
-    <!-- Latest Products -->
-    <div class="col-md-6">
-        <div class="card stat p-3">
-            <h6>Latest Products</h6>
-            {% for product in latest_products %}
-                <div>{{ product.name }} – ₹{{ product.price }}</div>
-            {% empty %}
-                <p>No products found</p>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Low Stock Alerts -->
-    <div class="col-md-6">
-        <div class="card stat p-3">
-            <h6>Low Stock Alerts</h6>
-            {% if low_stock_products %}
-                {% for product in low_stock_products %}
-                    <div class="text-danger">
-                        {{ product.name }} — Stock: {{ product.stock }}
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No low stock products</p>
-            {% endif %}
-        </div>
-    </div>
-
-</div>
-
-<hr class="my-4">
-
-<h4>Low Stock Products</h4>
-<canvas id="lowStockChart" height="120"></canvas>
-
-<!-- JSON safe data for JS -->
-{{ low_stock_names|json_script:"lowStockLabels" }}
-{{ low_stock_values|json_script:"lowStockValues" }}
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
 <script>
-const lowStockCtx = document.getElementById('lowStockChart');
+document.addEventListener("DOMContentLoaded", function () {
 
-if (lowStockCtx) {
-    const lowStockLabels = JSON.parse(document.getElementById('lowStockLabels').textContent);
-    const lowStockValues = JSON.parse(document.getElementById('lowStockValues').textContent);
+  const isDark = () => document.body.classList.contains("dark-mode");
+  const textColor = () => isDark() ? "#e5e7eb" : "#0f172a";
+  const gridColor = () => isDark() ? "#1e293b" : "#e5e7eb";
 
-    new Chart(lowStockCtx, {
-        type: 'bar',
-        data: {
-            labels: lowStockLabels,
-            datasets: [{
-                label: 'Stock Left',
-                data: lowStockValues,
-                backgroundColor: 'rgba(220, 53, 69, 0.7)',
-                borderRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
+  /* =====================
+     CENTER TOTAL PLUGIN
+  ===================== */
+  const centerTextPlugin = {
+    id: "centerText",
+    afterDraw(chart) {
+      const { ctx, chartArea: { width, height } } = chart;
+      const total = chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      ctx.font = "700 24px Segoe UI";
+      ctx.fillStyle = textColor();
+      ctx.fillText(total, width/2, height/2 - 6);
+
+      ctx.font = "500 13px Segoe UI";
+      ctx.fillStyle = isDark() ? "#94a3b8" : "#64748b";
+      ctx.fillText("Total Orders", width/2, height/2 + 16);
+
+      ctx.restore();
+    }
+  };
+
+  /* =====================
+     ORDER STATUS PIE
+  ===================== */
+  const orderLabels = JSON.parse('{{ order_labels|escapejs }}');
+  const orderData = JSON.parse('{{ order_values|escapejs }}');
+
+  let pieChart;
+
+  function renderPie() {
+    if (pieChart) pieChart.destroy();
+
+    pieChart = new Chart(document.getElementById("orderPieChart"), {
+      type: "doughnut",
+      plugins: [ChartDataLabels, centerTextPlugin],
+      data: {
+        labels: orderLabels,
+        datasets: [{
+          data: orderData,
+          backgroundColor: isDark()
+            ? ["#818cf8","#22c55e","#facc15","#fb7185","#38bdf8"]
+            : ["#6366f1","#16a34a","#f59e0b","#ef4444","#0ea5e9"],
+          borderColor: isDark() ? "#020617" : "#fff",
+          borderWidth: 2,
+          hoverOffset: 16,
+          hoverBorderWidth: 4,
+          cutout: "70%"
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { color: textColor() }
+          },
+          tooltip: {
+            callbacks: {
+              label(ctx) {
+                const value = ctx.raw;
+                const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+                const percent = ((value/total)*100).toFixed(1);
+                return ` ${ctx.label}: ${value} (${percent}%)`;
+              }
             }
+          },
+          datalabels: {
+            color: "#fff",
+            font: { weight: "700", size: 12 },
+            formatter(value, ctx) {
+              const total = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+              return ((value/total)*100).toFixed(0) + "%";
+            }
+          }
         }
+      }
     });
-}
+  }
+
+  renderPie();
+
+  /* =====================
+     WEEKLY REVENUE LINE
+  ===================== */
+  const weeklyLabels = JSON.parse('{{ weekly_labels|escapejs }}');
+  const weeklyData = JSON.parse('{{ weekly_data|escapejs }}');
+
+  let lineChart;
+
+  function renderLine() {
+    if (lineChart) lineChart.destroy();
+
+    lineChart = new Chart(document.getElementById("weeklyRevenueChart"), {
+      type: "line",
+      data: {
+        labels: weeklyLabels,
+        datasets: [{
+          label: "Revenue",
+          data: weeklyData,
+          borderColor: "#2563eb",
+          backgroundColor: "rgba(37,99,235,0.15)",
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: textColor() } }
+        },
+        scales: {
+          x: {
+            ticks: { color: textColor() },
+            grid: { color: gridColor() }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: textColor(),
+              callback: v => "₹" + v
+            },
+            grid: { color: gridColor() }
+          }
+        }
+      }
+    });
+  }
+
+  renderLine();
+
+  /* =====================
+     AUTO UPDATE ON DARK MODE
+  ===================== */
+  new MutationObserver(() => {
+    renderPie();
+    renderLine();
+  }).observe(document.body, {
+    attributes: true,
+    attributeFilter: ["class"]
+  });
+
+});
 </script>
 
-<hr class="my-4">
-
-<h4>Monthly Revenue</h4>
-
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Month</th>
-            <th>Total Revenue (₹)</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for r in monthly_revenue %}
-        <tr>
-            <td>{{ r.month|date:"F Y" }}</td>
-            <td>₹{{ r.total }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="2">No revenue data</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<canvas id="revenueChart" height="120"></canvas>
-
-<!-- JSON safe data for revenue chart -->
-{{ revenue_months|json_script:"revenueLabels" }}
-{{ revenue_values|json_script:"revenueData" }}
-
-<script>
-const revenueCtx = document.getElementById('revenueChart');
-
-if (revenueCtx) {
-    const revenueLabels = JSON.parse(document.getElementById('revenueLabels').textContent);
-    const revenueData = JSON.parse(document.getElementById('revenueData').textContent);
-
-    new Chart(revenueCtx, {
-        type: 'line',
-        data: {
-            labels: revenueLabels,
-            datasets: [{
-                label: 'Revenue (₹)',
-                data: revenueData,
-                borderColor: 'rgba(13, 110, 253, 1)',
-                backgroundColor: 'rgba(13, 110, 253, 0.2)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-}
-</script>
-
-<hr class="my-4">
-
-<!-- Company Info Card -->
-<div class="card shadow-sm mb-4">
-    <div class="card-body d-flex align-items-center">
-
-        {% if company.logo %}
-            <img src="{{ company.logo.url }}"
-                 class="me-4 rounded"
-                 style="width:90px;height:90px;object-fit:cover;">
-        {% endif %}
-
-        <div>
-            <h3 class="mb-1">{{ company.name }}</h3>
-            <p class="mb-1 text-muted">📍 {{ company.address }}</p>
-            <p class="mb-0">📞 {{ company.phone }} | 📧 {{ company.email }}</p>
-
-            {% if company.gst_number %}
-                <small class="text-secondary">GST: {{ company.gst_number }}</small>
-            {% endif %}
-        </div>
-
-    </div>
-</div>
-
-<div class="text-end">
-    <a href="{% url 'adminpanel:update_company_info' %}" class="btn btn-primary btn-sm">
-        ✏️ Edit Company Info
-    </a>
-</div>
 
 {% endblock %}

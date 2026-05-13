@@ -1,0 +1,160 @@
+/* =========================
+   BODY & GENERAL
+========================= */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: #f5f5f5;
+    color: #333;
+}
+
+h1, h2, h3 { font-weight: 700; }
+p { color: #555; margin-bottom: 15px; }
+
+/* =========================
+   BUTTONS
+========================= */
+.btn {
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn.primary {
+    background: linear-gradient(90deg, #18a8b2, #e8e8e8);
+    color: #fff;
+}
+
+.btn.primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255,102,0,0.3);
+}
+
+.btn.secondary {
+    background: #333;
+    color: #fff;
+}
+
+.btn.secondary:hover { background: #555; }
+
+/* =========================
+   HERO SECTION
+========================= */
+/* HERO SECTION */
+.home-hero {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    height: 500px;
+    margin: 40px auto;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.home-hero::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    background: rgba(0,0,0,0.3); /* dark overlay */
+    z-index: 2; /* on top of hero-slide */
+}
+
+.hero-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.hero-slide {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    z-index: 1; /* behind blur overlay */
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.hero-slide.show {
+    opacity: 1;
+    z-index: 1; /* still behind blur overlay */
+}
+
+.overlay {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff; /* make text visible over overlay */
+    z-index: 3; /* above blur */
+}
+
+.hero-buttons a { margin: 10px; }
+
+/* RESPONSIVE */
+@media screen and (max-width: 768px) {
+    .home-hero { height: 350px; width: 95%; }
+    .overlay h1 { font-size: 2rem; }
+    .overlay p { font-size: 1rem; }
+}
+
+.hero-content h1 { font-size: 3rem; margin-bottom: 15px; }
+.hero-content p { font-size: 1.2rem; margin-bottom: 25px; }
+
+/* =========================
+   SECTIONS
+========================= */
+.home-info, .three-col-section { padding: 60px 20px; text-align: center; }
+.home-info h2, .three-col-section h2 { font-size: 2.4rem; margin-bottom: 30px; }
+
+/* =========================
+   GRID & CARDS
+========================= */
+.three-col-grid {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 30px;
+}
+
+.col-box {
+    background: #fff;
+    border-radius: 15px;
+    padding: 25px;
+    flex: 1 1 260px;
+    max-width: 280px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.col-box:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+/* TOP CATEGORIES IMAGE FIX */
+.three-col-grid .col-box img {
+    width: 100%;         /* Makes image fill the container width */
+    height: 200px;       /* Fixed height, adjust as needed */
+    object-fit: cover;   /* Ensures image is cropped proportionally */
+    border-radius: 8px;  /* Optional: rounded corners */
+    display: block;
+}
+
+
+.product-box img { width: 100%; border-radius: 12px; margin-bottom: 15px; }
+
+/* GRAY BACKGROUND SECTION */
+.gray { background-color: #f1f1f1; }
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media screen and (max-width: 768px) {
+    .hero-content h1 { font-size: 2rem; }
+    .hero-content p { font-size: 1rem; }
+    .three-col-grid { flex-direction: column; gap: 20px; }
+}

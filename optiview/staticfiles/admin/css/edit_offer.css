@@ -1,0 +1,90 @@
+.create-offer-page {
+  padding: 24px;
+}
+
+/* Card */
+.category-form-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: var(--card-shadow);
+}
+
+.category-heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* Form */
+.category-form .form-group {
+  margin-bottom: 16px;
+}
+
+.category-form label {
+  display: block;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.category-form input,
+.category-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.category-form input:focus,
+.category-form select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+}
+
+.or-text {
+  text-align: center;
+  margin: 12px 0;
+  font-weight: bold;
+  color: var(--text-muted);
+}
+
+.checkbox label {
+  font-weight: 500;
+}
+
+/* Buttons */
+.btn-primary {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  opacity: .9;
+}
+.discount-warning {
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+/* Alerts */
+.alert {
+  background: #ffe6e6;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  color: #900;
+}

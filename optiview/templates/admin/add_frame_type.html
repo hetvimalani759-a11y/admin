@@ -1,0 +1,85 @@
+<!-- add_frame_type.html -->
+{% extends "admin/base.html" %}
+
+{% block extra_css %}
+<style>
+.frame-type-page {
+    padding: 24px;
+}
+
+/* Card wrapper */
+.frame-type-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+    box-shadow: var(--card-shadow);
+}
+
+/* Heading */
+.frame-type-card h2 {
+    color: var(--text-main);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+/* Form */
+.frame-type-card label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.frame-type-card input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.frame-type-card input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+}
+
+/* Button */
+.frame-type-card button {
+    padding: 10px;
+    width: 100%;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.frame-type-card button:hover {
+    opacity: .9;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="frame-type-page">
+  <div class="frame-type-card">
+    <h2>Add Frame Type</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="name">Frame Type Name:</label>
+        <input type="text" name="name" id="name" required>
+        <button type="submit">Add</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

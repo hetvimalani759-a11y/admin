@@ -1,65 +1,151 @@
 {% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/subcategories.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="subcategories-page">
+  <div class="row g-4">
 
-<h2>Add SubCategory</h2>
+    <!-- LEFT: Add Subcategory -->
+    <div class="col-md-4">
+      <div class="sub-form-card">
+        <h4 class="subcategory-heading ripple-text">➕ Add Subcategory</h4>
 
-<div class="row">
-  <!-- LEFT: Add Subcategory -->
-  <div class="col-md-4">
-    <h5>Add Subcategory</h5>
+        <form method="post" class="sub-form">
+          {% csrf_token %}
 
-    {% if messages %}
-      {% for message in messages %}
-        <div class="alert alert-success">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category" required>
+              <option value="">Select Category</option>
+              {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
 
-    <form method="post">
-      {% csrf_token %}
-
-      <div class="mb-3">
-        <label>Category</label>
-        <select name="category" class="form-control" required>
-          <option value="">Select Category</option>
-          {% for category in categories %}
-            <option value="{{ category.id }}">{{ category.name }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="mb-3">
-        <label>Subcategory Name</label>
-        <input type="text" name="name" class="form-control" required>
-      </div>
-
-      <button class="btn btn-primary w-100">Add Subcategory</button>
-    </form>
-  </div>
-
-  <!-- RIGHT: Subcategory Table -->
-  <div class="col-md-8">
-    <h5>Subcategories</h5>
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Subcategory</th>
-          <th>Category</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for sub in subcategories %}
-        <tr>
-          <td>{{ forloop.counter }}</td>
-          <td>{{ sub.name }}</td>
-          <td>{{ sub.category.name }}</td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="3">No subcategories yet</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+          <div class="form-group">
+            <label>Subcategory Name</label>
+            <input type="text" name="name" required>
+          </div>
+          <div class="form-group">
+  <label style="display:flex; align-items:center; gap:8px;">
+    <input type="checkbox" name="allow_lens">
+    Allow Lens Selection
+  </label>
 </div>
 
+          <button type="submit" class="btn-primary w-100">Add Subcategory</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- RIGHT: Subcategory Table -->
+    <div class="col-md-8">
+      <div class="sub-table-card">
+        <h4 class="subcategory-heading ripple-text">📂 Subcategories</h4>
+
+        <table class="subcategory-table">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Subcategory</th>
+              <th>Category</th>
+              <th>Allow Lens</th>
+              <th class="actions-col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for sub in subcategories %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ sub.name }}</td>
+              <td>{{ sub.category.name }}</td>
+              <td>
+  {% if sub.allow_lens %}
+      ✅
+  {% else %}
+      ❌
+  {% endif %}
+</td>
+              <td class="actions">
+                <button type="button"
+                        class="btn-edit"
+                        onclick="location.href='{% url 'adminpanel:edit_subcategory' sub.id %}'">
+                  Edit
+                </button>
+                <button type="button"
+                        class="btn-delete"
+                        data-id="{{ sub.id }}"
+                        data-name="{{ sub.name }}">
+                  Delete
+                </button>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4" class="no-data">No subcategories yet</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Delete Modal -->
+  <div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
+      <h5>Delete Subcategory</h5>
+      <p id="deleteText"></p>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" id="cancelDelete">Cancel</button>
+        <form id="deleteForm" method="post">
+          {% csrf_token %}
+          <button type="submit" class="modal-confirm">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".btn-delete");
+    const modal = document.getElementById("deleteModal");
+    const deleteText = document.getElementById("deleteText");
+    const deleteForm = document.getElementById("deleteForm");
+    const cancelBtn = document.getElementById("cancelDelete");
+
+    deleteButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const subId = this.dataset.id;
+            const subName = this.dataset.name;
+
+            deleteText.textContent = `Are you sure you want to delete "${subName}"?`;
+            deleteForm.action = `/admin-panel/subcategory/delete/${subId}/`; // must match urls.py
+
+            modal.style.display = "flex";
+        });
+    });
+
+    // Close modal on cancel
+    cancelBtn.addEventListener("click", function () {
+        modal.style.display = "none";
+    });
+
+    // Close modal when clicking outside modal box
+    modal.addEventListener("click", function (e) {
+        if (e.target === modal) modal.style.display = "none";
+    });
+});
+
+</script>
 {% endblock %}

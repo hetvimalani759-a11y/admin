@@ -1,0 +1,108 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* ===== PAGE ===== */
+.stock-page {
+    padding: 24px;
+}
+
+/* ===== CARD ===== */
+.stock-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+/* ===== HEADINGS ===== */
+.stock-page h2 {
+    color: var(--text-main);
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+/* ===== TABLE ===== */
+.stock-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.stock-table th,
+.stock-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--card-border);
+    text-align: left;
+    color: var(--text-main);
+}
+
+.stock-table thead {
+    background: var(--table-head);
+}
+
+.stock-table tbody tr:hover {
+    background: rgba(99, 102, 241, .06);
+}
+
+/* ===== STATUS ===== */
+.status-low {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.status-in {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+/* ===== EMPTY ===== */
+.no-data {
+    text-align: center;
+    padding: 18px;
+    color: var(--text-muted);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stock-page">
+    <h2>Stock Report</h2>
+
+    <div class="stock-card">
+        {% if variants %}
+        <table class="stock-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Variant</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in variants %}
+                <tr>
+                    <td>{{ v.product.name }}</td>
+                    <td>{{ v.color }}</td>
+                    <td>{{ v.stock }}</td>
+                    <td>
+                        {% if v.stock <= 5 %}
+                            <span class="status-low">Low Stock</span>
+                        {% else %}
+                            <span class="status-in">In Stock</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="no-data">No products found.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/edit_offer.css' %}">
+<!-- Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="create-offer-page">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="category-form-card">
+        <h4 class="category-heading ripple-text">✏️ Edit Offer</h4>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="category-form">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label>Offer Name</label>
+            <input type="text" name="name" value="{{ offer.name }}" required>
+          </div>
+
+          <div class="form-group">
+            <label>Discount Type</label>
+            <select name="discount_type" required>
+                <option value="percent" {% if offer.discount_type == "percent" %}selected{% endif %}>Percentage (%)</option>
+                <option value="flat" {% if offer.discount_type == "flat" %}selected{% endif %}>Flat Amount (₹)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Discount Value</label>
+            <input type="number" step="0.01" name="discount_value" value="{{ offer.discount_value }}" required>
+          </div>
+
+          <div class="form-group">
+            <label>Apply To Product</label>
+            <select name="product" id="productSelect">
+                <option value="">-- Select Product --</option>
+                {% for p in products %}
+                    <option value="{{ p.id }}" {% if offer.product and offer.product.id == p.id %}selected{% endif %}>
+                        {{ p.name }}
+                    </option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="or-text">OR</div>
+
+          <div class="form-group">
+            <label>Apply To Category</label>
+            <select name="category" id="categorySelect">
+                <option value="">-- Select Category --</option>
+                {% for c in categories %}
+                    <option value="{{ c.id }}" {% if offer.category and offer.category.id == c.id %}selected{% endif %}>
+                        {{ c.name }}
+                    </option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Start Date</label>
+            <input type="text" id="start_date" name="start_date" value="{{ offer.start_date|date:'Y-m-d' }}" required>
+          </div>
+
+          <div class="form-group">
+            <label>End Date</label>
+            <input type="text" id="end_date" name="end_date" value="{{ offer.end_date|date:'Y-m-d' }}" required readonly>
+          </div>
+
+          <div class="form-group checkbox">
+            <label>
+              <input type="checkbox" name="is_active" {% if offer.is_active %}checked{% endif %}> Active
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary w-100">Update Offer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'admin/js/edit_offer.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+  // Initialize End Date
+  const endPicker = flatpickr("#end_date", {
+      dateFormat: "Y-m-d",
+      allowInput: false, // prevent typing
+  });
+
+  // Initialize Start Date
+  const startPicker = flatpickr("#start_date", {
+      dateFormat: "Y-m-d",
+      minDate: "today",
+      defaultDate: "{{ offer.start_date|date:'Y-m-d' }}",
+      onChange: function(selectedDates) {
+          if (selectedDates.length > 0) {
+              const startDate = selectedDates[0];
+
+              // End Date must be strictly after Start Date
+              const minEndDate = new Date(startDate);
+              minEndDate.setDate(minEndDate.getDate() + 1);
+
+              // Set End Date minDate
+              endPicker.set('minDate', minEndDate);
+
+              // Clear End Date if current value is invalid
+              const endDateVal = endPicker.selectedDates[0];
+              if (!endDateVal || endDateVal <= startDate) {
+                  endPicker.clear();
+              }
+          }
+      }
+  });
+
+  // Set initial minDate for End Date based on existing Start Date
+  const initialStartDate = startPicker.selectedDates[0];
+  if (initialStartDate) {
+      const minEndDate = new Date(initialStartDate);
+      minEndDate.setDate(minEndDate.getDate() + 1);
+      endPicker.set('minDate', minEndDate);
+
+      const endDateVal = endPicker.selectedDates[0];
+      if (!endDateVal || endDateVal <= initialStartDate) {
+          endPicker.clear();
+      }
+  }
+
+  // Form-level validation
+  const form = document.querySelector(".category-form");
+  form.addEventListener("submit", function(e) {
+      const startDate = startPicker.selectedDates[0];
+      const endDate = endPicker.selectedDates[0];
+
+      if (!startDate || !endDate) {
+          e.preventDefault();
+          alert("Please select both Start Date and End Date.");
+          return;
+      }
+
+      if (endDate <= startDate) {
+          e.preventDefault();
+          alert("End Date must be after Start Date!");
+          endPicker.input.focus();
+      }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+*{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Reuse categories CSS -->
+<link rel="stylesheet" href="{% static 'admin/css/categories.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="categories-page delivery-page">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="category-form-card">
+                <h4 class="category-heading ripple-text">🚚 Add Delivery Person</h4>
+
+                <form method="post" class="category-form">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input id="username" type="text" name="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input id="email" type="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input id="password" type="password" name="password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input id="phone" type="text" name="phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="joining_date">Joining Date</label>
+                        <input id="joining_date" type="date" name="joining_date" required min="{{ today_date }}">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary w-100">Add</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}*

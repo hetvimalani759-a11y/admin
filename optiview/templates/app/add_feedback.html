@@ -1,0 +1,96 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+
+<link rel="stylesheet" href="{% static 'app/css/feedback.css' %}">
+
+<style>
+
+/* Star Rating Style */
+.star-rating{
+display:flex;
+flex-direction:row-reverse;
+justify-content:flex-end;
+font-size:30px;
+margin-bottom:10px;
+}
+
+.star-rating input{
+display:none;
+}
+
+.star-rating label{
+color:#ccc;
+cursor:pointer;
+transition:0.2s;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label{
+color:#ffc107;
+}
+
+.star-rating input:checked ~ label{
+color:#ffc107;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="cart-page">
+    <h2 class="cart-title text-center">📝 Give Feedback for {{ item.product.name }}</h2>
+
+<div class="cart-layout">
+    <div class="cart-items">
+
+        <form method="POST" class="cart-row feedback-form">
+            {% csrf_token %}
+
+            <!-- Star Rating -->
+            <label>Rating:</label>
+
+            <div class="star-rating">
+
+                <input type="radio" name="rating" id="star5" value="5">
+                <label for="star5">★</label>
+
+                <input type="radio" name="rating" id="star4" value="4">
+                <label for="star4">★</label>
+
+                <input type="radio" name="rating" id="star3" value="3">
+                <label for="star3">★</label>
+
+                <input type="radio" name="rating" id="star2" value="2">
+                <label for="star2">★</label>
+
+                <input type="radio" name="rating" id="star1" value="1">
+                <label for="star1">★</label>
+
+            </div>
+
+            <!-- Comment -->
+            <label for="comment">Comment:</label>
+            <textarea id="comment" name="comment" rows="4" required></textarea>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-success w-100 mt-2">Submit Feedback</button>
+
+        </form>
+
+    </div>
+</div>
+
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<!-- Add any JS here if needed -->
+
+{% endblock %}

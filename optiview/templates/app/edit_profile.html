@@ -1,0 +1,221 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-container">
+    <div class="profile-card">
+
+        <h3 class="text-center mb-4">Edit Profile</h3>
+
+        <form method="POST" enctype="multipart/form-data" id="profileForm">
+            {% csrf_token %}
+
+            <!-- ===== PROFILE IMAGE ===== -->
+            <div class="profile-image text-center">
+                {% if profile.profile_image %}
+                    <img src="{{ profile.profile_image.url }}" alt="Profile Image">
+                {% else %}
+                    <img src="{% static 'images/default-user.png' %}" alt="Default Image">
+                {% endif %}
+                <input type="file" name="profile_image" class="form-control mt-3">
+            </div>
+
+            <!-- ===== USER DETAILS ===== -->
+            <div class="form-section">
+
+                <label>First Name</label>
+                <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control custom-input">
+
+                <label>Last Name</label>
+                <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control custom-input">
+
+                <label>Username</label>
+                <input type="text" name="username" value="{{ user.username }}" class="form-control custom-input">
+
+                <label>Email</label>
+                <input type="email" name="email" value="{{ user.email }}" class="form-control custom-input">
+
+                <label>Phone</label>
+                <input type="text" name="phone" value="{{ profile.phone }}" maxlength="10" class="form-control custom-input">
+
+                <label>Date of Birth</label>
+                <input type="date" name="dob" value="{{ profile.dob|date:'Y-m-d' }}" class="form-control custom-input">
+
+                <label>Gender</label>
+                <select name="gender" class="form-control custom-input">
+                    <option value="" disabled {% if not profile.gender %}selected{% endif %}>Select Gender</option>
+                    <option value="M" {% if profile.gender == 'M' %}selected{% endif %}>Male</option>
+                    <option value="F" {% if profile.gender == 'F' %}selected{% endif %}>Female</option>
+                </select>
+
+                <!-- ===== ADDRESS ===== -->
+
+                <label>Address</label>
+                <input type="text" name="address" id="address" value="{{ profile.address }}" class="form-control custom-input">
+
+                <label>Area</label>
+                <input type="text" name="area" id="area" value="{{ profile.area }}" class="form-control custom-input">
+
+                <!-- ✅ STATE DROPDOWN -->
+                <label>State</label>
+                <select name="state" id="state" class="form-control">
+                    <option value="">Select State</option>
+                    <option value="Gujarat" {% if profile.state == "Gujarat" %}selected{% endif %}>Gujarat</option>
+                    <option value="Maharashtra" {% if profile.state == "Maharashtra" %}selected{% endif %}>Maharashtra</option>
+                    <option value="Delhi" {% if profile.state == "Delhi" %}selected{% endif %}>Delhi</option>
+                    <option value="Rajasthan" {% if profile.state == "Rajasthan" %}selected{% endif %}>Rajasthan</option>
+                </select>
+
+                <!-- ✅ CITY DROPDOWN -->
+                <label>City</label>
+                <select name="city" id="city" class="form-control" data-selected="{{ profile.city }}">
+                    {% if profile.city %}
+                        <option value="{{ profile.city }}" selected>{{ profile.city }}</option>
+                    {% else %}
+                        <option value="">Select City</option>
+                    {% endif %}
+                </select>
+
+                <label>Pincode</label>
+                <input type="text" name="pincode" id="pincode" value="{{ profile.pincode }}" class="form-control custom-input" readonly>
+
+            </div>
+
+            <!-- ===== BUTTONS ===== -->
+            <div class="profile-buttons mt-4 text-center">
+                <button type="submit" class="btn-light-custom">Save Changes</button>
+                <a href="{% url 'app:profile' %}" class="btn-light-custom">Cancel</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const stateSelect = document.getElementById("state");
+    const citySelect = document.getElementById("city");
+    const areaField = document.getElementById("area");
+    const pincodeField = document.getElementById("pincode");
+
+    // ✅ Load cities when state changes
+    stateSelect.addEventListener("change", function () {
+
+        const state = this.value;
+
+        if (!state) return;
+
+        fetch(`/api/get-cities/?state=${encodeURIComponent(state)}`)
+            .then(res => res.json())
+            .then(data => {
+
+                const selectedCity = citySelect.getAttribute("data-selected");
+
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                data.cities.forEach(city => {
+                    const option = document.createElement("option");
+                    option.value = city;
+                    option.textContent = city;
+
+                    if (city === selectedCity) {
+                        option.selected = true;
+                    }
+
+                    citySelect.appendChild(option);
+                });
+
+            });
+    });
+
+    // ✅ Auto trigger if state already selected (edit mode)
+    if (stateSelect.value) {
+        stateSelect.dispatchEvent(new Event("change"));
+    }
+
+    // ✅ Fetch pincode
+    function updatePincode() {
+
+        const state = stateSelect.value;
+        const city = citySelect.value;
+        const area = areaField.value;
+
+        if (!state || !city || !area) return;
+
+        fetch(`/api/get-pincode/?state=${state}&city=${city}&area=${area}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.pincode) {
+                    pincodeField.value = data.pincode;
+                } else {
+                    pincodeField.value = "";
+                }
+            });
+    }
+
+    citySelect.addEventListener("change", updatePincode);
+    areaField.addEventListener("blur", updatePincode);
+
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const stateField = document.getElementById("state");
+    const cityField = document.getElementById("city");
+    const areaField = document.getElementById("area");
+    const pincodeField = document.getElementById("pincode");
+
+    // ✅ Convert to Proper Case (fix capital issue)
+    function toTitleCase(str) {
+        return str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    [stateField, cityField, areaField].forEach(field => {
+        field.addEventListener("blur", function () {
+            this.value = toTitleCase(this.value.trim());
+            updatePincode();
+        });
+    });
+
+    // ✅ Fetch pincode automatically
+    function updatePincode() {
+
+        const state = stateField.value.trim();
+        const city = cityField.value.trim();
+        const area = areaField.value.trim();
+
+        if (!state || !city || !area) return;
+
+        fetch(`/api/get-pincode/?state=${encodeURIComponent(state)}&city=${encodeURIComponent(city)}&area=${encodeURIComponent(area)}`)
+            .then(res => {
+                if (!res.ok) throw new Error("API error");
+                return res.json();
+            })
+            .then(data => {
+                if (data.pincode) {
+                    pincodeField.value = data.pincode;
+                } else {
+                    pincodeField.value = "";
+                }
+            })
+            .catch(err => {
+                console.error("Pincode fetch error:", err);
+                pincodeField.value = "";
+            });
+    }
+
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,256 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/cart.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="cart-page">
+    <h2 class="cart-title text-center">🛒 My Cart</h2>
+
+    {% if items %}
+    <div class="cart-layout">
+
+        <!-- ================= CART ITEMS ================= -->
+        <div class="cart-items">
+            {% for item in items %}
+            <div class="cart-row" 
+                 data-id="{{ item.id }}" 
+                 data-variant-id="{% if item.variant %}{{ item.variant.id }}{% else %}0{% endif %}"
+                 data-stock="{% if item.variant %}{{ item.variant.stock }}{% else %}{{ item.product.stock }}{% endif %}">
+
+                <!-- Product Image -->
+                <div class="cart-img">
+    {% if item.variant and item.variant.images.all|length > 1 %}
+        <img src="{{ item.variant.images.all.1.image.url }}" alt="{{ item.product.name }}">
+    
+    {% elif item.variant and item.variant.images.first %}
+        <img src="{{ item.variant.images.first.image.url }}" alt="{{ item.product.name }}">
+    
+    {% else %}
+        {% with first_variant=item.product.variants.first %}
+            {% if first_variant and first_variant.images.all|length > 1 %}
+                <img src="{{ first_variant.images.all.1.image.url }}" alt="{{ item.product.name }}">
+            {% elif first_variant and first_variant.images.first %}
+                <img src="{{ first_variant.images.first.image.url }}" alt="{{ item.product.name }}">
+            {% else %}
+                <img src="{% static 'app/images/no-image.png' %}" alt="No Image">
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+</div>
+
+                <!-- Product Info -->
+                <div class="cart-info">
+                    <h6 class="cart-name">{{ item.product.name }}</h6>
+                       {% if item.lens %}
+<div class="lens-info" style="font-size:0.85rem;color:#555;margin-top:4px;">
+    Lens: {{ item.lens.name }}
+    (+ ₹{{ item.lens.additional_price|floatformat:0 }})
+</div>
+
+{% if item.left_eye_power or item.right_eye_power %}
+<div class="power-info" style="font-size:0.82rem;color:#777;">
+    👁 Left Eye: {{ item.left_eye_power|default:"-" }} |
+    Right Eye: {{ item.right_eye_power|default:"-" }}
+</div>
+{% endif %}
+
+<!-- <div class="lens-price" style="font-size:0.85rem;color:#333;margin-top:2px;">
+    Unit Price w/ Lens:
+    ₹{{ item.unit_price|add:item.lens.additional_price|floatformat:0 }}
+</div> -->
+{% endif %}
+                    <div class="price-row">
+                        {% with offer=item.product.get_best_offer %}
+                            {% if offer %}
+                                <span class="discounted-price" style="font-weight: bold; color: #5b4de0;">
+                                    ₹{{ item.product.get_final_price|floatformat:0 }}
+                                </span>
+                                <span class="original-price" style="text-decoration: line-through; color: #888; margin-left: 8px;">
+                                    ₹{{ item.product.price|floatformat:0 }}
+                                </span>
+                                {% if offer.discount_type == "percent" %}
+                                    <span class="discount-text" style="color: #28a745; margin-left: 5px; font-size: 0.85rem">
+                                        ({{ offer.discount_value }}% OFF)
+                                    </span>
+                                {% else %}
+                                    <span class="discount-text" style="color: #28a745; margin-left: 5px; font-size: 0.85rem">
+                                        (₹{{ offer.discount_value }} OFF)
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <span class="discounted-price" style="font-weight: bold; color: #5b4de0;">
+                                   ₹{{ item.product.price|floatformat:0 }}
+                                </span>
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+
+                <!-- Quantity Controls -->
+                <div class="qty-controls">
+                    <button type="button" class="qty-btn minus-btn">−</button>
+                    <span class="qty-number">{{ item.quantity }}</span>
+                    <button type="button" class="qty-btn plus-btn">+</button>
+                </div>
+
+                <!-- Remove Button -->
+                <button type="button" class="remove-btn">Remove</button>
+            </div>
+            {% endfor %}
+        </div><div class="items-box">
+
+    {% for item in cart_items %}
+    <div class="checkout-item"
+         data-id="{{ item.id }}"
+         data-stock="{% if item.variant %}{{ item.variant.stock }}{% else %}{{ item.product.stock }}{% endif %}"
+         data-original="{{ item.product.price }}"
+         data-final="{{ item.unit_price }}">
+
+      <!-- Product Image (Selected Variant) -->
+      {% if item.variant and item.variant.images.first %}
+        <img src="{{ item.variant.images.first.image.url }}" alt="{{ item.product.name }}">
+      {% else %}
+        {% with first_variant=item.product.variants.first %}
+          {% if first_variant and first_variant.images.first %}
+            <img src="{{ first_variant.images.first.image.url }}" alt="{{ item.product.name }}">
+          {% else %}
+            <img src="{% static 'app/images/no-image.png' %}" alt="No Image">
+          {% endif %}
+        {% endwith %}
+      {% endif %}
+
+      <!-- Product Info -->
+      <div class="item-info">
+        <div class="item-name">{{ item.product.name }}</div>
+                            {% if item.lens %}
+<div class="lens-info" style="font-size:0.85rem;color:#555;margin-top:4px;">
+    Lens: {{ item.lens.name }}
+    (+ ₹{{ item.lens.additional_price|floatformat:0 }})
+</div>
+
+{% if item.left_eye_power or item.right_eye_power %}
+<div class="power-info" style="font-size:0.82rem;color:#777;">
+    👁 Left Eye: {{ item.left_eye_power|default:"-" }} |
+    Right Eye: {{ item.right_eye_power|default:"-" }}
+</div>
+{% endif %}
+
+<!-- <div class="lens-price" style="font-size:0.85rem;color:#333;margin-top:2px;">
+    Unit Price w/ Lens:
+    ₹{{ item.unit_price|add:item.lens.additional_price|floatformat:0 }}
+</div> -->
+{% endif %}
+
+        <div class="item-price">
+          {% with offer=item.product.get_best_offer %}
+            {% if offer %}
+              <span class="discounted-price">₹{{ item.unit_price|floatformat:0 }}</span>
+              <span class="original-price">₹{{ item.product.price|floatformat:0 }}</span>
+              {% if offer.discount_type == "percent" %}
+                <span class="discount-text">({{ offer.discount_value }}% OFF)</span>
+              {% else %}
+                <span class="discount-text">(₹{{ offer.discount_value }} OFF)</span>
+              {% endif %}
+            {% else %}
+              <span class="discounted-price">₹{{ item.product.price|floatformat:0 }}</span>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+
+      <!-- Quantity Controls -->
+      <div class="qty-controls">
+        <button type="button" class="qty-btn minus-btn">−</button>
+        <span class="qty-number">{{ item.quantity }}</span>
+        <button type="button" class="qty-btn plus-btn" data-stock="{% if item.variant %}{{ item.variant.stock }}{% else %}{{ item.product.stock }}{% endif %}">+</button>
+      </div>
+
+      <!-- Remove Button -->
+      <a href="#" class="remove-btn" data-remove-url="{% url 'app:remove_from_cart' item.id %}">Remove</a>
+
+    </div>
+    {% endfor %}
+
+  </div>
+
+        <!-- ================= ORDER SUMMARY ================= -->
+        <div class="cart-summary">
+            <h5 class="text-center">Order Summary</h5>
+
+            <div class="summary-row">
+                <span>Items</span>
+                <span id="summaryItems">{{ items|length }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>Original Total</span>
+                <span>₹<span id="summaryOriginal">{{ original_total }}</span></span>
+            </div>
+
+            <div class="summary-row">
+                <span>Offer Discount</span>
+                <span class="text-success">− ₹<span id="summaryDiscount">{{ discount_total }}</span></span>
+            </div>
+
+            <div class="summary-row">
+                <span>Delivery</span>
+                <span id="summaryDelivery">
+                    {% if delivery_charge <= 0 %}Free 🎉{% else %}₹{{ delivery_charge }}{% endif %}
+                </span>
+            </div>
+
+            <hr>
+            {% if total_saved > 0 %}
+            <div class="saved-banner" id="saved-banner">🎉 You saved ₹{{ total_saved }}!</div>
+            {% endif %}
+
+            <div class="summary-row summary-total">
+                <span>Total Payable</span>
+                <span>₹<span id="summaryTotal">{{ grand_total }}</span></span>
+            </div>
+
+            <a href="{% url 'app:checkout' %}" class="checkout-btn btn btn-primary btn-lg w-100 mt-3">Checkout</a>
+
+            <div class="summary-actions text-center mt-2">
+                <a href="{% url 'app:shop' %}" class="add-more-link">➕ Add More Items</a>
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+    <!-- ================= EMPTY CART ================= -->
+    <div class="cart-empty text-center">
+        <h3>Your Cart is Empty 😔</h3>
+        <p>Looks like you haven’t added anything yet.</p>
+        <button class="btn-continue btn btn-primary" onclick="window.location.href='{% url 'app:shop' %}'">🛍 Continue Shopping</button>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ================= MODALS ================= -->
+<div class="modal-overlay" id="confirm-modal">
+    <div class="modal-box">
+        <p>Are you sure you want to remove this item?</p>
+        <div class="modal-actions">
+            <button id="confirm-yes" class="modal-confirm">Yes</button>
+            <button id="confirm-no" class="modal-cancel">No</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="stock-modal">
+    <div class="modal-box">
+        <p id="stock-text"></p>
+        <div class="modal-actions">
+            <button id="stock-ok" class="modal-confirm">OK</button>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="{% static 'app/js/cart.js' %}"></script>
+{% endblock %}
+{% endblock %}

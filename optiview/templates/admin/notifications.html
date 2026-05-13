@@ -1,17 +1,22 @@
 {% extends 'admin/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/notification.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="notifications-page">
+    <h3 class="ripple-text">🔔 Notifications</h3>
 
-<h3>Notifications</h3>
-
-{% for n in notifications %}
-    <div class="alert alert-info">
-        <b>{{ n.title }}</b><br>
-        {{ n.message }}<br>
-        <small>{{ n.created_at }}</small>
-    </div>
-{% empty %}
-    <p>No notifications</p>
-{% endfor %}
-
-
+    {% for n in notifications %}
+        <div class="alert">
+            <b>{{ n.title }}</b>
+            {{ n.message }}
+            <small>{{ n.created_at }}</small>
+        </div>
+    {% empty %}
+        <p>No notifications</p>
+    {% endfor %}
+</div>
 {% endblock %}

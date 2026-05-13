@@ -1,0 +1,80 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/mix.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-page">
+
+    <div class="profile-card">
+
+        <h4 class="profile-heading">Admin Profile</h4>
+
+        <!-- Profile Image -->
+        <div class="profile-image">
+
+            {% if profile.profile_image %}
+                <img src="{{ profile.profile_image.url }}" class="admin-avatar">
+            {% else %}
+                <img src="{% static 'admin/images/default-user.png' %}" class="admin-avatar">
+            {% endif %}
+
+        </div>
+
+        <div class="profile-info">
+
+            <div class="profile-field">
+                <span class="profile-label">First Name</span>
+                <span class="profile-value">{{ request.user.first_name }}</span>
+            </div>
+
+            <div class="profile-field">
+                <span class="profile-label">Last Name</span>
+                <span class="profile-value">{{ request.user.last_name }}</span>
+            </div>
+
+            <div class="profile-field">
+                <span class="profile-label">Username</span>
+                <span class="profile-value">{{ request.user.username }}</span>
+            </div>
+
+            <div class="profile-field">
+                <span class="profile-label">Email</span>
+                <span class="profile-value">{{ request.user.email }}</span>
+            </div>
+
+            <div class="profile-field">
+                <span class="profile-label">Phone</span>
+                <span class="profile-value">{{ profile.phone }}</span>
+            </div>
+
+            <div class="profile-field">
+                <span class="profile-label">Date of Birth</span>
+                <span class="profile-value">{{ profile.date_of_birth }}</span>
+            </div>
+
+            <div class="profile-field">
+                <span class="profile-label">Address</span>
+                <span class="profile-value">{{ profile.address }}</span>
+            </div>
+
+        </div>
+
+        <div class="profile-actions">
+            <a href="{% url 'adminpanel:edit_profile' %}" class="btn-save">
+                Edit Profile
+            </a>
+
+            <a href="{% url 'adminpanel:change_password' %}" class="btn-cancel">
+                Change Password
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

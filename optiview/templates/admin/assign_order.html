@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Assign Order</h2>
+
+<form method="POST">
+  {% csrf_token %}
+  <select name="order">
+    <option selected disabled>Select Order</option>
+    {% for o in orders %}
+      <option value="{{o.id}}">{{o.customer_name}} ({{o.status}})</option>
+    {% endfor %}
+  </select>
+
+  <select name="delivery_person">
+    <option selected disabled>Select Delivery Person</option>
+    {% for dp in delivery_persons %}
+      <option value="{{dp.id}}">{{dp.user.username}}</option>
+    {% endfor %}
+  </select>
+
+  <button type="submit">Assign</button>
+</form>
+{% endblock %}

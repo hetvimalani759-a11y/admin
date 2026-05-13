@@ -1,0 +1,243 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+.frame-shape-page {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.frame-shape-card {
+    width: 100%;
+    max-width: 750px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.frame-shape-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.frame-shape-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.btn-add {
+    background: var(--primary);
+    color: white;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.btn-add:hover {
+    opacity: .9;
+}
+
+.shape-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.shape-table th,
+.shape-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--card-border);
+    text-align: left;
+    color: var(--text-main);
+}
+
+.shape-table th {
+    background: var(--table-head);
+}
+
+.shape-table tbody tr:hover {
+    background: rgba(99,102,241,.06);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-edit {
+    background: #eef4ff;
+    color: #2563eb;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.btn-edit:hover {
+    background: #2563eb;
+    color: #fff;
+}
+
+.btn-delete {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: #fff;
+}
+
+.no-data {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+}
+
+/* ===== DELETE MODAL ===== */
+.custom-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.custom-modal.show {
+    display: flex;
+}
+
+.custom-modal-content {
+    background: var(--card-bg);
+    padding: 25px;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+}
+
+.btn-confirm-delete {
+    background: #dc2626;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.btn-cancel {
+    background: #e5e7eb;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="frame-shape-page">
+    <div class="frame-shape-card">
+
+        <div class="frame-shape-header">
+            <h2>Frame Shapes</h2>
+            <a href="{% url 'adminpanel:add_frame_shape' %}" class="btn-add">
+                + Add Frame Shape
+            </a>
+        </div>
+
+        <table class="shape-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th style="width:150px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shape in shapes %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ shape.name }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'adminpanel:edit_frame_shape' shape.id %}" class="btn-edit">
+                                Edit
+                            </a>
+
+                            <button class="btn-delete"
+                                onclick="openDeleteModal('{% url 'adminpanel:delete_frame_shape' shape.id %}', '{{ shape.name }}')">
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="no-data">
+                        No Frame Shapes Found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div id="deleteModal" class="custom-modal">
+    <div class="custom-modal-content">
+        <h3>Delete Frame Shape</h3>
+        <p id="deleteMessage"></p>
+
+        <form method="POST" id="deleteForm">
+            {% csrf_token %}
+            <button type="submit" class="btn-confirm-delete">
+                Yes, Delete
+            </button>
+            <button type="button" class="btn-cancel" onclick="closeDeleteModal()">
+                Cancel
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+function openDeleteModal(url, name) {
+    document.getElementById("deleteForm").action = url;
+    document.getElementById("deleteMessage").innerText =
+        "Are you sure you want to delete '" + name + "'?";
+    document.getElementById("deleteModal").classList.add("show");
+}
+
+function closeDeleteModal() {
+    document.getElementById("deleteModal").classList.remove("show");
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById("deleteModal");
+    if (event.target === modal) {
+        closeDeleteModal();
+    }
+};
+</script>
+
+{% endblock %}

@@ -1,93 +1,113 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Optiview Goggles</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
+{% extends 'app/base.html' %}
+{% load static %}
 
-<header class="header">
-    <div class="logo">Optiview</div>
-    <nav>
-        <a href="/">Home</a>
-        <a href="/about/">About</a>
-        <a href="/contact/">Contact</a>
-        <a href="/shop/">Shop</a>
-        <a href="/products/">products</a>
-        <a href="/lenses/">lenses</a>
-    </nav>
-</header> 
-<br>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/home.css' %}">
+{% endblock %}
 
-<!-- HERO IMAGE WITH TEXT -->
+{% block content %}
+
+<!-- HERO SLIDESHOW -->
 <section class="home-hero">
     <div class="hero-content">
-        <h1>Premium Goggles Collection</h1>
-        <p>Style • Safety • Comfort</p>
+        {% if images %}
+            {% for image in images %}
+                <img class="hero-slide {% if forloop.first %}show{% endif %}" 
+                     src="{{ image.image.url }}" 
+                     alt="{{ image.title }}">
+            {% endfor %}
+        {% else %}
+            <p>No hero images available.</p>
+        {% endif %}
 
-        <div class="hero-buttons">
-            <a href="/about/" class="btn primary">Explore More</a>
-            <a href="/contact/" class="btn secondary">Contact Us</a>
+        <div class="overlay">
+            <h1>Premium Goggles Collection</h1>
+            <p>Style • Safety • Comfort</p>
+            <div class="hero-buttons">
+                <a href="/about/" class="btn primary">Explore More</a>
+                <a href="/contact/" class="btn secondary">Contact Us</a>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- INFO SECTION -->
-<section class="home-info">
+<!-- WHY OPTIVIEW -->
+<section class="three-col-section">
     <h2>Why Optiview?</h2>
-    <p>
-        Optiview delivers high-quality goggles designed for clarity,
-        comfort and everyday protection.
+    <p class="center-text">
+        Optiview delivers high-quality goggles designed for clarity, comfort, and everyday protection.
     </p>
 </section>
 
-<footer class="figma-footer">
+<!-- TOP CATEGORIES -->
+<section class="three-col-section gray">
+    <h2>Top Categories</h2>
+    <div class="three-col-grid">
+        {% for category in categories %}
+        <div class="col-box" onclick="redirectToCategory({{ category.id }})">
+        <img src="{{ category.image.url }}" alt="{{ category.name }}">
+        <h3>{{ category.name }}</h3>
+        <p>Click to view products</p>
+    </div>
+{% endfor %}
 
-    <div class="footer-grid">
-
-        <div class="footer-col">
-            <h4>Optiview</h4>
-            <p>
-                Premium goggles designed for style,
-                comfort and eye protection.
-            </p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Quick Links</h4>
-            <p><a href="/">Home</a></p>
-            <p><a href="/shop/">Shop</a></p>
-            <p><a href="/about/">About Us</a></p>
-            <p><a href="/contact/">Contact</a></p>
-            <p><a href="/products/">products</a></p>
-            <p><a href="/lenses/">lenses</a></p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Contact</h4>
-            <p>Email: info@optiview.com</p>
-            <p>Phone: +91 98765 43210</p>
-            <p>Mon - Sat: 9AM - 8PM</p>
-        </div>
-
-        <div class="footer-col">
-            <h4>Follow Us</h4>
-            <p>Facebook</p>
-            <p>Instagram</p>
-            <p>Twitter</p>
-        </div>
+<script>
+function redirectToCategory(categoryId) {
+    window.location.href = `/shop/?category=${categoryId}`;
+}
+</script>
 
     </div>
+</section>
 
-    <div class="footer-brand">
-        <h2>Optiview</h2>
-        <p>© 2026 Optiview. All rights reserved.</p>
+<!-- Products display area -->
+<!-- <div id="products-container"></div>
+
+<script>
+function showProducts(categoryId) {
+    fetch(`/categories/${categoryId}/`)
+    .then(response => response.text())
+    .then(html => {
+        document.getElementById('products-container').innerHTML = html;
+    })
+    .catch(err => console.error(err));
+}
+</script> -->
+
+
+<!-- LATEST PRODUCTS -->
+<section class="three-col-section">
+    <h2>Latest Products</h2>
+    <div class="three-col-grid">
+        {% for product in latest_products %}
+            <div class="col-box product-box">
+                 <!-- IMAGE SLIDER -->
+<div class="product-image"  >
+    {% if product.variants.exists %}
+        {% with first_variant=product.variants.all.0 %}
+            {% if first_variant.images.all %}
+                <img src="{{ first_variant.images.all.0.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <img src="{% static 'app/images/default.png' %}" alt="{{ product.name }}">
+            {% endif %}
+        {% endwith %}
+    {% else %}
+        <img src="{% static 'app/images/default.png' %}" alt="{{ product.name }}">
+    {% endif %}
+</div>
+                <h3>{{ product.name }}</h3>
+                <p>₹{{ product.price }}</p>
+                <a href="{% url 'app:product_detail' product.id %}" class="btn">Buy Now</a>
+            </div>
+        {% empty %}
+            <p>No products available yet.</p>
+        {% endfor %}
     </div>
-
-</footer>
-
+</section>
 
 
-</body>
-</html>
+
+{% block extra_js %}
+<script src="{% static 'app/js/home.js' %}"></script>
+{% endblock %}
+{% endblock %}

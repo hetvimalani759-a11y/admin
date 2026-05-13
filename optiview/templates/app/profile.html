@@ -1,0 +1,65 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'app/css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-container">
+    <div class="profile-card">
+        
+        <!-- Profile Image -->
+        <div class="profile-image">
+            {% if profile.profile_image %}
+                <img src="{{ profile.profile_image.url }}" alt="Profile Image">
+            {% else %}
+                <img src="{% static 'images/default-user.png' %}" alt="Default Profile Image">
+            {% endif %}
+        </div>
+
+        <!-- Name Display -->
+        <h4 class="profile-name">
+            {% if user.first_name or user.last_name %}
+                {{ user.first_name }} {{ user.last_name }}
+            {% else %}
+                {{ user.username }}
+            {% endif %}
+        </h4>
+
+        <!-- Profile Details -->
+        <div class="profile-info">
+            <p><span>First Name:</span> {{ user.first_name|default:"Not Added" }}</p>
+            <p><span>Last Name:</span> {{ user.last_name|default:"Not Added" }}</p>
+            <p><span>Username:</span> {{ user.username }}</p>
+            <p><span>Email:</span> {{ user.email|default:"Not Added" }}</p>
+            <p><span>Phone:</span> {{ profile.phone|default:"Not Added" }}</p>
+            <p><span>Date of Birth:</span> {{ profile.dob|date:"d M Y"|default:"Not Added" }}</p>
+            <p><span>Gender:</span>
+                {% if profile.gender == "M" %} Male
+                {% elif profile.gender == "F" %} Female
+                {% else %} Not Added
+                {% endif %}
+            </p>
+            <p><span>Address:</span> {{ profile.address|default:"Not Added" }}</p>
+            <p><span>Area:</span> {{ profile.area|default:"Not Added" }}</p>
+            <p><span>City:</span> {{ profile.city|default:"Not Added" }}</p>
+            <p><span>State:</span> {{ profile.state|default:"Not Added" }}</p>
+            <p><span>Pincode:</span> {{ profile.pincode|default:"Not Added" }}</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="profile-buttons">
+            <a href="{% url 'app:edit_profile' %}" class="btn-light-custom">
+                Edit Profile
+            </a>
+            <a href="{% url 'app:change_password' %}" class="btn-dark-custom">
+                Change Password
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

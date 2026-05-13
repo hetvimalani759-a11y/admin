@@ -1,0 +1,96 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* ===== Page Container ===== */
+.frame-shape-page {
+  padding: 24px;
+}
+
+/* ===== Card ===== */
+.frame-shape-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+  max-width: 500px;
+  margin: auto;
+}
+
+/* Heading */
+.frame-shape-card h4 {
+  color: var(--text-main);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+/* Form */
+.frame-shape-card .form-group {
+  margin-bottom: 14px;
+}
+
+.frame-shape-card label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.frame-shape-card input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.frame-shape-card input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+}
+
+/* Button */
+.btn-primary {
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-primary:hover {
+  opacity: .9;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="frame-shape-page">
+  <div class="frame-shape-card">
+    <h4>➕ Add Frame Shape</h4>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Shape Name</label>
+        <input type="text" name="name" required>
+      </div>
+
+      <button type="submit" class="btn-primary">
+        Add Frame Shape
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

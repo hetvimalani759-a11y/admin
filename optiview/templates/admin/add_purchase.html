@@ -1,0 +1,168 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+/* ===== PAGE CONTAINER ===== */
+.add-purchase-page {
+    padding: 24px;
+}
+
+/* ===== CARD ===== */
+.purchase-form-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+/* ===== HEADINGS ===== */
+.add-purchase-page h2 {
+    color: var(--text-main);
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.add-purchase-page h4 {
+    color: var(--text-main);
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 12px;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.add-purchase-page label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.add-purchase-page select,
+.add-purchase-page input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.add-purchase-page input:focus,
+.add-purchase-page select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+}
+
+/* ===== PRODUCTS ROW ===== */
+#items div {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+#items select,
+#items input {
+    flex: 1;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+.btn-add {
+    background: #eef4ff;
+    color: #2563eb;
+}
+
+.btn-add:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-submit {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-submit:hover {
+    opacity: 0.9;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="add-purchase-page">
+    <h2>Add Purchase</h2>
+
+    <div class="purchase-form-card">
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Dealer:</label>
+            <select name="dealer" required>
+                {% for dealer in dealers %}
+                    <option value="{{ dealer.id }}">{{ dealer.name }}</option>
+                {% endfor %}
+            </select>
+
+            <label>Bill Number:</label>
+            <input type="text" name="bill_number" required>
+
+            <h4>Products</h4>
+            <div id="items">
+                <div>
+                    <select name="variant">
+                        {% for variant in variants %}
+                            <option value="{{ variant.id }}">
+                                {{ variant.product.name }} - {{ variant.color }}
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <input type="number" name="quantity" placeholder="Qty" required>
+                    <input type="number" step="0.01" name="cost_price" placeholder="Cost Price" required>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-add" onclick="addRow()">+ Add More</button>
+
+            <br><br>
+            <button type="submit" class="btn btn-submit">Save Purchase</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function addRow() {
+    let div = document.createElement("div");
+    div.innerHTML = `
+        <select name="variant">
+            {% for variant in variants %}
+                <option value="{{ variant.id }}">
+                    {{ variant.product.name }} - {{ variant.color }}
+                </option>
+            {% endfor %}
+        </select>
+        <input type="number" name="quantity" placeholder="Qty" required>
+        <input type="number" step="0.01" name="cost_price" placeholder="Cost Price" required>
+    `;
+    document.getElementById("items").appendChild(div);
+}
+</script>
+{% endblock %}

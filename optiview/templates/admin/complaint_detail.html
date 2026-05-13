@@ -1,0 +1,82 @@
+{% extends "admin/base.html" %}
+
+{% block content %}
+
+<style>
+
+/* DARK MODE SUPPORT */
+body.dark-mode h2 {
+    color: #f9fafb;
+}
+
+body.dark-mode .complaint-box {
+    background: #1f2937 !important;
+    color: #f9fafb;
+}
+
+body.dark-mode .desc-box {
+    background: #374151 !important;
+    color: #e5e7eb;
+}
+
+/* Optional: improve buttons in dark mode */
+body.dark-mode a {
+    opacity: 0.95;
+}
+
+</style>
+
+
+<h2>Complaint Detail</h2>
+
+<div class="complaint-box" style="background:white;padding:20px;border-radius:8px;width:600px">
+
+<p><b>Complaint ID :</b> #{{ complaint.id }}</p>
+
+<p><b>User :</b> {{ complaint.user.username }}</p>
+
+<p><b>Order :</b> #{{ complaint.order_item.order.id }}</p>
+
+<p><b>Reason :</b> {{ complaint.reason }}</p>
+
+<p><b>Description :</b></p>
+
+<p class="desc-box" style="background:#f5f5f5;padding:10px;border-radius:5px">
+{{ complaint.description }}
+</p>
+
+<p><b>Status :</b> {{ complaint.status }}</p>
+
+<p><b>Date :</b> {{ complaint.created_at }}</p>
+
+<br>
+
+{% if complaint.status == "pending" %}
+
+<a href="{% url 'adminpanel:resolve_complaint' complaint.id %}"
+style="background:rgb(104, 89, 218);color:white;padding:8px 15px;text-decoration:none;border-radius:5px;">
+Resolve
+</a>
+
+<a href="{% url 'adminpanel:reject_complaint' complaint.id %}"
+style="background:rgb(200, 104, 104);color:white;padding:8px 15px;text-decoration:none;border-radius:5px;">
+Reject
+</a>
+
+{% elif complaint.status == "resolved" %}
+
+<span style="background:rgb(26, 156, 26);color:white;padding:8px 15px;border-radius:5px;">
+Resolved
+</span>
+
+{% elif complaint.status == "rejected" %}
+
+<span style="background:rgb(175, 94, 94);color:white;padding:8px 15px;border-radius:5px;">
+Rejected
+</span>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

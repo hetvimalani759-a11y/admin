@@ -1,0 +1,215 @@
+.products-page {
+  padding: 24px;
+}
+
+/* Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.category-heading {
+  color: var(--text-main);
+}
+
+/* Add Button */
+.btn-add {
+  background: var(--primary);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-add:hover {
+  opacity: .9;
+}
+
+/* Search */
+.search-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+
+.btn-search {
+    
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  border: 1px solid var(--card-border)
+}
+
+/* Card */
+.table-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: var(--card-shadow);
+}
+
+/* Table */
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.product-table thead {
+  background: var(--table-head);
+}
+
+.product-table th,
+.product-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--card-border);
+  text-align: left;
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.product-table tbody tr:hover {
+  background: rgba(99, 102, 241, .06);
+}
+
+/* Image */
+.img-col {
+  width: 80px;
+}
+
+.product-img {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+}
+
+/* Actions */
+.actions-col {
+  width: 140px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Buttons (same as Category) */
+.btn-edit,
+.btn-delete {
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-edit {
+  background: #eef4ff;
+  color: #2563eb;
+}
+
+.btn-edit:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* Empty */
+.no-data {
+  text-align: center;
+  padding: 18px;
+  color: var(--text-muted);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, .45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 22px;
+  width: 100%;
+  max-width: 380px;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+}
+
+.modal-box h5 {
+  margin-bottom: 10px;
+  color: var(--text-main);
+}
+
+.modal-box p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-cancel {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-main);
+}
+
+.modal-confirm {
+  background: #dc3545;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+.modal-confirm:hover {
+  opacity: .9;
+}

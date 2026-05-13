@@ -1,0 +1,167 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/order_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="custom-order-container">
+
+<!-- ================= ORDER HEADER ================= -->
+<div class="custom-card header-card">
+
+    <div class="header-left">
+        <h2>📦 Order #{{ order.id }}</h2>
+        <p><strong>Date:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+        <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+    </div>
+
+    <!-- STATUS -->
+    <div class="status-badge">
+        {% if order.status == "delivered" %}
+            Delivered
+        {% elif order.status == "cancelled" %}
+            Cancelled
+        {% elif order.status == "partially_delivered" %}
+            Partially Delivered
+        {% elif order.status == "out_for_delivery" %}
+            Out For Delivery
+        {% else %}
+            Processing
+        {% endif %}
+    </div>
+
+</div>
+
+
+<!-- ================= CUSTOMER ================= -->
+<div class="custom-card">
+    <div class="section-title">👤 Customer Information</div>
+
+    <div class="section-content">
+        <p><strong>Name:</strong> 
+    {% if order.full_name %}
+        {{ order.full_name }}
+    {% elif order.user %}
+        {{ order.user.username }}
+    {% else %}
+        Guest User
+    {% endif %}
+</p>
+
+<p><strong>Username:</strong> 
+    {{ order.user.username|default:"-" }}
+</p>
+        <p><strong>Phone:</strong> {{ order.phone }}</p>
+    </div>
+</div>
+
+
+<!-- ================= ADDRESS ================= -->
+<div class="custom-card">
+    <div class="section-title">🚚 Delivery Address</div>
+
+    <div class="section-content">
+        <p>{{ order.address }}</p>
+        <p>{{ order.city }}, {{ order.state }}</p>
+        <p><strong>Pincode:</strong> {{ order.pincode }}</p>
+    </div>
+</div>
+
+
+<!-- ================= ITEMS ================= -->
+<div class="custom-card">
+    <div class="section-title">🛒 Order Items</div>
+
+    <div class="table-wrapper">
+        <table class="custom-table">
+
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+
+                    <td>
+                        <strong>{{ item.product.name }}</strong>
+
+                        {% if item.variant %}
+                            <br><small>Color: {{ item.variant.color }}</small>
+                        {% endif %}
+
+                        {% if item.lens %}
+                            <br><small>Lens: {{ item.lens.name }}</small>
+                        {% endif %}
+
+                        {% if item.left_eye_power or item.right_eye_power %}
+                            <br>
+                            <small>
+                                Power:
+                                L {{ item.left_eye_power|default:"-" }} |
+                                R {{ item.right_eye_power|default:"-" }}
+                            </small>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ item.quantity }}</td>
+
+                    <td>₹{{ item.price|floatformat:0 }}</td>
+
+                    <td>
+                        {% if item.status == "delivered" %}
+                            <span class="badge bg-success">Delivered</span>
+                        {% elif item.status == "cancelled" %}
+                            <span class="badge bg-danger">Cancelled</span>
+                        {% elif item.status == "out_for_delivery" %}
+                            <span class="badge bg-warning">Out</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Processing</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="total-col">
+                        ₹{{ item.total_price|floatformat:0 }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="empty">
+                        No items found
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+
+<!-- ================= TOTAL ================= -->
+<div class="grand-total-box">
+    💰 Grand Total: ₹{{ order.get_total_amount|floatformat:0 }}
+</div>
+
+
+<!-- ================= BACK ================= -->
+<div class="back-btn-wrapper">
+    <a href="{% url 'adminpanel:orders_list' %}" class="back-btn">
+        ← Back to Orders
+    </a>
+</div>
+
+</div>
+
+{% endblock %}

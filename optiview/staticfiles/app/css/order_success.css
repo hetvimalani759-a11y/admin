@@ -1,0 +1,65 @@
+.ov-success-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.ov-popup-card {
+  background: #fff;
+  padding: 36px 46px;
+  border-radius: 14px;
+  text-align: center;
+  animation: ovScaleIn .35s ease;
+}
+
+.ov-checkmark {
+  width: 90px;
+  height: 90px;
+  margin-bottom: 10px;
+}
+
+.ov-checkmark-circle {
+  stroke: #28a745;
+  stroke-width: 4;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: ovCircle .6s ease forwards;
+}
+.btn{
+    background-color: #149b1d;
+    color: rgb(0, 0, 0);
+    padding: 10px 20px;
+    border-radius: 8px;
+    /* border-radius: 5px; */
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+.ov-checkmark-check {
+  stroke: #28a745;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: ovCheck .4s .6s ease forwards;
+}
+
+.ov-hidden { display: none !important; }
+
+@keyframes ovCircle { to { stroke-dashoffset: 0; } }
+@keyframes ovCheck { to { stroke-dashoffset: 0; } }
+@keyframes ovScaleIn {
+  from { transform: scale(.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+#ov-confetti-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100000;
+}

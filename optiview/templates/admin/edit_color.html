@@ -1,0 +1,106 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<!-- <link rel="stylesheet" href="{% static 'app/css/admin.css' %}"> -->
+<style>
+/* Page wrapper */
+.edit-color-page {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Card */
+.edit-color-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: var(--card-shadow);
+}
+
+/* Heading */
+.edit-color-card h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+/* Form */
+.edit-color-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.edit-color-card label {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.edit-color-card input[type="text"] {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--card-border);
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-size: 14px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.edit-color-card input[type="text"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, .15);
+    outline: none;
+}
+
+/* Button */
+.edit-color-card button {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.edit-color-card button:hover {
+    opacity: .9;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="edit-color-page">
+    <div class="edit-color-card">
+        <h2>Edit Color: {{ color.name }}</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <label for="name">Color Name:</label>
+            <input type="text"
+                   id="name"
+                   name="name"
+                   value="{{ color.name }}"
+                   required>
+
+            <label for="code">Hex Code (Optional):</label>
+            <input type="text"
+                   id="code"
+                   name="code"
+                   value="{{ color.code }}">
+
+            <button type="submit">Update Color</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
